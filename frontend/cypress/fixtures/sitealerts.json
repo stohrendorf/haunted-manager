@@ -1,0 +1,9 @@
+{
+  "announcements": [
+    {
+      "background_color": "danger",
+      "message": "some failure alert",
+      "text_color": "success"
+    }
+  ]
+}

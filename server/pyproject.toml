@@ -1,0 +1,42 @@
+[tool.poetry]
+name = "haunted-server"
+version = "0.1.0"
+description = "EdisonEngine Ghost Sharing Server"
+authors = ["Steffen Ohrendorf <steffen.ohrendorf@gmx.de>"]
+license = "GPL-3"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+Django = "*"
+Jinja2 = "*"
+django-cors-headers = "*"
+dataclasses-json = "*"
+pyhumps = "*"
+PyYAML = "*"
+django-email-verification = "*"
+
+[tool.poetry.dev-dependencies]
+black = "*"
+isort = "*"
+pytest = "*"
+pytest-django = "*"
+requests = "*"
+
+flake8 = "*"
+flake8-black = "*"
+flake8-coding = "*"
+flake8-commas = "*"
+flake8-isort = "*"
+flake8-quotes = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.black]
+target_version = ["py38"]
+line-length = 120
