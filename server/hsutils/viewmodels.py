@@ -40,6 +40,24 @@ class AnnouncementsResponse:
 
 @dataclass_json
 @dataclass(kw_only=True)
+class ChangeEmailRequest:
+    email: str
+
+    def validate(self):
+        validate_change_email_request(self)
+
+
+@dataclass_json
+@dataclass(kw_only=True)
+class ChangePasswordRequest:
+    password: str
+
+    def validate(self):
+        validate_change_password_request(self)
+
+
+@dataclass_json
+@dataclass(kw_only=True)
 class CreateSessionRequest:
     description: str
     tags: list[int]
@@ -190,6 +208,22 @@ def validate_announcements_response(data: AnnouncementsResponse):
         raise SchemaValidationError("AnnouncementsResponse.announcements")
     for field_data in data.announcements:
         validate_announcement_entry(field_data)
+    return
+
+
+def validate_change_email_request(data: ChangeEmailRequest):
+    if data.email is None:
+        raise SchemaValidationError("ChangeEmailRequest.email")
+    if len(data.email) < 1:
+        raise SchemaValidationError("ChangeEmailRequest.email")
+    return
+
+
+def validate_change_password_request(data: ChangePasswordRequest):
+    if data.password is None:
+        raise SchemaValidationError("ChangePasswordRequest.password")
+    if len(data.password) < 1:
+        raise SchemaValidationError("ChangePasswordRequest.password")
     return
 
 
@@ -525,6 +559,48 @@ class register:
         @json_response
         def request_handler(request) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
             rq: RegisterRequest = RegisterRequest.schema().loads(request.body.decode())
+            rq.validate()
+            response = fn(request, rq)
+            if isinstance(response, tuple):
+                code, response = response
+            else:
+                code = HttpResponse.status_code
+            response.validate()
+            return code, response
+
+        return path(cls.path, request_handler, name=cls.operation)
+
+
+class change_password:
+    path = "api/v0/auth/change-password"
+    operation = "change_password"
+
+    @classmethod
+    def wrap(cls, fn: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse]):
+        @json_response
+        def request_handler(request) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+            rq: ChangePasswordRequest = ChangePasswordRequest.schema().loads(request.body.decode())
+            rq.validate()
+            response = fn(request, rq)
+            if isinstance(response, tuple):
+                code, response = response
+            else:
+                code = HttpResponse.status_code
+            response.validate()
+            return code, response
+
+        return path(cls.path, request_handler, name=cls.operation)
+
+
+class change_email:
+    path = "api/v0/auth/change-email"
+    operation = "change_email"
+
+    @classmethod
+    def wrap(cls, fn: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse]):
+        @json_response
+        def request_handler(request) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+            rq: ChangeEmailRequest = ChangeEmailRequest.schema().loads(request.body.decode())
             rq.validate()
             response = fn(request, rq)
             if isinstance(response, tuple):

@@ -42,6 +42,14 @@ class RegisterRequest(Compound):
     email = StringField(min_length=1)
 
 
+class ChangePasswordRequest(Compound):
+    password = StringField(min_length=1)
+
+
+class ChangeEmailRequest(Compound):
+    email = StringField(min_length=1)
+
+
 class Tag(Compound):
     id = IntegerField()
     name = StringField(min_length=1)
@@ -174,6 +182,20 @@ endpoints = (
         method="post",
         response=SuccessResponse(),
         body=RegisterRequest(),
+    ),
+    Endpoint(
+        operation_name="changePassword",
+        path="/api/v0/auth/change-password",
+        method="post",
+        response=SuccessResponse(),
+        body=ChangePasswordRequest(),
+    ),
+    Endpoint(
+        operation_name="changeEmail",
+        path="/api/v0/auth/change-email",
+        method="post",
+        response=SuccessResponse(),
+        body=ChangeEmailRequest(),
     ),
     Endpoint(
         operation_name="logout",

@@ -17,9 +17,9 @@ from django.http import (
 from django_email_verification import send_email, verify_email_view, verify_token
 
 from haunted_auth.models import ApiKey
-from haunted_sessions.models import Session, Tag
 from hsutils.viewmodels import (
-    CreateSessionRequest,
+    ChangeEmailRequest,
+    ChangePasswordRequest,
     Empty,
     LoginRequest,
     ProfileInfoResponse,
@@ -104,6 +104,32 @@ def regenerate_token(request: HttpRequest) -> Union[tuple[int, Empty], Empty]:
         pass
     request.user.api_key = ApiKey.objects.create(owner=request.user)
     return Empty()
+
+
+@login_required
+def change_password(request: HttpRequest, body: ChangePasswordRequest) -> SuccessResponse:
+    try:
+        validate_password(body.password, request.user)
+    except ValidationError as e:
+        return SuccessResponse(
+            success=False,
+            message="Your new password is not secure enough for the following reasons:\n" + "\n".join(e.messages),
+        )
+
+    request.user.set_password(body.password)
+    request.user.save()
+    return SuccessResponse(success=True, message="password changed")
+
+
+@login_required
+def change_email(request: HttpRequest, body: ChangeEmailRequest) -> SuccessResponse:
+    if User.objects.filter(email=body.email).exists():
+        return SuccessResponse(success=False, message="Email address already in use.")
+
+    request.user.email = body.email
+    request.user.save()
+    send_email(request.user)
+    return SuccessResponse(success=True, message="email changed")
 
 
 @verify_email_view

@@ -8,6 +8,12 @@ export interface IAnnouncementEntry {
 export interface IAnnouncementsResponse {
   announcements: IAnnouncementEntry[];
 }
+export interface IChangeEmailRequest {
+  email: string;
+}
+export interface IChangePasswordRequest {
+  password: string;
+}
 export interface ICreateSessionRequest {
   description: string;
   tags: number[];
@@ -89,6 +95,22 @@ function validateAnnouncementsResponse(data: IAnnouncementsResponse): void {
   for (const fieldData of data.announcements) {
     validateAnnouncementEntry(fieldData);
   }
+}
+function validateChangeEmailRequest(data: IChangeEmailRequest): void {
+  if (data.email === undefined)
+    throw new SchemaValidationError("ChangeEmailRequest.email");
+  if (data.email === null)
+    throw new SchemaValidationError("ChangeEmailRequest.email");
+  if (data.email.length < 1)
+    throw new SchemaValidationError("ChangeEmailRequest.email");
+}
+function validateChangePasswordRequest(data: IChangePasswordRequest): void {
+  if (data.password === undefined)
+    throw new SchemaValidationError("ChangePasswordRequest.password");
+  if (data.password === null)
+    throw new SchemaValidationError("ChangePasswordRequest.password");
+  if (data.password.length < 1)
+    throw new SchemaValidationError("ChangePasswordRequest.password");
 }
 function validateCreateSessionRequest(data: ICreateSessionRequest): void {
   if (data.description === undefined)
@@ -319,6 +341,28 @@ export async function register(
   validateRegisterRequest(body);
   const result = (await post(
     "/api/v0/auth/register",
+    body
+  )) as ISuccessResponse;
+  validateSuccessResponse(result);
+  return result;
+}
+export async function changePassword(
+  body: IChangePasswordRequest
+): Promise<ISuccessResponse> {
+  validateChangePasswordRequest(body);
+  const result = (await post(
+    "/api/v0/auth/change-password",
+    body
+  )) as ISuccessResponse;
+  validateSuccessResponse(result);
+  return result;
+}
+export async function changeEmail(
+  body: IChangeEmailRequest
+): Promise<ISuccessResponse> {
+  validateChangeEmailRequest(body);
+  const result = (await post(
+    "/api/v0/auth/change-email",
     body
   )) as ISuccessResponse;
   validateSuccessResponse(result);

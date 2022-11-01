@@ -147,6 +147,7 @@ EMAIL_MAIL_HTML = "email_confirmation_body.html.j2"
 EMAIL_MAIL_PLAIN = "email_confirmation_body.txt.j2"
 EMAIL_MAIL_SUBJECT = "Confirm your email"
 EMAIL_MAIL_PAGE_TEMPLATE = "confirm_template.html"
+EMAIL_MAIL_TOKEN_LIFE = 60 * 60
 
 if DEBUG:
     CORS_ALLOW_CREDENTIALS = True
@@ -155,7 +156,6 @@ if DEBUG:
     ALLOWED_HOSTS = ("localhost", "127.0.0.1")
 
     EMAIL_FROM_ADDRESS = "noreply@example.com"
-    EMAIL_MAIL_TOKEN_LIFE = 60 * 60
     EMAIL_PAGE_DOMAIN = "https://example.com/"
 
     # For Django Email Backend
@@ -167,7 +167,6 @@ if DEBUG:
     EMAIL_USE_TLS = True
 else:
     EMAIL_FROM_ADDRESS = "noreply@example.com"
-    EMAIL_MAIL_TOKEN_LIFE = 60 * 60
     EMAIL_PAGE_DOMAIN = "https://example.com/"
 
     # For Django Email Backend
