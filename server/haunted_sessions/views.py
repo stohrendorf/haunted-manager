@@ -1,13 +1,18 @@
 from typing import Union
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.db.transaction import atomic
 from django.http import HttpRequest, HttpResponseNotFound
+from django.views.decorators.csrf import csrf_exempt
 
+from haunted_auth.models import ApiKey
 from hsutils.viewmodels import (
     CreateSessionRequest,
     DeleteSessionRequest,
     Session,
+    SessionAccessRequest,
     SessionsResponse,
     SessionTag,
     SuccessResponse,
@@ -70,6 +75,26 @@ def delete_session(request, body: DeleteSessionRequest) -> Union[tuple[int, Succ
         message=f"session {body.session_id} deleted",
         success=True,
     )
+
+
+@csrf_exempt
+def check_session_access(request: HttpRequest, body: SessionAccessRequest) -> SuccessResponse:
+    if body.api_key != settings.SESSION_CHECK_API_KEY:
+        return SuccessResponse(success=False, message="invalid api key")
+
+    try:
+        user = get_user_model().objects.get(username=body.username)
+    except get_user_model().DoesNotExist:
+        return SuccessResponse(success=False, message="user does not exist")
+    try:
+        auth_token = ApiKey.objects.get(owner=user)
+    except ApiKey.DoesNotExist:
+        return SuccessResponse(success=False, message="auth token not found")
+    if auth_token.key != body.auth_token:
+        return SuccessResponse(success=False, message="invalid auth token")
+    if not SessionModel.objects.filter(key=body.session_id).exists():
+        return SuccessResponse(success=False, message="session does not exist")
+    return SuccessResponse(success=True, message="")
 
 
 @login_required

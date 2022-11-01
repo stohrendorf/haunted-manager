@@ -44,6 +44,12 @@ export interface ISession {
   owner: string;
   tags: ISessionTag[];
 }
+export interface ISessionAccessRequest {
+  api_key: string;
+  auth_token: string;
+  session_id: string;
+  username: string;
+}
 export interface ISessionTag {
   description: string;
   name: string;
@@ -213,6 +219,32 @@ function validateSession(data: ISession): void {
     validateSessionTag(fieldData);
   }
 }
+function validateSessionAccessRequest(data: ISessionAccessRequest): void {
+  if (data.api_key === undefined)
+    throw new SchemaValidationError("SessionAccessRequest.api_key");
+  if (data.api_key === null)
+    throw new SchemaValidationError("SessionAccessRequest.api_key");
+  if (data.api_key.length < 1)
+    throw new SchemaValidationError("SessionAccessRequest.api_key");
+  if (data.auth_token === undefined)
+    throw new SchemaValidationError("SessionAccessRequest.auth_token");
+  if (data.auth_token === null)
+    throw new SchemaValidationError("SessionAccessRequest.auth_token");
+  if (data.auth_token.length < 1)
+    throw new SchemaValidationError("SessionAccessRequest.auth_token");
+  if (data.session_id === undefined)
+    throw new SchemaValidationError("SessionAccessRequest.session_id");
+  if (data.session_id === null)
+    throw new SchemaValidationError("SessionAccessRequest.session_id");
+  if (data.session_id.length < 1)
+    throw new SchemaValidationError("SessionAccessRequest.session_id");
+  if (data.username === undefined)
+    throw new SchemaValidationError("SessionAccessRequest.username");
+  if (data.username === null)
+    throw new SchemaValidationError("SessionAccessRequest.username");
+  if (data.username.length < 1)
+    throw new SchemaValidationError("SessionAccessRequest.username");
+}
 function validateSessionTag(data: ISessionTag): void {
   if (data.description === undefined)
     throw new SchemaValidationError("SessionTag.description");
@@ -309,6 +341,17 @@ export async function deleteSession(
   validateDeleteSessionRequest(body);
   const result = (await post(
     "/api/v0/sessions/delete",
+    body
+  )) as ISuccessResponse;
+  validateSuccessResponse(result);
+  return result;
+}
+export async function checkSessionAccess(
+  body: ISessionAccessRequest
+): Promise<ISuccessResponse> {
+  validateSessionAccessRequest(body);
+  const result = (await post(
+    "/api/v0/sessions/check-access",
     body
   )) as ISuccessResponse;
   validateSuccessResponse(result);

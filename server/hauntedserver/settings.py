@@ -178,3 +178,5 @@ else:
     EMAIL_USE_TLS = True
 
 SITE_ID = 1
+
+SESSION_CHECK_API_KEY = "test123"

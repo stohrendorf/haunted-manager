@@ -90,6 +90,13 @@ class DeleteSessionRequest(Compound):
     session_id = StringField(min_length=1)
 
 
+class SessionAccessRequest(Compound):
+    username = StringField(min_length=1)
+    auth_token = StringField(min_length=1)
+    session_id = StringField(min_length=1)
+    api_key = StringField(min_length=1)
+
+
 class Empty(Compound):
     pass
 
@@ -150,6 +157,13 @@ endpoints = (
         method="post",
         response=SuccessResponse(),
         body=DeleteSessionRequest(),
+    ),
+    Endpoint(
+        operation_name="checkSessionAccess",
+        path="/api/v0/sessions/check-access",
+        method="post",
+        response=SuccessResponse(),
+        body=SessionAccessRequest(),
     ),
     Endpoint(
         operation_name="getAnnouncements",

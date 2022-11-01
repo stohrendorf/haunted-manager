@@ -130,6 +130,18 @@ class Session:
 
 @dataclass_json
 @dataclass(kw_only=True)
+class SessionAccessRequest:
+    api_key: str
+    auth_token: str
+    session_id: str
+    username: str
+
+    def validate(self):
+        validate_session_access_request(self)
+
+
+@dataclass_json
+@dataclass(kw_only=True)
 class SessionTag:
     description: str
     name: str
@@ -313,6 +325,26 @@ def validate_session(data: Session):
     return
 
 
+def validate_session_access_request(data: SessionAccessRequest):
+    if data.api_key is None:
+        raise SchemaValidationError("SessionAccessRequest.api_key")
+    if len(data.api_key) < 1:
+        raise SchemaValidationError("SessionAccessRequest.api_key")
+    if data.auth_token is None:
+        raise SchemaValidationError("SessionAccessRequest.auth_token")
+    if len(data.auth_token) < 1:
+        raise SchemaValidationError("SessionAccessRequest.auth_token")
+    if data.session_id is None:
+        raise SchemaValidationError("SessionAccessRequest.session_id")
+    if len(data.session_id) < 1:
+        raise SchemaValidationError("SessionAccessRequest.session_id")
+    if data.username is None:
+        raise SchemaValidationError("SessionAccessRequest.username")
+    if len(data.username) < 1:
+        raise SchemaValidationError("SessionAccessRequest.username")
+    return
+
+
 def validate_session_tag(data: SessionTag):
     if data.description is None:
         raise SchemaValidationError("SessionTag.description")
@@ -460,6 +492,27 @@ class delete_session:
         @json_response
         def request_handler(request) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
             rq: DeleteSessionRequest = DeleteSessionRequest.schema().loads(request.body.decode())
+            rq.validate()
+            response = fn(request, rq)
+            if isinstance(response, tuple):
+                code, response = response
+            else:
+                code = HttpResponse.status_code
+            response.validate()
+            return code, response
+
+        return path(cls.path, request_handler, name=cls.operation)
+
+
+class check_session_access:
+    path = "api/v0/sessions/check-access"
+    operation = "check_session_access"
+
+    @classmethod
+    def wrap(cls, fn: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse]):
+        @json_response
+        def request_handler(request) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+            rq: SessionAccessRequest = SessionAccessRequest.schema().loads(request.body.decode())
             rq.validate()
             response = fn(request, rq)
             if isinstance(response, tuple):
