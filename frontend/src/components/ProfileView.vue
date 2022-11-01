@@ -45,7 +45,8 @@ export default class ProfileView extends Vue {
     >
       <bs-btn
         :disabled="profileInfo.verified && profileInfo.email"
-        variant="outline-primary"
+        outline
+        variant="primary"
       >
         <span class="bi bi-check" /> Verify
       </bs-btn>
@@ -56,7 +57,7 @@ export default class ProfileView extends Vue {
       label="Auth Token"
       type="text"
     >
-      <bs-btn variant="outline-primary" @click="refreshToken()">
+      <bs-btn outline variant="primary" @click="refreshToken()">
         <span class="bi bi-arrow-repeat" /> Regenerate
       </bs-btn>
     </single-line-input>

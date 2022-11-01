@@ -18,11 +18,7 @@ export default class ClipboardCopyable extends Vue {
 
 <template>
   <span class="btn-">
-    <slot />&hairsp;<bs-btn
-      variant="primary"
-      :small="true"
-      @click="copyToClipboard()"
-    >
+    <slot />&hairsp;<bs-btn variant="primary" small @click="copyToClipboard()">
       <span class="bi bi-clipboard" />
     </bs-btn>
   </span>

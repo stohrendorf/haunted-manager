@@ -52,7 +52,9 @@ export default class SessionList extends Vue {
         class="list-group-item"
       >
         <h5 class="mb-1">
-          {{ session.id }}
+          <clipboard-copyable :value="session.id">
+            <code>{{ session.id }}</code>
+          </clipboard-copyable>
           <small class="text-secondary"> by {{ session.owner }} </small>
           &nbsp;
           <small
@@ -70,10 +72,10 @@ export default class SessionList extends Vue {
           {{ session.description }}
         </div>
 
-        <clipboard-copyable :value="session.id" />
         <bs-btn
           v-show="profile.$state.username === session.owner"
           variant="danger"
+          small
           @click="deleteSession(session.id)"
         >
           <i class="bi bi-trash" /> Delete

@@ -13,6 +13,9 @@ export default class BsBtn extends Vue {
 
   @Prop({ required: false, default: false, type: Boolean })
   public small: boolean = undefined!;
+
+  @Prop({ required: false, default: false, type: Boolean })
+  public outline: boolean = undefined!;
 }
 </script>
 
@@ -20,7 +23,7 @@ export default class BsBtn extends Vue {
   <button
     :class="[
       'btn',
-      'btn-' + variant,
+      'btn-' + (outline ? 'outline-' : '') + variant,
       disabled ? 'disabled' : '',
       small ? 'btn-sm' : '',
     ]"
