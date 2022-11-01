@@ -57,15 +57,6 @@ class TagsResponse(Compound):
     tags = ArrayField(items=Tag())
 
 
-class Level(Compound):
-    id = IntegerField()
-    name = StringField(min_length=1)
-
-
-class LevelsResponse(Compound):
-    levels = ArrayField(items=Level())
-
-
 class SuccessResponse(Compound):
     success = BooleanField()
     message = StringField()
@@ -151,12 +142,6 @@ endpoints = (
         method="post",
         response=SuccessResponse(),
         body=DeleteSessionRequest(),
-    ),
-    Endpoint(
-        operation_name="getLevels",
-        path="/api/v0/levels",
-        method="get",
-        response=LevelsResponse(),
     ),
     Endpoint(
         operation_name="getAnnouncements",

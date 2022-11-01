@@ -16,13 +16,6 @@ export interface IDeleteSessionRequest {
   session_id: string;
 }
 export interface IEmpty {}
-export interface ILevel {
-  id: number;
-  name: string;
-}
-export interface ILevelsResponse {
-  levels: ILevel[];
-}
 export interface ILoginRequest {
   password: string;
   username: string;
@@ -118,22 +111,6 @@ function validateDeleteSessionRequest(data: IDeleteSessionRequest): void {
     throw new SchemaValidationError("DeleteSessionRequest.session_id");
 }
 function validateEmpty(data: IEmpty): void {}
-function validateLevel(data: ILevel): void {
-  if (data.id === undefined) throw new SchemaValidationError("Level.id");
-  if (data.id === null) throw new SchemaValidationError("Level.id");
-  if (data.name === undefined) throw new SchemaValidationError("Level.name");
-  if (data.name === null) throw new SchemaValidationError("Level.name");
-  if (data.name.length < 1) throw new SchemaValidationError("Level.name");
-}
-function validateLevelsResponse(data: ILevelsResponse): void {
-  if (data.levels === undefined)
-    throw new SchemaValidationError("LevelsResponse.levels");
-  if (data.levels === null)
-    throw new SchemaValidationError("LevelsResponse.levels");
-  for (const fieldData of data.levels) {
-    validateLevel(fieldData);
-  }
-}
 function validateLoginRequest(data: ILoginRequest): void {
   if (data.password === undefined)
     throw new SchemaValidationError("LoginRequest.password");
@@ -313,11 +290,6 @@ export async function deleteSession(
     body
   )) as ISuccessResponse;
   validateSuccessResponse(result);
-  return result;
-}
-export async function getLevels(): Promise<ILevelsResponse> {
-  const result = (await get("/api/v0/levels")) as ILevelsResponse;
-  validateLevelsResponse(result);
   return result;
 }
 export async function getAnnouncements(): Promise<IAnnouncementsResponse> {

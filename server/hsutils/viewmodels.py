@@ -66,25 +66,6 @@ class Empty:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class Level:
-    id: int
-    name: str
-
-    def validate(self):
-        validate_level(self)
-
-
-@dataclass_json
-@dataclass(kw_only=True)
-class LevelsResponse:
-    levels: list["Level"]
-
-    def validate(self):
-        validate_levels_response(self)
-
-
-@dataclass_json
-@dataclass(kw_only=True)
 class LoginRequest:
     password: str
     username: str
@@ -231,24 +212,6 @@ def validate_delete_session_request(data: DeleteSessionRequest):
 
 
 def validate_empty(data: Empty):
-    return
-
-
-def validate_level(data: Level):
-    if data.id is None:
-        raise SchemaValidationError("Level.id")
-    if data.name is None:
-        raise SchemaValidationError("Level.name")
-    if len(data.name) < 1:
-        raise SchemaValidationError("Level.name")
-    return
-
-
-def validate_levels_response(data: LevelsResponse):
-    if data.levels is None:
-        raise SchemaValidationError("LevelsResponse.levels")
-    for field_data in data.levels:
-        validate_level(field_data)
     return
 
 
@@ -465,25 +428,6 @@ class delete_session:
             rq: DeleteSessionRequest = DeleteSessionRequest.schema().loads(request.body.decode())
             rq.validate()
             response = fn(request, rq)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
-
-        return path(cls.path, request_handler, name=cls.operation)
-
-
-class get_levels:
-    path = "api/v0/levels"
-    operation = "get_levels"
-
-    @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest], LevelsResponse]):
-        @json_response
-        def request_handler(request) -> Union[tuple[int, LevelsResponse], LevelsResponse]:
-            response = fn(request)
             if isinstance(response, tuple):
                 code, response = response
             else:
