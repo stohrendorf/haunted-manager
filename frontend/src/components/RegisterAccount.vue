@@ -13,6 +13,7 @@ export default class RegisterAccount extends Vue {
   };
 
   private error: string | null = null;
+  private registrationSuccessful: boolean = false;
 
   async register(): Promise<void> {
     const result = await register(this.registrationInfo);
@@ -20,13 +21,14 @@ export default class RegisterAccount extends Vue {
       this.error = result.message;
     } else {
       this.error = null;
+      this.registrationSuccessful = true;
     }
   }
 }
 </script>
 
 <template>
-  <div>
+  <div v-if="!registrationSuccessful">
     <h3>Register</h3>
 
     <div class="input-group mb-3 disabled">
@@ -80,6 +82,13 @@ export default class RegisterAccount extends Vue {
     >
       Register
     </bs-btn>
+  </div>
+  <div v-else>
+    <h3>Registration Successful</h3>
+    <bs-alert variant="primary">
+      <p>Successfully registered</p>
+      <p>Check your email to activate your account</p>
+    </bs-alert>
   </div>
 </template>
 
