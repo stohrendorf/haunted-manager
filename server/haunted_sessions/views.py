@@ -86,6 +86,8 @@ def check_session_access(request: HttpRequest, body: SessionAccessRequest) -> Su
         user = get_user_model().objects.get(username=body.username)
     except get_user_model().DoesNotExist:
         return SuccessResponse(success=False, message="user does not exist")
+    if not user.is_active:
+        return SuccessResponse(success=False, message="user is inactive")
     try:
         auth_token = ApiKey.objects.get(owner=user)
     except ApiKey.DoesNotExist:
