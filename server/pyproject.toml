@@ -16,6 +16,7 @@ PyYAML = "*"
 django-email-verification = "*"
 psycopg2 = "*"
 mysqlclient = "*"
+django-environ = "*"
 
 [tool.poetry.dev-dependencies]
 black = "*"

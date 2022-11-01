@@ -151,6 +151,19 @@ deprecation = "*"
 PyJWT = "*"
 
 [[package]]
+name = "django-environ"
+version = "0.9.0"
+description = "A package that allows you to utilize 12factor inspired environment variables to configure your Django application."
+category = "main"
+optional = false
+python-versions = ">=3.4,<4"
+
+[package.extras]
+develop = ["coverage[toml] (>=5.0a4)", "pytest (>=4.6.11)", "furo (>=2021.8.17b43,<2021.9.0)", "sphinx (>=3.5.0)", "sphinx-notfound-page"]
+docs = ["furo (>=2021.8.17b43,<2021.9.0)", "sphinx (>=3.5.0)", "sphinx-notfound-page"]
+testing = ["coverage[toml] (>=5.0a4)", "pytest (>=4.6.11)"]
+
+[[package]]
 name = "exceptiongroup"
 version = "1.0.0"
 description = "Backport of PEP 654 (exception groups)"
@@ -560,7 +573,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "78128d99a8110103a403c3d0cb142822af080349c7174f648629b9336f28ebc3"
+content-hash = "8f84e5410463d518d8458ba18b1c2764bf7ac1a9b48eb354291a174c6f738078"
 
 [metadata.files]
 asgiref = [
@@ -629,6 +642,10 @@ django-cors-headers = [
 django-email-verification = [
     {file = "django-email-verification-0.3.1.tar.gz", hash = "sha256:1f0e32531244b165d617c0f105522e1ec2fdb48f4d7f34c496a53a4efa0b9961"},
     {file = "django_email_verification-0.3.1-py3-none-any.whl", hash = "sha256:e30495a356d8ada9041317667601aef88ffe542540111197916f51477d2193f8"},
+]
+django-environ = [
+    {file = "django-environ-0.9.0.tar.gz", hash = "sha256:bff5381533056328c9ac02f71790bd5bf1cea81b1beeb648f28b81c9e83e0a21"},
+    {file = "django_environ-0.9.0-py2.py3-none-any.whl", hash = "sha256:f21a5ef8cc603da1870bbf9a09b7e5577ab5f6da451b843dbcc721a7bca6b3d9"},
 ]
 exceptiongroup = [
     {file = "exceptiongroup-1.0.0-py3-none-any.whl", hash = "sha256:2ac84b496be68464a2da60da518af3785fff8b7ec0d090a581604bc870bdee41"},
