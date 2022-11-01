@@ -7,6 +7,7 @@ from django.contrib.auth import login as django_login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
+from django.db.transaction import atomic
 from django.http import (
     HttpRequest,
     HttpResponseBadRequest,
@@ -70,13 +71,16 @@ def profile(request: HttpRequest) -> ProfileInfoResponse:
     )
 
 
+@atomic
 def register(request: HttpRequest, body: RegisterRequest) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
     if not request.user.is_anonymous or request.user.is_authenticated:
         return SuccessResponse(success=False, message="already logged in")
 
+    if User.objects.filter(username=body.username).exists() or User.objects.filter(email=body.email).exists():
+        return 409, SuccessResponse(success=False, message="Username and/or email address already in use")
+
+    user = None
     try:
-        if User.objects.filter(username=body.username).exists() or User.objects.filter(email=body.email).exists():
-            return 409, SuccessResponse(success=False, message="Username and/or email address already in use")
         user = User.objects.create_user(
             is_active=False,
             username=body.username,
@@ -89,9 +93,13 @@ def register(request: HttpRequest, body: RegisterRequest) -> Union[tuple[int, Su
         send_email(user)
     except ValidationError as e:
         logging.error("registration failed", exc_info=True)
+        if user is not None:
+            user.delete()
         return HttpResponseBadRequest.status_code, SuccessResponse(success=False, message="; ".join(e.messages))
     except Exception:
         logging.error("registration failed", exc_info=True)
+        if user is not None:
+            user.delete()
         return HttpResponseServerError.status_code, SuccessResponse(success=False, message="Registration failure")
 
     return SuccessResponse(success=True, message="registered")
