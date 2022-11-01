@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "haunted-server"
 version = "0.1.0"
-description = "EdisonEngine Ghost Sharing Server"
+description = "CroftEngine Ghost Session Management Server"
 authors = ["Steffen Ohrendorf <steffen.ohrendorf@gmx.de>"]
 license = "GPL-3"
 
@@ -14,6 +14,8 @@ dataclasses-json = "*"
 pyhumps = "*"
 PyYAML = "*"
 django-email-verification = "*"
+psycopg2 = "*"
+mysqlclient = "*"
 
 [tool.poetry.dev-dependencies]
 black = "*"
