@@ -1,3 +1,4 @@
+import logging
 from functools import wraps
 from typing import Any, Callable
 
@@ -24,7 +25,8 @@ def json_response(f: RequestHandler) -> JsonResponseRequestHandler:
     def wrapper(request: HttpRequest):
         try:
             response_data = f(request)
-        except Exception as e:
+        except Exception:
+            logging.error("request processing error", exc_info=True)
             return JsonResponse(
                 data={},
                 status=HttpResponseServerError.status_code,

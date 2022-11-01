@@ -1,4 +1,3 @@
-from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -124,19 +123,19 @@ CORS_ALLOWED_ORIGINS = tuple(
     env(
         "CORS_ALLOWED_ORIGINS",
         default="",
-    ).split(",")
+    ).split(","),
 )
 CSRF_TRUSTED_ORIGINS = tuple(
     env(
         "CSRF_TRUSTED_ORIGINS",
         default="",
-    ).split(",")
+    ).split(","),
 )
 ALLOWED_HOSTS = tuple(
     env(
         "ALLOWED_HOSTS",
         default="",
-    ).split(",")
+    ).split(","),
 )
 EMAIL_FROM_ADDRESS = env("EMAIL_FROM_ADDRESS")
 EMAIL_PAGE_DOMAIN = env("EMAIL_PAGE_DOMAIN")

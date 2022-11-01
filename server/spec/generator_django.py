@@ -114,7 +114,7 @@ def gen_django(schemas: list[Compound], endpoints: list[Endpoint]) -> str:
             for field_name, field in schema.subfields():
                 output += f"    {field_name}: {_field_to_type_sig(field)}\n"
 
-            output += f"    def validate(self):\n"
+            output += "    def validate(self):\n"
             output += f"        validate_{humps.decamelize(schema.typename())}(self)\n"
 
             output += "\n"
