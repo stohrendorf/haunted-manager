@@ -84,6 +84,7 @@ def register(request: HttpRequest, body: RegisterRequest) -> Union[tuple[int, Su
             password=body.password,
         )
         validate_password(body.password, user)
+        ApiKey.objects.create(owner=user)
         user.save()
         send_email(user)
     except ValidationError as e:
@@ -102,7 +103,7 @@ def regenerate_token(request: HttpRequest) -> Union[tuple[int, Empty], Empty]:
         ApiKey.objects.get(owner=request.user).delete()
     except ApiKey.DoesNotExist:
         pass
-    request.user.api_key = ApiKey.objects.create(owner=request.user)
+    ApiKey.objects.create(owner=request.user)
     return Empty()
 
 
