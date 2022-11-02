@@ -88,7 +88,7 @@ export default class App extends Vue {
       <bs-navbar-nav ms="auto">
         <li class="navbar-text text-info">
           <span class="bi bi-info-circle" />
-          Happily providing {{ stats.total_sessions }} sessions from
+          Happily providing {{ stats.total_sessions }} sessions for
           {{ stats.total_users }} users.
         </li>
       </bs-navbar-nav>
