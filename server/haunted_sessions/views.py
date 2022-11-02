@@ -92,7 +92,7 @@ def check_session_access(request: HttpRequest, body: SessionAccessRequest) -> Su
         auth_token = ApiKey.objects.get(owner=user)
     except ApiKey.DoesNotExist:
         return SuccessResponse(success=False, message="auth token not found")
-    if auth_token.key != body.auth_token:
+    if auth_token.key.hex != body.auth_token:
         return SuccessResponse(success=False, message="invalid auth token")
     if not SessionModel.objects.filter(key=body.session_id).exists():
         return SuccessResponse(success=False, message="session does not exist")
