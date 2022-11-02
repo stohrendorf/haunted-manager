@@ -15,6 +15,7 @@ RUN apt-get update -y \
 WORKDIR /usr/local/haunted-manager
 COPY . .
 RUN find . -type f -exec dos2unix {} \; \
+    && chmod a+x manage.py \
     && poetry install --only main --no-interaction --no-ansi
 
 EXPOSE 8000
