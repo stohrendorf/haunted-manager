@@ -249,6 +249,20 @@ python-versions = "*"
 flake8 = "*"
 
 [[package]]
+name = "gunicorn"
+version = "20.1.0"
+description = "WSGI HTTP Server for UNIX"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[package.extras]
+eventlet = ["eventlet (>=0.24.1)"]
+gevent = ["gevent (>=1.4.0)"]
+setproctitle = ["setproctitle"]
+tornado = ["tornado (>=0.2)"]
+
+[[package]]
 name = "idna"
 version = "3.4"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -573,7 +587,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "8f84e5410463d518d8458ba18b1c2764bf7ac1a9b48eb354291a174c6f738078"
+content-hash = "5a8e2d52256316115433664a075bd8792c29b84bebd55cfc910cf9bf3e56b2c0"
 
 [metadata.files]
 asgiref = [
@@ -673,6 +687,10 @@ flake8-isort = [
 ]
 flake8-quotes = [
     {file = "flake8-quotes-3.3.1.tar.gz", hash = "sha256:633adca6fb8a08131536af0d750b44d6985b9aba46f498871e21588c3e6f525a"},
+]
+gunicorn = [
+    {file = "gunicorn-20.1.0-py3-none-any.whl", hash = "sha256:9dcc4547dbb1cb284accfb15ab5667a0e5d1881cc443e0677b4882a4067a807e"},
+    {file = "gunicorn-20.1.0.tar.gz", hash = "sha256:e0a968b5ba15f8a328fdfd7ab1fcb5af4470c28aaf7e55df02a99bc13138e6e8"},
 ]
 idna = [
     {file = "idna-3.4-py3-none-any.whl", hash = "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"},
