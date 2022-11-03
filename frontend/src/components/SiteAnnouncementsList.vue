@@ -27,7 +27,7 @@ export default class SiteAnnouncementsList extends Vue {
     >
       <div class="card-body">
         <i class="bi bi-info-square" />
-        {{ announcement.message }}
+        <span v-html="announcement.message" />
       </div>
     </div>
   </div>
