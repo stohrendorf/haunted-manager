@@ -75,6 +75,7 @@ class Session(Compound):
     tags = ArrayField(items=SessionTag())
     owner = StringField(min_length=1)
     description = StringField()
+    players = ArrayField(items=StringField(min_length=1))
 
 
 class CreateSessionRequest(Compound):
@@ -94,6 +95,16 @@ class SessionAccessRequest(Compound):
     username = StringField(min_length=1)
     auth_token = StringField(min_length=1)
     session_id = StringField(min_length=1)
+    api_key = StringField(min_length=1)
+
+
+class SessionPlayers(Compound):
+    session_id = StringField(min_length=1)
+    usernames = ArrayField(items=StringField(min_length=1))
+
+
+class SessionsPlayersRequest(Compound):
+    sessions = ArrayField(items=SessionPlayers())
     api_key = StringField(min_length=1)
 
 
@@ -164,6 +175,13 @@ endpoints = (
         method="post",
         response=SuccessResponse(),
         body=SessionAccessRequest(),
+    ),
+    Endpoint(
+        operation_name="updateSessionsPlayers",
+        path="/api/v0/sessions/session-players",
+        method="post",
+        response=Empty(),
+        body=SessionsPlayersRequest(),
     ),
     Endpoint(
         operation_name="getAnnouncements",

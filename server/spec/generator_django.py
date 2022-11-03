@@ -23,7 +23,7 @@ def _field_to_type_sig(field: BaseField) -> str:
     elif isinstance(field, BooleanField):
         t = "bool"
     elif isinstance(field, ArrayField):
-        t = f"list[{_field_to_type_sig(field.items)}]"
+        t = f"List[{_field_to_type_sig(field.items)}]"
     else:
         t = f'"{field.typename()}"'
 
@@ -91,7 +91,7 @@ def _gen_django_field_checks(context: str, accessor: str, field: BaseField) -> s
 
 
 def gen_django(schemas: list[Compound], endpoints: list[Endpoint]) -> str:
-    output = "from typing import Callable, Optional, Union\n"
+    output = "from typing import Callable, Optional, Union, List\n"
     output += "from dataclasses import dataclass\n"
     output += "from dataclasses_json import dataclass_json\n"
     output += "from django.http import HttpRequest, HttpResponse\n"

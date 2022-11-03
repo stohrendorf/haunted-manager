@@ -1,6 +1,6 @@
 import re
 from dataclasses import dataclass
-from typing import Callable, Optional, Union
+from typing import Callable, List, Optional, Union
 
 from dataclasses_json import dataclass_json
 from django.http import HttpRequest, HttpResponse
@@ -32,7 +32,7 @@ class AnnouncementEntry:
 @dataclass_json
 @dataclass(kw_only=True)
 class AnnouncementsResponse:
-    announcements: list["AnnouncementEntry"]
+    announcements: List["AnnouncementEntry"]
 
     def validate(self):
         validate_announcements_response(self)
@@ -60,7 +60,7 @@ class ChangePasswordRequest:
 @dataclass(kw_only=True)
 class CreateSessionRequest:
     description: str
-    tags: list[int]
+    tags: List[int]
 
     def validate(self):
         validate_create_session_request(self)
@@ -122,7 +122,8 @@ class Session:
     description: str
     id: str
     owner: str
-    tags: list["SessionTag"]
+    players: List[str]
+    tags: List["SessionTag"]
 
     def validate(self):
         validate_session(self)
@@ -142,6 +143,16 @@ class SessionAccessRequest:
 
 @dataclass_json
 @dataclass(kw_only=True)
+class SessionPlayers:
+    session_id: str
+    usernames: List[str]
+
+    def validate(self):
+        validate_session_players(self)
+
+
+@dataclass_json
+@dataclass(kw_only=True)
 class SessionTag:
     description: str
     name: str
@@ -152,8 +163,18 @@ class SessionTag:
 
 @dataclass_json
 @dataclass(kw_only=True)
+class SessionsPlayersRequest:
+    api_key: str
+    sessions: List["SessionPlayers"]
+
+    def validate(self):
+        validate_sessions_players_request(self)
+
+
+@dataclass_json
+@dataclass(kw_only=True)
 class SessionsResponse:
-    sessions: list["Session"]
+    sessions: List["Session"]
 
     def validate(self):
         validate_sessions_response(self)
@@ -193,7 +214,7 @@ class Tag:
 @dataclass_json
 @dataclass(kw_only=True)
 class TagsResponse:
-    tags: list["Tag"]
+    tags: List["Tag"]
 
     def validate(self):
         validate_tags_response(self)
@@ -318,6 +339,11 @@ def validate_session(data: Session):
         raise SchemaValidationError("Session.owner")
     if len(data.owner) < 1:
         raise SchemaValidationError("Session.owner")
+    if data.players is None:
+        raise SchemaValidationError("Session.players")
+    for field_data in data.players:
+        if len(field_data) < 1:
+            raise SchemaValidationError("Session.players")
     if data.tags is None:
         raise SchemaValidationError("Session.tags")
     for field_data in data.tags:
@@ -345,6 +371,19 @@ def validate_session_access_request(data: SessionAccessRequest):
     return
 
 
+def validate_session_players(data: SessionPlayers):
+    if data.session_id is None:
+        raise SchemaValidationError("SessionPlayers.session_id")
+    if len(data.session_id) < 1:
+        raise SchemaValidationError("SessionPlayers.session_id")
+    if data.usernames is None:
+        raise SchemaValidationError("SessionPlayers.usernames")
+    for field_data in data.usernames:
+        if len(field_data) < 1:
+            raise SchemaValidationError("SessionPlayers.usernames")
+    return
+
+
 def validate_session_tag(data: SessionTag):
     if data.description is None:
         raise SchemaValidationError("SessionTag.description")
@@ -354,6 +393,18 @@ def validate_session_tag(data: SessionTag):
         raise SchemaValidationError("SessionTag.name")
     if len(data.name) < 1:
         raise SchemaValidationError("SessionTag.name")
+    return
+
+
+def validate_sessions_players_request(data: SessionsPlayersRequest):
+    if data.api_key is None:
+        raise SchemaValidationError("SessionsPlayersRequest.api_key")
+    if len(data.api_key) < 1:
+        raise SchemaValidationError("SessionsPlayersRequest.api_key")
+    if data.sessions is None:
+        raise SchemaValidationError("SessionsPlayersRequest.sessions")
+    for field_data in data.sessions:
+        validate_session_players(field_data)
     return
 
 
@@ -513,6 +564,27 @@ class check_session_access:
         @json_response
         def request_handler(request) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
             rq: SessionAccessRequest = SessionAccessRequest.schema().loads(request.body.decode())
+            rq.validate()
+            response = fn(request, rq)
+            if isinstance(response, tuple):
+                code, response = response
+            else:
+                code = HttpResponse.status_code
+            response.validate()
+            return code, response
+
+        return path(cls.path, request_handler, name=cls.operation)
+
+
+class update_sessions_players:
+    path = "api/v0/sessions/session-players"
+    operation = "update_sessions_players"
+
+    @classmethod
+    def wrap(cls, fn: Callable[[HttpRequest, SessionsPlayersRequest], Empty]):
+        @json_response
+        def request_handler(request) -> Union[tuple[int, Empty], Empty]:
+            rq: SessionsPlayersRequest = SessionsPlayersRequest.schema().loads(request.body.decode())
             rq.validate()
             response = fn(request, rq)
             if isinstance(response, tuple):

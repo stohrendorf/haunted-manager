@@ -11,8 +11,10 @@ from haunted_auth.models import ApiKey
 from hsutils.viewmodels import (
     CreateSessionRequest,
     DeleteSessionRequest,
+    Empty,
     Session,
     SessionAccessRequest,
+    SessionsPlayersRequest,
     SessionsResponse,
     SessionTag,
     SuccessResponse,
@@ -22,6 +24,8 @@ from hsutils.viewmodels import (
 
 from .models import Session as SessionModel
 from .models import Tag as TagModel
+
+User = get_user_model()
 
 
 def get_tags(request) -> TagsResponse:
@@ -51,6 +55,7 @@ def get_sessions(request) -> SessionsResponse:
                 ],
                 owner=session.owner.username,
                 description=session.description,
+                players=[u.username for u in session.players.all()],
             )
             for session in SessionModel.objects.order_by("-created_at").all()
         ],
@@ -83,8 +88,8 @@ def check_session_access(request: HttpRequest, body: SessionAccessRequest) -> Su
         return SuccessResponse(success=False, message="invalid api key")
 
     try:
-        user = get_user_model().objects.get(username=body.username)
-    except get_user_model().DoesNotExist:
+        user = User.objects.get(username=body.username)
+    except User.DoesNotExist:
         return SuccessResponse(success=False, message="user does not exist")
     if not user.is_active:
         return SuccessResponse(success=False, message="user is inactive")
@@ -97,6 +102,28 @@ def check_session_access(request: HttpRequest, body: SessionAccessRequest) -> Su
     if not SessionModel.objects.filter(key=body.session_id).exists():
         return SuccessResponse(success=False, message="session does not exist")
     return SuccessResponse(success=True, message="")
+
+
+@csrf_exempt
+@atomic
+def update_sessions_players(request, body: SessionsPlayersRequest) -> Empty:
+    if body.api_key != settings.SESSION_CHECK_API_KEY:
+        return Empty()
+
+    for session in SessionModel.objects.all():
+        session.players.clear()
+    for session in body.sessions:
+        try:
+            db_session = SessionModel.objects.get(key=session.session_id)
+        except SessionModel.DoesNotExist:
+            continue
+        for user in session.usernames:
+            try:
+                db_user = User.objects.get(username=user)
+            except User.DoesNotExist:
+                continue
+            db_session.players.add(db_user)
+    return Empty()
 
 
 @login_required

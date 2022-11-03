@@ -22,3 +22,4 @@ class Session(TimestampedModel):
     owner = models.ForeignKey(to=User, on_delete=models.deletion.CASCADE)
     tags = models.ManyToManyField(to=Tag, related_name="sessions")
     description = models.CharField(blank=True, null=False, max_length=512)
+    players = models.ManyToManyField(to=User, related_name="sessions")
