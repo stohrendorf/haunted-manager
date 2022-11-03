@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Optional, Type
+from typing import Optional
 
 
 @dataclass(kw_only=True)
@@ -125,11 +125,11 @@ def is_pure_primitive_field(field: BaseField):
     return is_pure_primitive_field_type(type(field))
 
 
-def gather_dependencies(compound: type) -> set[type]:
-    compounds = [compound]
-    result: set[Type[Compound]] = set()
-    while compounds:
-        q, compounds = compounds[0], compounds[1:]
+def gather_dependencies(compound: type[Compound]) -> set[type[BaseField | Compound]]:
+    queue: list[type[BaseField | Compound]] = [compound]
+    result: set[type[BaseField | Compound]] = set()
+    while queue:
+        q, queue = queue[0], queue[1:]
         if q in result:
             continue
         result.add(q)
@@ -141,5 +141,5 @@ def gather_dependencies(compound: type) -> set[type]:
             if not isinstance(subfield, Compound):
                 if is_pure_primitive_field(subfield) and not is_primitive_field(subfield):
                     continue
-            compounds.append(type(subfield))
+            queue.append(type(subfield))
     return result

@@ -1,5 +1,4 @@
 import logging
-from typing import Tuple, Union
 
 import django.contrib.auth
 from django.contrib.auth import authenticate, get_user_model
@@ -31,7 +30,7 @@ from hsutils.viewmodels import (
 User = get_user_model()
 
 
-def login(request: HttpRequest, body: LoginRequest) -> Union[SuccessResponse, Tuple[int, SuccessResponse]]:
+def login(request: HttpRequest, body: LoginRequest) -> SuccessResponse | tuple[int, SuccessResponse]:
     user = authenticate(request, username=body.username, password=body.password)
     if user is None or not user.is_active:
         return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="invalid login credentials")
@@ -72,7 +71,7 @@ def profile(request: HttpRequest) -> ProfileInfoResponse:
 
 
 @atomic
-def register(request: HttpRequest, body: RegisterRequest) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+def register(request: HttpRequest, body: RegisterRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
     if not request.user.is_anonymous or request.user.is_authenticated:
         return SuccessResponse(success=False, message="already logged in")
 
@@ -106,7 +105,7 @@ def register(request: HttpRequest, body: RegisterRequest) -> Union[tuple[int, Su
 
 
 @login_required
-def regenerate_token(request: HttpRequest) -> Union[tuple[int, Empty], Empty]:
+def regenerate_token(request: HttpRequest) -> tuple[int, Empty] | Empty:
     try:
         ApiKey.objects.get(owner=request.user).delete()
     except ApiKey.DoesNotExist:

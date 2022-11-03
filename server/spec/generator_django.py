@@ -90,8 +90,8 @@ def _gen_django_field_checks(context: str, accessor: str, field: BaseField) -> s
     return output
 
 
-def gen_django(schemas: list[Compound], endpoints: list[Endpoint]) -> str:
-    output = "from typing import Callable, Optional, Union, List\n"
+def gen_django(schemas: list[BaseField | Compound], endpoints: list[Endpoint]) -> str:
+    output = "from typing import Callable, Optional, List\n"
     output += "from dataclasses import dataclass\n"
     output += "from dataclasses_json import dataclass_json\n"
     output += "from django.http import HttpRequest, HttpResponse\n"
@@ -142,17 +142,25 @@ def gen_django(schemas: list[Compound], endpoints: list[Endpoint]) -> str:
         output += f'    operation = "{humps.decamelize(endpoint.operation_name)}"\n'
         output += "    @classmethod\n"
         if endpoint.method == "post":
+            assert endpoint.body is not None
             output += (
                 f"    def wrap(cls, fn: Callable[[HttpRequest, {endpoint.body.typename()}],"
-                f" {endpoint.response.typename()}]):\n"
+                f" {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]]):\n"
             )
         elif endpoint.method == "get":
-            output += f"    def wrap(cls, fn: Callable[[HttpRequest], {endpoint.response.typename()}]):\n"
+            output += (
+                f"    def wrap(cls, fn: Callable[[HttpRequest],"
+                f" {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]]):\n"
+            )
         else:
             raise RuntimeError
         output += "        @json_response\n"
-        output += f"        def request_handler(request) -> Union[tuple[int, {endpoint.response.typename()}], {endpoint.response.typename()}]:\n"
+        output += (
+            f"        def request_handler(request)"
+            f" -> tuple[int, {endpoint.response.typename()}] | {endpoint.response.typename()}:\n"
+        )
         if endpoint.method == "post":
+            assert endpoint.body is not None
             output += (
                 f"            rq: {endpoint.body.typename()} = {endpoint.body.typename()}"
                 f".schema().loads(request.body.decode())\n"

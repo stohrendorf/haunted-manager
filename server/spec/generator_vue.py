@@ -72,7 +72,7 @@ def _field_to_type_sig(field: BaseField) -> str:
     return f"{t}|null" if field.nullable else t
 
 
-def gen_vue(schemas: list[Compound], endpoints: list[Endpoint]) -> str:
+def gen_vue(schemas: list[BaseField | Compound], endpoints: list[Endpoint]) -> str:
     output = "/* eslint-disable no-empty */\n"
     output += "// noinspection RedundantIfStatementJS\n"
 

@@ -1,6 +1,6 @@
 import re
 from dataclasses import dataclass
-from typing import Callable, List, Optional, Union
+from typing import Callable, List, Optional
 
 from dataclasses_json import dataclass_json
 from django.http import HttpRequest, HttpResponse
@@ -461,9 +461,9 @@ class get_stats:
     operation = "get_stats"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest], StatsResponse]):
+    def wrap(cls, fn: Callable[[HttpRequest], StatsResponse | tuple[int, StatsResponse]]):
         @json_response
-        def request_handler(request) -> Union[tuple[int, StatsResponse], StatsResponse]:
+        def request_handler(request) -> tuple[int, StatsResponse] | StatsResponse:
             response = fn(request)
             if isinstance(response, tuple):
                 code, response = response
@@ -480,9 +480,9 @@ class get_tags:
     operation = "get_tags"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest], TagsResponse]):
+    def wrap(cls, fn: Callable[[HttpRequest], TagsResponse | tuple[int, TagsResponse]]):
         @json_response
-        def request_handler(request) -> Union[tuple[int, TagsResponse], TagsResponse]:
+        def request_handler(request) -> tuple[int, TagsResponse] | TagsResponse:
             response = fn(request)
             if isinstance(response, tuple):
                 code, response = response
@@ -499,9 +499,9 @@ class get_sessions:
     operation = "get_sessions"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest], SessionsResponse]):
+    def wrap(cls, fn: Callable[[HttpRequest], SessionsResponse | tuple[int, SessionsResponse]]):
         @json_response
-        def request_handler(request) -> Union[tuple[int, SessionsResponse], SessionsResponse]:
+        def request_handler(request) -> tuple[int, SessionsResponse] | SessionsResponse:
             response = fn(request)
             if isinstance(response, tuple):
                 code, response = response
@@ -518,9 +518,9 @@ class create_session:
     operation = "create_session"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, CreateSessionRequest], SuccessResponse]):
+    def wrap(cls, fn: Callable[[HttpRequest, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]]):
         @json_response
-        def request_handler(request) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+        def request_handler(request) -> tuple[int, SuccessResponse] | SuccessResponse:
             rq: CreateSessionRequest = CreateSessionRequest.schema().loads(request.body.decode())
             rq.validate()
             response = fn(request, rq)
@@ -539,9 +539,9 @@ class delete_session:
     operation = "delete_session"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, DeleteSessionRequest], SuccessResponse]):
+    def wrap(cls, fn: Callable[[HttpRequest, DeleteSessionRequest], SuccessResponse | tuple[int, SuccessResponse]]):
         @json_response
-        def request_handler(request) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+        def request_handler(request) -> tuple[int, SuccessResponse] | SuccessResponse:
             rq: DeleteSessionRequest = DeleteSessionRequest.schema().loads(request.body.decode())
             rq.validate()
             response = fn(request, rq)
@@ -560,9 +560,9 @@ class check_session_access:
     operation = "check_session_access"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse]):
+    def wrap(cls, fn: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse | tuple[int, SuccessResponse]]):
         @json_response
-        def request_handler(request) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+        def request_handler(request) -> tuple[int, SuccessResponse] | SuccessResponse:
             rq: SessionAccessRequest = SessionAccessRequest.schema().loads(request.body.decode())
             rq.validate()
             response = fn(request, rq)
@@ -581,9 +581,9 @@ class update_sessions_players:
     operation = "update_sessions_players"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, SessionsPlayersRequest], Empty]):
+    def wrap(cls, fn: Callable[[HttpRequest, SessionsPlayersRequest], Empty | tuple[int, Empty]]):
         @json_response
-        def request_handler(request) -> Union[tuple[int, Empty], Empty]:
+        def request_handler(request) -> tuple[int, Empty] | Empty:
             rq: SessionsPlayersRequest = SessionsPlayersRequest.schema().loads(request.body.decode())
             rq.validate()
             response = fn(request, rq)
@@ -602,9 +602,9 @@ class get_announcements:
     operation = "get_announcements"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest], AnnouncementsResponse]):
+    def wrap(cls, fn: Callable[[HttpRequest], AnnouncementsResponse | tuple[int, AnnouncementsResponse]]):
         @json_response
-        def request_handler(request) -> Union[tuple[int, AnnouncementsResponse], AnnouncementsResponse]:
+        def request_handler(request) -> tuple[int, AnnouncementsResponse] | AnnouncementsResponse:
             response = fn(request)
             if isinstance(response, tuple):
                 code, response = response
@@ -621,9 +621,9 @@ class get_profile:
     operation = "get_profile"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest], ProfileInfoResponse]):
+    def wrap(cls, fn: Callable[[HttpRequest], ProfileInfoResponse | tuple[int, ProfileInfoResponse]]):
         @json_response
-        def request_handler(request) -> Union[tuple[int, ProfileInfoResponse], ProfileInfoResponse]:
+        def request_handler(request) -> tuple[int, ProfileInfoResponse] | ProfileInfoResponse:
             response = fn(request)
             if isinstance(response, tuple):
                 code, response = response
@@ -640,9 +640,9 @@ class regenerate_token:
     operation = "regenerate_token"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest], Empty]):
+    def wrap(cls, fn: Callable[[HttpRequest], Empty | tuple[int, Empty]]):
         @json_response
-        def request_handler(request) -> Union[tuple[int, Empty], Empty]:
+        def request_handler(request) -> tuple[int, Empty] | Empty:
             response = fn(request)
             if isinstance(response, tuple):
                 code, response = response
@@ -659,9 +659,9 @@ class login:
     operation = "login"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, LoginRequest], SuccessResponse]):
+    def wrap(cls, fn: Callable[[HttpRequest, LoginRequest], SuccessResponse | tuple[int, SuccessResponse]]):
         @json_response
-        def request_handler(request) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+        def request_handler(request) -> tuple[int, SuccessResponse] | SuccessResponse:
             rq: LoginRequest = LoginRequest.schema().loads(request.body.decode())
             rq.validate()
             response = fn(request, rq)
@@ -680,9 +680,9 @@ class register:
     operation = "register"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, RegisterRequest], SuccessResponse]):
+    def wrap(cls, fn: Callable[[HttpRequest, RegisterRequest], SuccessResponse | tuple[int, SuccessResponse]]):
         @json_response
-        def request_handler(request) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+        def request_handler(request) -> tuple[int, SuccessResponse] | SuccessResponse:
             rq: RegisterRequest = RegisterRequest.schema().loads(request.body.decode())
             rq.validate()
             response = fn(request, rq)
@@ -701,9 +701,9 @@ class change_password:
     operation = "change_password"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse]):
+    def wrap(cls, fn: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse | tuple[int, SuccessResponse]]):
         @json_response
-        def request_handler(request) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+        def request_handler(request) -> tuple[int, SuccessResponse] | SuccessResponse:
             rq: ChangePasswordRequest = ChangePasswordRequest.schema().loads(request.body.decode())
             rq.validate()
             response = fn(request, rq)
@@ -722,9 +722,9 @@ class change_email:
     operation = "change_email"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse]):
+    def wrap(cls, fn: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse | tuple[int, SuccessResponse]]):
         @json_response
-        def request_handler(request) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+        def request_handler(request) -> tuple[int, SuccessResponse] | SuccessResponse:
             rq: ChangeEmailRequest = ChangeEmailRequest.schema().loads(request.body.decode())
             rq.validate()
             response = fn(request, rq)
@@ -743,9 +743,9 @@ class logout:
     operation = "logout"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest], Empty]):
+    def wrap(cls, fn: Callable[[HttpRequest], Empty | tuple[int, Empty]]):
         @json_response
-        def request_handler(request) -> Union[tuple[int, Empty], Empty]:
+        def request_handler(request) -> tuple[int, Empty] | Empty:
             response = fn(request)
             if isinstance(response, tuple):
                 code, response = response

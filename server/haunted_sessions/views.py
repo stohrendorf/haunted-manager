@@ -1,5 +1,3 @@
-from typing import Union
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
@@ -63,7 +61,7 @@ def get_sessions(request) -> SessionsResponse:
 
 
 @login_required
-def delete_session(request, body: DeleteSessionRequest) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+def delete_session(request, body: DeleteSessionRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
     session = SessionModel.objects.get(key=body.session_id)
     if not session:
         return HttpResponseNotFound.status_code, SuccessResponse(
@@ -131,7 +129,7 @@ def update_sessions_players(request, body: SessionsPlayersRequest) -> Empty:
 def create_session(
     request: HttpRequest,
     data: CreateSessionRequest,
-) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+) -> tuple[int, SuccessResponse] | SuccessResponse:
     session = SessionModel.objects.create(
         owner=request.user,
         description=data.description,

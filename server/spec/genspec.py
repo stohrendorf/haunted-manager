@@ -1,11 +1,9 @@
 from pathlib import Path
 
-from endpoints import Endpoint
+from endpoints import Endpoint, gather_compounds
 from generator_django import gen_django
 from generator_vue import gen_vue
 from structural import ArrayField, BooleanField, Compound, IntegerField, StringField
-
-from spec.endpoints import gather_compounds
 
 
 class TagName(StringField):

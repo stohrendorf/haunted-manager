@@ -93,7 +93,7 @@ TIME_ZONE = "UTC"
 USE_I18N = False
 USE_TZ = True
 
-STATICFILES_DIRS = []
+STATICFILES_DIRS: list[str] = []
 STATIC_ROOT = BASE_DIR / "static"
 STATIC_URL = "static/"
 

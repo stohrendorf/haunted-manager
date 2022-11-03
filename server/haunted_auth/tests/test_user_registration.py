@@ -35,6 +35,7 @@ def test_not_registered(live_server: LiveServer):
     assert get_user_model().objects.count() == 0
     code, response = get_test_url(live_server, get_profile.path, ProfileInfoResponse)
     assert code == HttpResponse.status_code
+    assert response is not None
     assert response.email is None
     assert response.authenticated is False
 
@@ -45,6 +46,7 @@ def test_register_verify_happy_path(live_server: LiveServer):
         live_server, email="test@example.com", password=uuid.uuid4().hex, username="test-user"
     )
     assert code == HttpResponse.status_code
+    assert response is not None
     assert response.success is True
 
     user = get_user_model().objects.get()
