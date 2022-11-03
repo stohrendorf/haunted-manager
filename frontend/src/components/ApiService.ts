@@ -42,6 +42,7 @@ export interface ISession {
   description: string;
   id: string;
   owner: string;
+  players: string[];
   tags: ISessionTag[];
 }
 export interface ISessionAccessRequest {
@@ -50,9 +51,17 @@ export interface ISessionAccessRequest {
   session_id: string;
   username: string;
 }
+export interface ISessionPlayers {
+  session_id: string;
+  usernames: string[];
+}
 export interface ISessionTag {
   description: string;
   name: string;
+}
+export interface ISessionsPlayersRequest {
+  api_key: string;
+  sessions: ISessionPlayers[];
 }
 export interface ISessionsResponse {
   sessions: ISession[];
@@ -213,6 +222,14 @@ function validateSession(data: ISession): void {
     throw new SchemaValidationError("Session.owner");
   if (data.owner === null) throw new SchemaValidationError("Session.owner");
   if (data.owner.length < 1) throw new SchemaValidationError("Session.owner");
+  if (data.players === undefined)
+    throw new SchemaValidationError("Session.players");
+  if (data.players === null) throw new SchemaValidationError("Session.players");
+  for (const fieldData of data.players) {
+    if (fieldData.length < 1)
+      throw new SchemaValidationError("Session.players");
+  }
+
   if (data.tags === undefined) throw new SchemaValidationError("Session.tags");
   if (data.tags === null) throw new SchemaValidationError("Session.tags");
   for (const fieldData of data.tags) {
@@ -245,6 +262,22 @@ function validateSessionAccessRequest(data: ISessionAccessRequest): void {
   if (data.username.length < 1)
     throw new SchemaValidationError("SessionAccessRequest.username");
 }
+function validateSessionPlayers(data: ISessionPlayers): void {
+  if (data.session_id === undefined)
+    throw new SchemaValidationError("SessionPlayers.session_id");
+  if (data.session_id === null)
+    throw new SchemaValidationError("SessionPlayers.session_id");
+  if (data.session_id.length < 1)
+    throw new SchemaValidationError("SessionPlayers.session_id");
+  if (data.usernames === undefined)
+    throw new SchemaValidationError("SessionPlayers.usernames");
+  if (data.usernames === null)
+    throw new SchemaValidationError("SessionPlayers.usernames");
+  for (const fieldData of data.usernames) {
+    if (fieldData.length < 1)
+      throw new SchemaValidationError("SessionPlayers.usernames");
+  }
+}
 function validateSessionTag(data: ISessionTag): void {
   if (data.description === undefined)
     throw new SchemaValidationError("SessionTag.description");
@@ -256,6 +289,21 @@ function validateSessionTag(data: ISessionTag): void {
     throw new SchemaValidationError("SessionTag.name");
   if (data.name === null) throw new SchemaValidationError("SessionTag.name");
   if (data.name.length < 1) throw new SchemaValidationError("SessionTag.name");
+}
+function validateSessionsPlayersRequest(data: ISessionsPlayersRequest): void {
+  if (data.api_key === undefined)
+    throw new SchemaValidationError("SessionsPlayersRequest.api_key");
+  if (data.api_key === null)
+    throw new SchemaValidationError("SessionsPlayersRequest.api_key");
+  if (data.api_key.length < 1)
+    throw new SchemaValidationError("SessionsPlayersRequest.api_key");
+  if (data.sessions === undefined)
+    throw new SchemaValidationError("SessionsPlayersRequest.sessions");
+  if (data.sessions === null)
+    throw new SchemaValidationError("SessionsPlayersRequest.sessions");
+  for (const fieldData of data.sessions) {
+    validateSessionPlayers(fieldData);
+  }
 }
 function validateSessionsResponse(data: ISessionsResponse): void {
   if (data.sessions === undefined)
@@ -355,6 +403,17 @@ export async function checkSessionAccess(
     body
   )) as ISuccessResponse;
   validateSuccessResponse(result);
+  return result;
+}
+export async function updateSessionsPlayers(
+  body: ISessionsPlayersRequest
+): Promise<IEmpty> {
+  validateSessionsPlayersRequest(body);
+  const result = (await post(
+    "/api/v0/sessions/session-players",
+    body
+  )) as IEmpty;
+  validateEmpty(result);
   return result;
 }
 export async function getAnnouncements(): Promise<IAnnouncementsResponse> {

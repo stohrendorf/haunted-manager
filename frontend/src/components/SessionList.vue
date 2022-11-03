@@ -68,12 +68,22 @@ export default class SessionList extends Vue {
           </small>
         </h5>
 
-        <div v-show="session.description">
+        <div v-if="session.description">
           {{ session.description }}
         </div>
 
+        <div
+          v-if="session.players && session.players.length > 0"
+          class="text-secondary"
+        >
+          Currently playing: {{ session.players.join(", ") }}.
+        </div>
+        <div v-else class="text-secondary">
+          No active players in this session <span class="bi bi-emoji-frown" />
+        </div>
+
         <bs-btn
-          v-show="profile.$state.username === session.owner"
+          v-if="profile.$state.username === session.owner"
           variant="danger"
           small
           @click="deleteSession(session.id)"
