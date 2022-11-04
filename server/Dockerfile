@@ -17,7 +17,8 @@ WORKDIR /usr/local/haunted-manager
 COPY . .
 RUN find . -type f -exec dos2unix {} \; \
     && chmod a+x manage.py \
-    && poetry install --only main --no-interaction --no-ansi
+    && poetry install --no-interaction --no-ansi \
+    && poetry run pytest
 
 EXPOSE 8000
 
