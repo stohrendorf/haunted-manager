@@ -17,8 +17,8 @@ export default class BsNavbar extends Vue {
     <div class="container-fluid">
       <a
         class="navbar-brand"
-        @click="$router.push('/')"
         style="cursor: pointer"
+        @click="$router.push('/')"
       >
         <slot name="brand" />
       </a>
