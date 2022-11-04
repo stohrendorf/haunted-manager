@@ -1,7 +1,7 @@
 import SessionList from "@/components/SessionList.vue";
 import { createPinia, setActivePinia } from "pinia";
 
-describe("<SessionsView />", () => {
+describe("<SessionList />", () => {
   it("contains items", () => {
     cy.intercept("GET", "/api/v0/sessions", {
       body: {
@@ -9,14 +9,19 @@ describe("<SessionsView />", () => {
           {
             id: "id123",
             description: "description abc",
-            tags: ["tag1", "tag2"],
+            tags: [
+              { name: "tag1", description: "tag description 1" },
+              { name: "tag2", description: "tag description 2" },
+            ],
             owner: "owner1",
+            players: ["player1"],
           },
           {
             id: "id456",
             description: "description def",
-            tags: ["tag3"],
+            tags: [{ name: "tag3", description: "tag description 3" }],
             owner: "owner2",
+            players: [],
           },
         ],
       },
