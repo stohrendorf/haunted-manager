@@ -41,12 +41,11 @@ docker run -d --cpus 2 --memory 250m --restart unless-stopped \
 Once the server is running, ensure your publicly running web server is reverse-proxying any request that starts with
 `/api/`, `/email/` or `/admin/` to `localhost:8000`.
 
-For the apache2 web server, this can be achieved with the following lines (ensure you replace the public hostname with
-yours):
+For the apache2 web server, this can be achieved with the following lines:
 ```
 RewriteEngine on
-RewriteCond  %{HTTP_HOST}%{REQUEST_URI}  ^haunted\.earvillage\.net/(admin|email|api)/.*$ [NC]
-RewriteRule  ^/(.*)$ http://localhost:8000/$1  [proxy]
+RewriteCond %{REQUEST_URI} ^/(admin|email|api)/.*$ [NC]
+RewriteRule ^/(.*)$ http://localhost:8000/$1 [proxy]
 ```
 
 For this to work, your production `env` file (called `${BACKEND_CONFIG_ENV_FILE}` above) should contain the following
