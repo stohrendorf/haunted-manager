@@ -9,6 +9,7 @@ ENV PATH="$POETRY_HOME/bin:$PATH"
 
 RUN apt-get update -y \
     && apt-get install -y libmariadb-dev python-is-python3 dos2unix \
+    && rm -rf /var/lib/apt/lists/* \
     && curl -sSL https://install.python-poetry.org | python3 - \
     && mkdir -p /usr/local/haunted-manager
 
