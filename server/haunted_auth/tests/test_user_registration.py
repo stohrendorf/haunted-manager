@@ -43,7 +43,10 @@ def test_not_registered(live_server: LiveServer):
 @pytest.mark.django_db
 def test_register_verify_happy_path(live_server: LiveServer):
     code, response = try_register(
-        live_server, email="test@example.com", password=uuid.uuid4().hex, username="test-user"
+        live_server,
+        email="test@example.com",
+        password=uuid.uuid4().hex,
+        username="test-user",
     )
     assert code == HttpResponse.status_code
     assert response is not None
@@ -57,7 +60,10 @@ def test_register_verify_happy_path(live_server: LiveServer):
     # check that a duplicate user can't be registered
 
     code, response = try_register(
-        live_server, email="test@example.com", password=uuid.uuid4().hex, username="test-user"
+        live_server,
+        email="test@example.com",
+        password=uuid.uuid4().hex,
+        username="test-user",
     )
     assert code == 409
     assert response.success is False
