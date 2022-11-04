@@ -46,6 +46,7 @@ export default class RegisterAccount extends Vue {
     <div class="input-group mb-3 disabled">
       <span class="input-group-text">Email</span>
       <input
+        ref="email"
         v-model="registrationInfo.email"
         type="email"
         class="form-control"
@@ -76,6 +77,7 @@ export default class RegisterAccount extends Vue {
       :disabled="
         !registrationInfo.password ||
         !registrationInfo.email ||
+        !$refs.email.validity.valid ||
         !registrationInfo.username
       "
       @click="register()"
