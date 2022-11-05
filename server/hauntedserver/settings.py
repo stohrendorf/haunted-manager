@@ -1,3 +1,4 @@
+from datetime import timedelta
 from pathlib import Path
 
 import environ
@@ -114,7 +115,7 @@ EMAIL_MAIL_HTML = "email_confirmation_body.html.j2"
 EMAIL_MAIL_PLAIN = "email_confirmation_body.txt.j2"
 EMAIL_MAIL_SUBJECT = "Confirm your email"
 EMAIL_MAIL_PAGE_TEMPLATE = "confirm_template.html"
-EMAIL_MAIL_TOKEN_LIFE = 60 * 60
+EMAIL_MAIL_TOKEN_LIFE = int(timedelta(days=1).total_seconds())
 
 CORS_ALLOW_CREDENTIALS = env(
     "CORS_ALLOW_CREDENTIALS",
