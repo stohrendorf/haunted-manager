@@ -35,42 +35,32 @@ describe("<SessionList />", () => {
 
     cy.get(".list-group-item").should("have.length", 2);
 
+    cy.get(".list-group-item").eq(0).find("code").should("have.text", "id123");
     cy.get(".list-group-item")
       .eq(0)
-      .find("h5")
-      .should("contain.text", "id123")
-      .within((item) => {
-        return cy
-          .wrap(item)
-          .find("small.badge")
-          .should("have.length", 2)
-          .should("contain.text", "tag1")
-          .should("contain.text", "tag2");
-      });
+      .find(".badge")
+      .should("have.length", 2)
+      .should("contain.text", "tag1")
+      .should("contain.text", "tag2");
     cy.get(".list-group-item")
       .eq(0)
-      .find("small.text-secondary")
-      .should("contain.text", "owner1");
+      .find("span.text-secondary")
+      .should("have.text", " by owner1");
     cy.get(".list-group-item")
       .eq(0)
       .find("div")
       .should("contain.text", "description abc");
 
+    cy.get(".list-group-item").eq(1).find("code").should("have.text", "id456");
     cy.get(".list-group-item")
       .eq(1)
-      .find("h5")
-      .should("contain.text", "id456")
-      .within((item) => {
-        return cy
-          .wrap(item)
-          .find("small.badge")
-          .should("have.length", 1)
-          .should("contain.text", "tag3");
-      });
+      .find(".badge")
+      .should("have.length", 1)
+      .should("contain.text", "tag3");
     cy.get(".list-group-item")
       .eq(1)
-      .find("small.text-secondary")
-      .should("contain.text", "owner2");
+      .find("span.text-secondary")
+      .should("have.text", " by owner2");
     cy.get(".list-group-item")
       .eq(1)
       .find("div")
