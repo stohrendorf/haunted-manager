@@ -33,7 +33,7 @@ User = get_user_model()
 def login(request: HttpRequest, body: LoginRequest) -> SuccessResponse | tuple[int, SuccessResponse]:
     user = authenticate(request, username=body.username, password=body.password)
     if user is None or not user.is_active:
-        return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="invalid login credentials")
+        return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="Invalid login credentials")
 
     django_login(request, user)
     logging.info(f"Logged in: {user}")
