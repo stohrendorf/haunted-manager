@@ -25,9 +25,9 @@ export default class SiteAnnouncementsList extends Vue {
         announcement.text_color
       "
     >
-      <div class="card-body">
-        <i class="bi bi-info-square" />
-        <span v-html="announcement.message" />
+      <div class="card-body row justify-content-start">
+        <i class="bi bi-info-square col col-auto" />
+        <div class="col align-self-stretch" v-html="announcement.message" />
       </div>
     </div>
   </div>
