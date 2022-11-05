@@ -3,8 +3,9 @@ import { Options, Vue } from "vue-class-component";
 import { getProfile, login } from "@/components/ApiService";
 import { profileStore } from "@/components/ProfileStore";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
+import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
 
-@Options({ components: { BsBtn } })
+@Options({ components: { FloatingSingleLineInput, BsBtn } })
 export default class LoginWidget extends Vue {
   public profileInfo = profileStore();
 
@@ -29,28 +30,32 @@ export default class LoginWidget extends Vue {
   >
     <div class="mb-3 row">
       <div class="col">
-        <input
+        <floating-single-line-input
           v-model="username"
-          class="form-control"
           type="text"
           required
-          placeholder="Login"
+          label="Username or Email"
         />
       </div>
     </div>
     <div class="mb-3 row">
       <div class="col">
-        <input
+        <floating-single-line-input
           v-model="password"
-          class="form-control"
           type="password"
           required
-          placeholder="Password"
+          label="Password"
         />
       </div>
     </div>
     <div class="form-group mb-3">
-      <bs-btn class="w-100" variant="success" type="submit">Login</bs-btn>
+      <bs-btn
+        class="w-100"
+        variant="success"
+        type="submit"
+        :disabled="!username || !password"
+        >Login</bs-btn
+      >
     </div>
     <div class="form-group">
       <bs-btn class="w-100" variant="primary" @click="$router.push('/register')"

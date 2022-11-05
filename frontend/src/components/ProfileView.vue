@@ -7,12 +7,12 @@ import {
   regenerateToken,
 } from "@/components/ApiService";
 import { profileStore } from "@/components/ProfileStore";
-import SingleLineInput from "@/components/bootstrap/SingleLineInput.vue";
+import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import BsAlert from "@/components/bootstrap/BsAlert.vue";
 
 @Options({
-  components: { BsAlert, SingleLineInput, BsBtn },
+  components: { BsAlert, FloatingSingleLineInput, BsBtn },
 })
 export default class ProfileView extends Vue {
   private profileInfo = profileStore();
@@ -60,13 +60,13 @@ export default class ProfileView extends Vue {
       </div>
     </bs-alert>
 
-    <single-line-input
+    <floating-single-line-input
       v-model="profileInfo.username"
       label="Username"
       disabled
     />
 
-    <single-line-input
+    <floating-single-line-input
       v-model="profileInfo.auth_token"
       label="Auth Token"
       type="text"
@@ -75,9 +75,9 @@ export default class ProfileView extends Vue {
       <bs-btn variant="primary" @click="refreshToken()">
         <span class="bi bi-arrow-repeat" /> Regenerate
       </bs-btn>
-    </single-line-input>
+    </floating-single-line-input>
 
-    <single-line-input
+    <floating-single-line-input
       v-model="wantedEmail"
       label="Change Email"
       type="email"
@@ -90,11 +90,11 @@ export default class ProfileView extends Vue {
       >
         <span class="bi bi-check" /> Change &amp; Verify
       </bs-btn>
-    </single-line-input>
+    </floating-single-line-input>
 
-    <single-line-input
+    <floating-single-line-input
       v-model="wantedPassword"
-      label="Change Password"
+      label="New Password"
       type="password"
     >
       <bs-btn
@@ -104,7 +104,7 @@ export default class ProfileView extends Vue {
       >
         <span class="bi bi-key" /> Change Password
       </bs-btn>
-    </single-line-input>
+    </floating-single-line-input>
   </div>
 </template>
 
