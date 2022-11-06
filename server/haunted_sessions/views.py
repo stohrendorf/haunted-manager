@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
@@ -89,12 +91,21 @@ def check_session_access(request: HttpRequest, body: SessionAccessRequest) -> Su
         user = User.objects.get(username=body.username)
     except User.DoesNotExist:
         return SuccessResponse(success=False, message="user does not exist")
+    except Exception:
+        logging.error("unexpected error while retrieving user", exc_info=True)
+        return SuccessResponse(success=False, message="unexpected error while retrieving user")
+
     if not user.is_active:
         return SuccessResponse(success=False, message="user is inactive")
+
     try:
         auth_token = ApiKey.objects.get(owner=user)
     except ApiKey.DoesNotExist:
         return SuccessResponse(success=False, message="auth token not found")
+    except Exception:
+        logging.error("unexpected error while checking auth token", exc_info=True)
+        return SuccessResponse(success=False, message="unexpected error while checking auth token")
+
     if auth_token.key.hex != body.auth_token:
         return SuccessResponse(success=False, message="invalid auth token")
     if not SessionModel.objects.filter(key=body.session_id).exists():
