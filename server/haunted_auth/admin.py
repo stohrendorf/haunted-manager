@@ -4,7 +4,8 @@ from .models import ApiKey
 
 
 class ApiKeyAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("owner", "key")
+    list_display_links = ("owner", "key")
 
 
 admin.site.register(ApiKey, ApiKeyAdmin)

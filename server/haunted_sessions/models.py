@@ -16,6 +16,9 @@ class Tag(TimestampedModel):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ("name",)
+
 
 class Session(TimestampedModel):
     key = models.UUIDField(default=uuid.uuid4, unique=True)
@@ -23,3 +26,6 @@ class Session(TimestampedModel):
     tags = models.ManyToManyField(to=Tag, related_name="sessions")
     description = models.CharField(blank=True, null=False, max_length=512)
     players = models.ManyToManyField(to=User, related_name="sessions")
+
+    def __str__(self):
+        return self.key

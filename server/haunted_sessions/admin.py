@@ -4,11 +4,12 @@ from .models import Session, Tag
 
 
 class TagAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("name", "description")
 
 
 class SessionAdmin(admin.ModelAdmin):
-    pass
+    list_display = ("owner", "key", "description")
+    list_display_links = ("owner", "key")
 
 
 admin.site.register(Tag, TagAdmin)
