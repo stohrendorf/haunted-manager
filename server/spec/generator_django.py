@@ -156,7 +156,7 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: list[Endpoint]) -
             raise RuntimeError
         output += "        @json_response\n"
         output += (
-            f"        def request_handler(request)"
+            f"        def request_handler(request: HttpRequest)"
             f" -> tuple[int, {endpoint.response.typename()}] | {endpoint.response.typename()}:\n"
         )
         if endpoint.method == "post":

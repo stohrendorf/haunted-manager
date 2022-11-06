@@ -28,6 +28,7 @@ requests = "*"
 mypy = "*"
 pytest-mypy = "*"
 types-requests = "*"
+django-stubs = "*"
 
 flake8 = "*"
 flake8-black = "*"
@@ -47,3 +48,9 @@ multi_line_output = 3
 [tool.black]
 target_version = ["py38"]
 line-length = 120
+
+[tool.mypy]
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "hauntedserver.settings"

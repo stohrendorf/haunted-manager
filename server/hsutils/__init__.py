@@ -1,7 +1,8 @@
 import logging
 from functools import wraps
-from typing import Any, Callable
+from typing import Any, Callable, TypeVar
 
+from dataclasses_json import DataClassJsonMixin
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
@@ -15,16 +16,18 @@ from django.http import (
 from django.http.response import HttpResponseBase
 from django.utils import timezone
 
-RequestHandler = Callable[[HttpRequest], HttpResponse]
+T = TypeVar("T", bound=DataClassJsonMixin)
+
+RequestHandler = Callable[[HttpRequest], HttpResponse | T | tuple[int, T]]
 HttpResponseRequestHandler = Callable[[HttpRequest], Any]
 JsonResponseRequestHandler = Callable[[HttpRequest], JsonResponse]
 
 
-def json_response(f: RequestHandler) -> JsonResponseRequestHandler:
-    @wraps(f)
+def json_response(fn: RequestHandler) -> JsonResponseRequestHandler:
+    @wraps(fn)
     def wrapper(request: HttpRequest):
         try:
-            response_data = f(request)
+            response_data = fn(request)
         except Exception:
             logging.error("request processing error", exc_info=True)
             return JsonResponse(

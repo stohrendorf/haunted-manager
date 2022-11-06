@@ -3,7 +3,6 @@ import logging
 import django.contrib.auth
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth import login as django_login
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from django.db.transaction import atomic
@@ -41,8 +40,10 @@ def login(request: HttpRequest, body: LoginRequest) -> SuccessResponse | tuple[i
     return SuccessResponse(success=True, message="")
 
 
-@login_required
-def logout(request: HttpRequest) -> Empty:
+def logout(request: HttpRequest) -> Empty | tuple[int, Empty]:
+    if not request.user.is_active or not request.user.is_authenticated:
+        return HttpResponseForbidden.status_code, Empty()
+
     django.contrib.auth.logout(request)
     return Empty()
 
@@ -104,8 +105,9 @@ def register(request: HttpRequest, body: RegisterRequest) -> tuple[int, SuccessR
     return SuccessResponse(success=True, message="registered")
 
 
-@login_required
 def regenerate_token(request: HttpRequest) -> tuple[int, Empty] | Empty:
+    if not request.user.is_active or not request.user.is_authenticated:
+        return HttpResponseForbidden.status_code, Empty()
     try:
         ApiKey.objects.get(owner=request.user).delete()
     except ApiKey.DoesNotExist:
@@ -114,8 +116,10 @@ def regenerate_token(request: HttpRequest) -> tuple[int, Empty] | Empty:
     return Empty()
 
 
-@login_required
-def change_password(request: HttpRequest, body: ChangePasswordRequest) -> SuccessResponse:
+def change_password(request: HttpRequest, body: ChangePasswordRequest) -> SuccessResponse | tuple[int, SuccessResponse]:
+    if not request.user.is_active or not request.user.is_authenticated:
+        return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")
+
     try:
         validate_password(body.password, request.user)
     except ValidationError as e:
@@ -129,8 +133,10 @@ def change_password(request: HttpRequest, body: ChangePasswordRequest) -> Succes
     return SuccessResponse(success=True, message="password changed")
 
 
-@login_required
-def change_email(request: HttpRequest, body: ChangeEmailRequest) -> SuccessResponse:
+def change_email(request: HttpRequest, body: ChangeEmailRequest) -> SuccessResponse | tuple[int, SuccessResponse]:
+    if not request.user.is_active or not request.user.is_authenticated:
+        return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")
+
     if User.objects.filter(email=body.email).exists():
         return SuccessResponse(success=False, message="Email address already in use.")
 

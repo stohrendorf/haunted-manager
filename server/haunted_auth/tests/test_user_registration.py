@@ -66,6 +66,7 @@ def test_register_verify_happy_path(live_server: LiveServer):
         username="test-user",
     )
     assert code == 409
+    assert response is not None
     assert response.success is False
 
     user = get_user_model().objects.get()

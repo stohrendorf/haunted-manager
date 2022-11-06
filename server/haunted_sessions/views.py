@@ -2,9 +2,8 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.decorators import login_required
 from django.db.transaction import atomic
-from django.http import HttpRequest, HttpResponseNotFound
+from django.http import HttpRequest, HttpResponseForbidden, HttpResponseNotFound
 from django.views.decorators.csrf import csrf_exempt
 
 from haunted_auth.models import ApiKey
@@ -62,8 +61,10 @@ def get_sessions(request) -> SessionsResponse:
     )
 
 
-@login_required
 def delete_session(request, body: DeleteSessionRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
+    if not request.user.is_active or not request.user.is_authenticated:
+        return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")
+
     session = SessionModel.objects.get(key=body.session_id)
     if not session:
         return HttpResponseNotFound.status_code, SuccessResponse(
@@ -119,8 +120,8 @@ def update_sessions_players(request, body: SessionsPlayersRequest) -> Empty:
     if body.api_key != settings.SESSION_CHECK_API_KEY:
         return Empty()
 
-    for session in SessionModel.objects.all():
-        session.players.clear()
+    for db_session in SessionModel.objects.all():
+        db_session.players.clear()
     for session in body.sessions:
         try:
             db_session = SessionModel.objects.get(key=session.session_id)
@@ -135,12 +136,14 @@ def update_sessions_players(request, body: SessionsPlayersRequest) -> Empty:
     return Empty()
 
 
-@login_required
 @atomic
 def create_session(
     request: HttpRequest,
     data: CreateSessionRequest,
 ) -> tuple[int, SuccessResponse] | SuccessResponse:
+    if not request.user.is_active or not request.user.is_authenticated:
+        return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")
+
     session = SessionModel.objects.create(
         owner=request.user,
         description=data.description,
