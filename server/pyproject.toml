@@ -27,6 +27,7 @@ pytest-django = "*"
 requests = "*"
 mypy = "*"
 pytest-mypy = "*"
+coverage = "*"
 types-requests = "*"
 django-stubs = "*"
 
