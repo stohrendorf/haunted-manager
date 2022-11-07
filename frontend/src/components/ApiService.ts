@@ -14,6 +14,9 @@ export interface IChangeEmailRequest {
 export interface IChangePasswordRequest {
   password: string;
 }
+export interface IChangeUsernameRequest {
+  username: string;
+}
 export interface ICreateSessionRequest {
   description: string;
   tags: number[];
@@ -126,6 +129,14 @@ function validateChangePasswordRequest(data: IChangePasswordRequest): void {
     throw new SchemaValidationError("ChangePasswordRequest.password");
   if (data.password.length < 1)
     throw new SchemaValidationError("ChangePasswordRequest.password");
+}
+function validateChangeUsernameRequest(data: IChangeUsernameRequest): void {
+  if (data.username === undefined)
+    throw new SchemaValidationError("ChangeUsernameRequest.username");
+  if (data.username === null)
+    throw new SchemaValidationError("ChangeUsernameRequest.username");
+  if (data.username.length < 1)
+    throw new SchemaValidationError("ChangeUsernameRequest.username");
 }
 function validateCreateSessionRequest(data: ICreateSessionRequest): void {
   if (data.description === undefined)
@@ -435,6 +446,17 @@ export async function getAnnouncements(): Promise<IAnnouncementsResponse> {
 export async function getProfile(): Promise<IProfileInfoResponse> {
   const result = (await get("/api/v0/auth/profile")) as IProfileInfoResponse;
   validateProfileInfoResponse(result);
+  return result;
+}
+export async function changeUsername(
+  body: IChangeUsernameRequest
+): Promise<ISuccessResponse> {
+  validateChangeUsernameRequest(body);
+  const result = (await post(
+    "/api/v0/auth/change-username",
+    body
+  )) as ISuccessResponse;
+  validateSuccessResponse(result);
   return result;
 }
 export async function regenerateToken(): Promise<IEmpty> {

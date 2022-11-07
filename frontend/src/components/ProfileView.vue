@@ -5,6 +5,7 @@ import {
   changePassword,
   getProfile,
   regenerateToken,
+  changeUsername,
 } from "@/components/ApiService";
 import { profileStore } from "@/components/ProfileStore";
 import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
@@ -18,11 +19,13 @@ export default class ProfileView extends Vue {
   private profileInfo = profileStore();
   private wantedEmail: string = "";
   private wantedPassword: string = "";
+  private wantedUsername: string = "";
   private err: string = "";
 
   async created(): Promise<void> {
     this.profileInfo.$state = await getProfile();
     this.wantedEmail = this.profileInfo.email ?? "";
+    this.wantedUsername = this.profileInfo.username;
   }
 
   async refreshToken(): Promise<void> {
@@ -39,6 +42,14 @@ export default class ProfileView extends Vue {
 
   async changeEmail(): Promise<void> {
     const response = await changeEmail({ email: this.wantedEmail });
+    this.profileInfo.$state = await getProfile();
+    if (response.success) this.err = "";
+    else this.err = response.message;
+  }
+
+  async changeUsername(): Promise<void> {
+    const response = await changeUsername({ username: this.wantedUsername });
+    this.profileInfo.$state = await getProfile();
     if (response.success) this.err = "";
     else this.err = response.message;
   }
@@ -60,11 +71,15 @@ export default class ProfileView extends Vue {
       </div>
     </bs-alert>
 
-    <floating-single-line-input
-      v-model="profileInfo.username"
-      label="Username"
-      disabled
-    />
+    <floating-single-line-input v-model="wantedUsername" label="Username">
+      <bs-btn
+        :disabled="!wantedUsername || wantedUsername === profileInfo.username"
+        variant="primary"
+        @click="changeUsername()"
+      >
+        <span class="bi bi-person-badge" /> Change Username
+      </bs-btn>
+    </floating-single-line-input>
 
     <floating-single-line-input
       v-model="profileInfo.auth_token"
@@ -79,7 +94,7 @@ export default class ProfileView extends Vue {
 
     <floating-single-line-input
       v-model="wantedEmail"
-      label="Change Email"
+      label="Email"
       type="email"
       required
     >
@@ -94,7 +109,7 @@ export default class ProfileView extends Vue {
 
     <floating-single-line-input
       v-model="wantedPassword"
-      label="New Password"
+      label="Password"
       type="password"
     >
       <bs-btn
