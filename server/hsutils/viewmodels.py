@@ -2,7 +2,7 @@ import re
 from dataclasses import dataclass
 from typing import Callable, List, Optional
 
-from dataclasses_json import dataclass_json
+from dataclasses_json import DataClassJsonMixin, dataclass_json
 from django.http import HttpRequest, HttpResponse
 from django.urls import path
 
@@ -20,7 +20,7 @@ class SchemaValidationError(Exception):
 
 @dataclass_json
 @dataclass(kw_only=True)
-class AnnouncementEntry:
+class AnnouncementEntry(DataClassJsonMixin):
     background_color: str
     message: str
     text_color: str
@@ -31,7 +31,7 @@ class AnnouncementEntry:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class AnnouncementsResponse:
+class AnnouncementsResponse(DataClassJsonMixin):
     announcements: List["AnnouncementEntry"]
 
     def validate(self):
@@ -40,7 +40,7 @@ class AnnouncementsResponse:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class ChangeEmailRequest:
+class ChangeEmailRequest(DataClassJsonMixin):
     email: str
 
     def validate(self):
@@ -49,7 +49,7 @@ class ChangeEmailRequest:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class ChangePasswordRequest:
+class ChangePasswordRequest(DataClassJsonMixin):
     password: str
 
     def validate(self):
@@ -58,7 +58,7 @@ class ChangePasswordRequest:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class CreateSessionRequest:
+class CreateSessionRequest(DataClassJsonMixin):
     description: str
     tags: List[int]
 
@@ -68,7 +68,7 @@ class CreateSessionRequest:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class DeleteSessionRequest:
+class DeleteSessionRequest(DataClassJsonMixin):
     session_id: str
 
     def validate(self):
@@ -77,14 +77,14 @@ class DeleteSessionRequest:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class Empty:
+class Empty(DataClassJsonMixin):
     def validate(self):
         validate_empty(self)
 
 
 @dataclass_json
 @dataclass(kw_only=True)
-class LoginRequest:
+class LoginRequest(DataClassJsonMixin):
     password: str
     username: str
 
@@ -94,7 +94,7 @@ class LoginRequest:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class ProfileInfoResponse:
+class ProfileInfoResponse(DataClassJsonMixin):
     auth_token: Optional[str]
     authenticated: bool
     email: Optional[str]
@@ -107,7 +107,7 @@ class ProfileInfoResponse:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class RegisterRequest:
+class RegisterRequest(DataClassJsonMixin):
     email: str
     password: str
     username: str
@@ -118,7 +118,7 @@ class RegisterRequest:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class Session:
+class Session(DataClassJsonMixin):
     description: str
     id: str
     owner: str
@@ -131,7 +131,7 @@ class Session:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class SessionAccessRequest:
+class SessionAccessRequest(DataClassJsonMixin):
     api_key: str
     auth_token: str
     session_id: str
@@ -143,7 +143,7 @@ class SessionAccessRequest:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class SessionPlayers:
+class SessionPlayers(DataClassJsonMixin):
     session_id: str
     usernames: List[str]
 
@@ -153,7 +153,7 @@ class SessionPlayers:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class SessionTag:
+class SessionTag(DataClassJsonMixin):
     description: str
     name: str
 
@@ -163,7 +163,7 @@ class SessionTag:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class SessionsPlayersRequest:
+class SessionsPlayersRequest(DataClassJsonMixin):
     api_key: str
     sessions: List["SessionPlayers"]
 
@@ -173,7 +173,7 @@ class SessionsPlayersRequest:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class SessionsResponse:
+class SessionsResponse(DataClassJsonMixin):
     sessions: List["Session"]
 
     def validate(self):
@@ -182,7 +182,7 @@ class SessionsResponse:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class StatsResponse:
+class StatsResponse(DataClassJsonMixin):
     total_sessions: int
     total_users: int
 
@@ -192,7 +192,7 @@ class StatsResponse:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class SuccessResponse:
+class SuccessResponse(DataClassJsonMixin):
     message: str
     success: bool
 
@@ -202,7 +202,7 @@ class SuccessResponse:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class Tag:
+class Tag(DataClassJsonMixin):
     description: str
     id: int
     name: str
@@ -213,7 +213,7 @@ class Tag:
 
 @dataclass_json
 @dataclass(kw_only=True)
-class TagsResponse:
+class TagsResponse(DataClassJsonMixin):
     tags: List["Tag"]
 
     def validate(self):
@@ -266,6 +266,8 @@ def validate_create_session_request(data: CreateSessionRequest):
     if data.tags is None:
         raise SchemaValidationError("CreateSessionRequest.tags")
     for field_data in data.tags:
+        if field_data is None:
+            raise SchemaValidationError("CreateSessionRequest.tags")
         pass
     return
 
@@ -342,6 +344,8 @@ def validate_session(data: Session):
     if data.players is None:
         raise SchemaValidationError("Session.players")
     for field_data in data.players:
+        if field_data is None:
+            raise SchemaValidationError("Session.players")
         if len(field_data) < 1:
             raise SchemaValidationError("Session.players")
     if data.tags is None:
@@ -379,6 +383,8 @@ def validate_session_players(data: SessionPlayers):
     if data.usernames is None:
         raise SchemaValidationError("SessionPlayers.usernames")
     for field_data in data.usernames:
+        if field_data is None:
+            raise SchemaValidationError("SessionPlayers.usernames")
         if len(field_data) < 1:
             raise SchemaValidationError("SessionPlayers.usernames")
     return

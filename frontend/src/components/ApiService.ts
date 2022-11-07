@@ -137,6 +137,10 @@ function validateCreateSessionRequest(data: ICreateSessionRequest): void {
   if (data.tags === null)
     throw new SchemaValidationError("CreateSessionRequest.tags");
   for (const fieldData of data.tags) {
+    if (fieldData === undefined)
+      throw new SchemaValidationError("CreateSessionRequest.tags");
+    if (fieldData === null)
+      throw new SchemaValidationError("CreateSessionRequest.tags");
   }
 }
 function validateDeleteSessionRequest(data: IDeleteSessionRequest): void {
@@ -226,6 +230,9 @@ function validateSession(data: ISession): void {
     throw new SchemaValidationError("Session.players");
   if (data.players === null) throw new SchemaValidationError("Session.players");
   for (const fieldData of data.players) {
+    if (fieldData === undefined)
+      throw new SchemaValidationError("Session.players");
+    if (fieldData === null) throw new SchemaValidationError("Session.players");
     if (fieldData.length < 1)
       throw new SchemaValidationError("Session.players");
   }
@@ -274,6 +281,10 @@ function validateSessionPlayers(data: ISessionPlayers): void {
   if (data.usernames === null)
     throw new SchemaValidationError("SessionPlayers.usernames");
   for (const fieldData of data.usernames) {
+    if (fieldData === undefined)
+      throw new SchemaValidationError("SessionPlayers.usernames");
+    if (fieldData === null)
+      throw new SchemaValidationError("SessionPlayers.usernames");
     if (fieldData.length < 1)
       throw new SchemaValidationError("SessionPlayers.usernames");
   }

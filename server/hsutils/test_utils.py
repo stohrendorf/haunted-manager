@@ -1,9 +1,10 @@
 from typing import Optional, TypeVar
 
 import requests
+from dataclasses_json import DataClassJsonMixin
 from pytest_django.live_server_helper import LiveServer
 
-T = TypeVar("T")
+T = TypeVar("T", bound=DataClassJsonMixin)
 
 
 def get_test_url(live_server: LiveServer, path: str, response_class: type[T]) -> tuple[int, Optional[T]]:

@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Iterable
 
 from endpoints import Endpoint
 from structural import (
@@ -14,7 +15,7 @@ from structural import (
 )
 
 
-def _gen_vue_field_checks(context: str, accessor: str, field: BaseField):
+def _gen_vue_field_checks(context: str, accessor: str, field: BaseField) -> Iterable[str]:
     yield f'  if({accessor} === undefined) throw new SchemaValidationError("{context}");'
     if not field.nullable:
         yield f'  if({accessor} === null) throw new SchemaValidationError("{context}");'
@@ -35,20 +36,10 @@ def _gen_vue_field_checks(context: str, accessor: str, field: BaseField):
             yield f'  if({accessor} > {field.max}) throw new SchemaValidationError("{context}");'
     elif isinstance(field, ArrayField):
         yield f"  for ( const fieldData of {accessor} ) {{\n"
-        if isinstance(field.items, StringField):
-            if field.items.min_length is not None:
-                yield f'  if(fieldData.length < {field.items.min_length}) throw new SchemaValidationError("{context}");'
-            if field.items.max_length is not None:
-                yield f'  if(fieldData.length > {field.items.max_length}) throw new SchemaValidationError("{context}");'
-            if field.items.regex is not None:
-                yield f'  if(!fieldData.match(/^{field.items.regex}$/)) throw new SchemaValidationError("{context}");'
-        elif isinstance(field.items, (IntegerField, FloatField)):
-            if field.items.min is not None:
-                yield f'  if(fieldData < {field.items.min}) throw new SchemaValidationError("{context}");'
-            if field.items.max is not None:
-                yield f'  if(fieldData > {field.items.max}) throw new SchemaValidationError("{context}");'
-        else:
+        if isinstance(field.items, Compound):
             yield f"      validate{field.items.typename()}(fieldData);\n"
+        else:
+            yield from _gen_vue_field_checks(context, "fieldData", field.items)
         yield "}\n"
 
     if field.nullable:

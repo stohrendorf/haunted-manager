@@ -30,16 +30,19 @@ def _field_to_type_sig(field: BaseField) -> str:
     return f"Optional[{t}]" if field.nullable else t
 
 
-def _gen_django_field_checks(context: str, accessor: str, field: BaseField) -> str:
-    indent = " " * 4
+base_indent = " " * 4
+
+
+def _gen_check(context: str, indent: str, field: BaseField, accessor: str) -> tuple[str, bool]:
     output = ""
+    empty = True
+
     if not field.nullable:
         output += f'{indent}if {accessor} is None: raise SchemaValidationError("{context}")\n'
     else:
         output += f"{indent}if {accessor} is not None:\n"
-        indent = " " * 8
+        indent += base_indent
 
-    empty = True
     if isinstance(field, StringField):
         if field.min_length is not None:
             output += f'{indent}if len({accessor}) < {field.min_length}: raise SchemaValidationError("{context}")\n'
@@ -61,39 +64,31 @@ def _gen_django_field_checks(context: str, accessor: str, field: BaseField) -> s
             empty = False
     elif isinstance(field, ArrayField):
         output += f"{indent}for field_data in {accessor}:\n"
-        if isinstance(field.items, StringField):
-            if field.items.min_length is not None:
-                output += f'{indent}    if len(field_data) < {field.items.min_length}: raise SchemaValidationError("{context}")\n'
-                empty = False
-            if field.items.max_length is not None:
-                output += f'{indent}    if len(field_data) > {field.items.max_length}: raise SchemaValidationError("{context}")\n'
-                empty = False
-            if field.items.regex is not None:
-                output += f'{indent}    if not re.fullmatch(r"{field.items.regex}", field_data): raise SchemaValidationError("{context}")\n'
-                empty = False
-        elif isinstance(field.items, (IntegerField, FloatField)):
-            if field.items.min is not None:
-                output += f'{indent}    if field_data < {field.items.min}: raise SchemaValidationError("{context}")\n'
-                empty = False
-            if field.items.max is not None:
-                output += f'{indent}    if field_data > {field.items.max}: raise SchemaValidationError("{context}")\n'
-                empty = False
-        else:
+        if isinstance(field.items, Compound):
             output += f"{indent}    validate_{humps.decamelize(field.items.typename())}(field_data)\n"
             empty = False
+        else:
+            field_output, empty = _gen_check(context, indent + base_indent, field.items, "field_data")
+            output += field_output
         if empty:
             output += f"{indent}    pass\n"
         empty = False
 
     if field.nullable and empty:
         output += f"{indent}pass\n"
+
+    return output, empty
+
+
+def _gen_django_field_checks(context: str, accessor: str, field: BaseField) -> str:
+    output, _ = _gen_check(context, base_indent, field, accessor)
     return output
 
 
 def gen_django(schemas: list[BaseField | Compound], endpoints: list[Endpoint]) -> str:
     output = "from typing import Callable, Optional, List\n"
     output += "from dataclasses import dataclass\n"
-    output += "from dataclasses_json import dataclass_json\n"
+    output += "from dataclasses_json import DataClassJsonMixin, dataclass_json\n"
     output += "from django.http import HttpRequest, HttpResponse\n"
     output += "from django.urls import path\n"
     output += "from . import json_response\n"
@@ -110,7 +105,7 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: list[Endpoint]) -
         if not is_primitive_field(schema):
             output += "@dataclass_json\n"
             output += "@dataclass(kw_only=True)\n"
-            output += f"class {schema.typename()}:\n"
+            output += f"class {schema.typename()}(DataClassJsonMixin):\n"
             for field_name, field in schema.subfields():
                 output += f"    {field_name}: {_field_to_type_sig(field)}\n"
 

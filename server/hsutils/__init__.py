@@ -6,20 +6,13 @@ from dataclasses_json import DataClassJsonMixin
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
-from django.http import (
-    HttpRequest,
-    HttpResponse,
-    HttpResponseForbidden,
-    HttpResponseServerError,
-    JsonResponse,
-)
+from django.http import HttpRequest, HttpResponse, HttpResponseServerError, JsonResponse
 from django.http.response import HttpResponseBase
 from django.utils import timezone
 
 T = TypeVar("T", bound=DataClassJsonMixin)
 
 RequestHandler = Callable[[HttpRequest], HttpResponse | T | tuple[int, T]]
-HttpResponseRequestHandler = Callable[[HttpRequest], Any]
 JsonResponseRequestHandler = Callable[[HttpRequest], JsonResponse]
 
 
@@ -51,17 +44,6 @@ def json_response(fn: RequestHandler) -> JsonResponseRequestHandler:
     return wrapper
 
 
-def require_verified_mail(f: RequestHandler) -> RequestHandler:
-    @wraps(f)
-    def wrapper(request: HttpRequest):
-        if not request.user.is_active:
-            return HttpResponseForbidden()
-
-        return f(request)
-
-    return wrapper
-
-
 class TimestampedModel(models.Model):
     created_at = models.DateTimeField(default=timezone.now, editable=False, blank=False, null=False)
     updated_at = models.DateTimeField(default=timezone.now, editable=False, blank=False, null=False)
@@ -72,5 +54,5 @@ class TimestampedModel(models.Model):
 
 
 @receiver(pre_save, sender=TimestampedModel)
-def my_handler(sender, instance: TimestampedModel, **kwargs):
+def update_timestamped_model_timestamps(sender, instance: TimestampedModel, **kwargs):
     instance.updated_at = timezone.now()
