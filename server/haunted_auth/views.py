@@ -19,6 +19,7 @@ from haunted_auth.models import ApiKey
 from hsutils.viewmodels import (
     ChangeEmailRequest,
     ChangePasswordRequest,
+    ChangeUsernameRequest,
     Empty,
     LoginRequest,
     ProfileInfoResponse,
@@ -131,6 +132,25 @@ def change_password(request: HttpRequest, body: ChangePasswordRequest) -> Succes
     request.user.set_password(body.password)
     request.user.save()
     return SuccessResponse(success=True, message="password changed")
+
+
+@atomic
+def change_username(request: HttpRequest, body: ChangeUsernameRequest) -> SuccessResponse | tuple[int, SuccessResponse]:
+    if not request.user.is_active or not request.user.is_authenticated:
+        return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")
+
+    if User.objects.filter(username=body.username).exists():
+        return SuccessResponse(success=False, message="Username already in use")
+
+    try:
+        request.user.username = body.username
+    except Exception:
+        logging.error("failed to change username", exc_info=True)
+        return SuccessResponse(success=False, message="Failed to change username")
+
+    request.user.username = body.username
+    request.user.save()
+    return SuccessResponse(success=True, message="username changed")
 
 
 def change_email(request: HttpRequest, body: ChangeEmailRequest) -> SuccessResponse | tuple[int, SuccessResponse]:

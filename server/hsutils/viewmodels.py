@@ -58,6 +58,15 @@ class ChangePasswordRequest(DataClassJsonMixin):
 
 @dataclass_json
 @dataclass(kw_only=True)
+class ChangeUsernameRequest(DataClassJsonMixin):
+    username: str
+
+    def validate(self):
+        validate_change_username_request(self)
+
+
+@dataclass_json
+@dataclass(kw_only=True)
 class CreateSessionRequest(DataClassJsonMixin):
     description: str
     tags: List[int]
@@ -257,6 +266,14 @@ def validate_change_password_request(data: ChangePasswordRequest):
         raise SchemaValidationError("ChangePasswordRequest.password")
     if len(data.password) < 1:
         raise SchemaValidationError("ChangePasswordRequest.password")
+    return
+
+
+def validate_change_username_request(data: ChangeUsernameRequest):
+    if data.username is None:
+        raise SchemaValidationError("ChangeUsernameRequest.username")
+    if len(data.username) < 1:
+        raise SchemaValidationError("ChangeUsernameRequest.username")
     return
 
 
@@ -631,6 +648,27 @@ class get_profile:
         @json_response
         def request_handler(request: HttpRequest) -> tuple[int, ProfileInfoResponse] | ProfileInfoResponse:
             response = fn(request)
+            if isinstance(response, tuple):
+                code, response = response
+            else:
+                code = HttpResponse.status_code
+            response.validate()
+            return code, response
+
+        return path(cls.path, request_handler, name=cls.operation)
+
+
+class change_username:
+    path = "api/v0/auth/change-username"
+    operation = "change_username"
+
+    @classmethod
+    def wrap(cls, fn: Callable[[HttpRequest, ChangeUsernameRequest], SuccessResponse | tuple[int, SuccessResponse]]):
+        @json_response
+        def request_handler(request: HttpRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
+            rq: ChangeUsernameRequest = ChangeUsernameRequest.schema().loads(request.body.decode())
+            rq.validate()
+            response = fn(request, rq)
             if isinstance(response, tuple):
                 code, response = response
             else:

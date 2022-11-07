@@ -29,6 +29,10 @@ class ProfileInfoResponse(Compound):
     auth_token = StringField(nullable=True, min_length=1)
 
 
+class ChangeUsernameRequest(Compound):
+    username = StringField(min_length=1)
+
+
 class LoginRequest(Compound):
     username = StringField(min_length=1)
     password = StringField(min_length=1)
@@ -192,6 +196,13 @@ endpoints = (
         path="/api/v0/auth/profile",
         method="get",
         response=ProfileInfoResponse(),
+    ),
+    Endpoint(
+        operation_name="changeUsername",
+        path="/api/v0/auth/change-username",
+        method="post",
+        response=SuccessResponse(),
+        body=ChangeUsernameRequest(),
     ),
     Endpoint(
         operation_name="regenerateToken",
