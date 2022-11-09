@@ -40,9 +40,7 @@ export default class SessionList extends Vue {
     </bs-alert>
     <bs-alert v-show="profile.authenticated" variant="primary">
       Use your auth token
-      <clipboard-copyable :value="profile.auth_token">
-        <code>{{ profile.auth_token?.substring(0, 6) }}...</code>
-      </clipboard-copyable>
+      <a href="" @click.prevent="$router.push('/profile')">from your profile</a>
       to join a session.
     </bs-alert>
     <div class="list-group">
