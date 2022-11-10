@@ -41,6 +41,11 @@ export interface IRegisterRequest {
   password: string;
   username: string;
 }
+export interface IServerInfoResponse {
+  coop_url: string;
+  total_sessions: number;
+  total_users: number;
+}
 export interface ISession {
   description: string;
   id: string;
@@ -68,10 +73,6 @@ export interface ISessionsPlayersRequest {
 }
 export interface ISessionsResponse {
   sessions: ISession[];
-}
-export interface IStatsResponse {
-  total_sessions: number;
-  total_users: number;
 }
 export interface ISuccessResponse {
   message: string;
@@ -225,6 +226,26 @@ function validateRegisterRequest(data: IRegisterRequest): void {
   if (data.username.length < 1)
     throw new SchemaValidationError("RegisterRequest.username");
 }
+function validateServerInfoResponse(data: IServerInfoResponse): void {
+  if (data.coop_url === undefined)
+    throw new SchemaValidationError("ServerInfoResponse.coop_url");
+  if (data.coop_url === null)
+    throw new SchemaValidationError("ServerInfoResponse.coop_url");
+  if (data.coop_url.length < 1)
+    throw new SchemaValidationError("ServerInfoResponse.coop_url");
+  if (data.total_sessions === undefined)
+    throw new SchemaValidationError("ServerInfoResponse.total_sessions");
+  if (data.total_sessions === null)
+    throw new SchemaValidationError("ServerInfoResponse.total_sessions");
+  if (data.total_sessions < 0)
+    throw new SchemaValidationError("ServerInfoResponse.total_sessions");
+  if (data.total_users === undefined)
+    throw new SchemaValidationError("ServerInfoResponse.total_users");
+  if (data.total_users === null)
+    throw new SchemaValidationError("ServerInfoResponse.total_users");
+  if (data.total_users < 0)
+    throw new SchemaValidationError("ServerInfoResponse.total_users");
+}
 function validateSession(data: ISession): void {
   if (data.description === undefined)
     throw new SchemaValidationError("Session.description");
@@ -336,20 +357,6 @@ function validateSessionsResponse(data: ISessionsResponse): void {
     validateSession(fieldData);
   }
 }
-function validateStatsResponse(data: IStatsResponse): void {
-  if (data.total_sessions === undefined)
-    throw new SchemaValidationError("StatsResponse.total_sessions");
-  if (data.total_sessions === null)
-    throw new SchemaValidationError("StatsResponse.total_sessions");
-  if (data.total_sessions < 0)
-    throw new SchemaValidationError("StatsResponse.total_sessions");
-  if (data.total_users === undefined)
-    throw new SchemaValidationError("StatsResponse.total_users");
-  if (data.total_users === null)
-    throw new SchemaValidationError("StatsResponse.total_users");
-  if (data.total_users < 0)
-    throw new SchemaValidationError("StatsResponse.total_users");
-}
 function validateSuccessResponse(data: ISuccessResponse): void {
   if (data.message === undefined)
     throw new SchemaValidationError("SuccessResponse.message");
@@ -379,9 +386,9 @@ function validateTagsResponse(data: ITagsResponse): void {
     validateTag(fieldData);
   }
 }
-export async function getStats(): Promise<IStatsResponse> {
-  const result = (await get("/api/v0/stats")) as IStatsResponse;
-  validateStatsResponse(result);
+export async function getServerInfo(): Promise<IServerInfoResponse> {
+  const result = (await get("/api/v0/server-info")) as IServerInfoResponse;
+  validateServerInfoResponse(result);
   return result;
 }
 export async function getTags(): Promise<ITagsResponse> {

@@ -8,12 +8,18 @@ import BsNavbar from "@/components/bootstrap/BsNavbar.vue";
 import BsNavbarNav from "@/components/bootstrap/BsNavbarNav.vue";
 import BsRouterNavItem from "@/components/bootstrap/BsRouterNavItem.vue";
 import BsDropdownNavItem from "@/components/bootstrap/BsDropdownNavItem.vue";
-import { getProfile, getStats, IStatsResponse } from "@/components/ApiService";
+import {
+  getProfile,
+  getServerInfo,
+  IServerInfoResponse,
+} from "@/components/ApiService";
 import { profileStore } from "@/components/ProfileStore";
 import BsModal from "@/components/bootstrap/BsModal.vue";
+import ClipboardCopyable from "@/components/utilities/ClipboardCopyable.vue";
 
 @Options({
   components: {
+    ClipboardCopyable,
     BsModal,
     SiteAnnouncementsList,
     LoginWidget,
@@ -29,11 +35,15 @@ export default class App extends Vue {
   public profileInfo = profileStore();
   private err: Error | null = null;
   private info: string = "";
-  private stats: IStatsResponse = { total_sessions: 0, total_users: 0 };
+  private serverInfo: IServerInfoResponse = {
+    total_sessions: 0,
+    total_users: 0,
+    coop_url: "",
+  };
 
   async created(): Promise<void> {
     this.profileInfo.$state = await getProfile();
-    this.stats = await getStats();
+    this.serverInfo = await getServerInfo();
   }
 
   errorCaptured(err: Error, vm: Vue, info: string): boolean {
@@ -84,23 +94,46 @@ export default class App extends Vue {
           <span class="bi bi-plus-square-fill" />
           Create Session
         </bs-router-nav-item>
+        <bs-dropdown-nav-item
+          v-show="profileInfo.authenticated"
+          min-width="20em"
+        >
+          <template #toggle>
+            <span class="bi bi-key-fill" /> Session Credentials
+          </template>
+          <div style="padding: 0.6666em">
+            <div>
+              The server address is
+              <clipboard-copyable :value="serverInfo.coop_url">
+                <code>{{ serverInfo.coop_url }}</code>
+              </clipboard-copyable>
+            </div>
+            <hr />
+            <div>
+              Your personal Auth token is
+              <clipboard-copyable :value="profileInfo.auth_token">
+                <code>{{ profileInfo.auth_token }}</code>
+              </clipboard-copyable>
+            </div>
+          </div>
+        </bs-dropdown-nav-item>
       </bs-navbar-nav>
       <bs-navbar-nav ms="auto">
         <li class="navbar-text text-info">
           <span class="bi bi-info-circle" />
-          Happily providing {{ stats.total_sessions }} sessions for
-          {{ stats.total_users }} users.
+          Happily providing {{ serverInfo.total_sessions }} sessions for
+          {{ serverInfo.total_users }} users.
         </li>
       </bs-navbar-nav>
       <bs-navbar-nav ms="auto">
-        <bs-dropdown-nav-item v-show="profileInfo.authenticated">
+        <bs-dropdown-nav-item v-show="profileInfo.authenticated" end="true">
           <template #toggle>
             <not-verified-lock />
             {{ profileInfo.username }}
           </template>
           <logout-widget />
         </bs-dropdown-nav-item>
-        <bs-dropdown-nav-item v-show="!profileInfo.authenticated">
+        <bs-dropdown-nav-item v-show="!profileInfo.authenticated" end="true">
           <template #toggle> Login/Register </template>
           <login-widget />
         </bs-dropdown-nav-item>

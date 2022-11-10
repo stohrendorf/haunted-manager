@@ -38,11 +38,6 @@ export default class SessionList extends Vue {
     >
       To create a session, you need to verify your email address.
     </bs-alert>
-    <bs-alert v-show="profile.authenticated" variant="primary">
-      Use your auth token
-      <a href="" @click.prevent="$router.push('/profile')">from your profile</a>
-      to join a session.
-    </bs-alert>
     <div class="list-group">
       <div
         v-for="session in sessions"

@@ -16,9 +16,10 @@ class IsoDateTime(StringField):
         super().__init__(regex=r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}.[0-9]{6}\+[0-9]{2}:[0-9]{2}")
 
 
-class StatsResponse(Compound):
+class ServerInfoResponse(Compound):
     total_users = IntegerField(min=0)
     total_sessions = IntegerField(min=0)
+    coop_url = StringField(min_length=1)
 
 
 class ProfileInfoResponse(Compound):
@@ -140,10 +141,10 @@ def write_django_spec(output: Path, endpoints: dict[str, dict[HttpMethod, Endpoi
 
 def main():
     endpoints = {
-        "/api/v0/stats": {
+        "/api/v0/server-info": {
             HttpMethod.GET: Endpoint(
-                operation_name="getStats",
-                response=StatsResponse(),
+                operation_name="getServerInfo",
+                response=ServerInfoResponse(),
             )
         },
         "/api/v0/tags": {

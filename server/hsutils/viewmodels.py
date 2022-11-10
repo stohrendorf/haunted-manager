@@ -127,6 +127,17 @@ class RegisterRequest(DataClassJsonMixin):
 
 @dataclass_json
 @dataclass(kw_only=True)
+class ServerInfoResponse(DataClassJsonMixin):
+    coop_url: str
+    total_sessions: int
+    total_users: int
+
+    def validate(self):
+        validate_server_info_response(self)
+
+
+@dataclass_json
+@dataclass(kw_only=True)
 class Session(DataClassJsonMixin):
     description: str
     id: str
@@ -187,16 +198,6 @@ class SessionsResponse(DataClassJsonMixin):
 
     def validate(self):
         validate_sessions_response(self)
-
-
-@dataclass_json
-@dataclass(kw_only=True)
-class StatsResponse(DataClassJsonMixin):
-    total_sessions: int
-    total_users: int
-
-    def validate(self):
-        validate_stats_response(self)
 
 
 @dataclass_json
@@ -347,6 +348,22 @@ def validate_register_request(data: RegisterRequest):
     return
 
 
+def validate_server_info_response(data: ServerInfoResponse):
+    if data.coop_url is None:
+        raise SchemaValidationError("ServerInfoResponse.coop_url")
+    if len(data.coop_url) < 1:
+        raise SchemaValidationError("ServerInfoResponse.coop_url")
+    if data.total_sessions is None:
+        raise SchemaValidationError("ServerInfoResponse.total_sessions")
+    if data.total_sessions < 0:
+        raise SchemaValidationError("ServerInfoResponse.total_sessions")
+    if data.total_users is None:
+        raise SchemaValidationError("ServerInfoResponse.total_users")
+    if data.total_users < 0:
+        raise SchemaValidationError("ServerInfoResponse.total_users")
+    return
+
+
 def validate_session(data: Session):
     if data.description is None:
         raise SchemaValidationError("Session.description")
@@ -439,18 +456,6 @@ def validate_sessions_response(data: SessionsResponse):
     return
 
 
-def validate_stats_response(data: StatsResponse):
-    if data.total_sessions is None:
-        raise SchemaValidationError("StatsResponse.total_sessions")
-    if data.total_sessions < 0:
-        raise SchemaValidationError("StatsResponse.total_sessions")
-    if data.total_users is None:
-        raise SchemaValidationError("StatsResponse.total_users")
-    if data.total_users < 0:
-        raise SchemaValidationError("StatsResponse.total_users")
-    return
-
-
 def validate_success_response(data: SuccessResponse):
     if data.message is None:
         raise SchemaValidationError("SuccessResponse.message")
@@ -479,14 +484,14 @@ def validate_tags_response(data: TagsResponse):
     return
 
 
-class get_stats:
-    path = "api/v0/stats"
-    operation = "get_stats"
+class get_server_info:
+    path = "api/v0/server-info"
+    operation = "get_server_info"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest], StatsResponse | tuple[int, StatsResponse]]):
+    def wrap(cls, fn: Callable[[HttpRequest], ServerInfoResponse | tuple[int, ServerInfoResponse]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, StatsResponse] | StatsResponse:
+        def request_handler(request: HttpRequest) -> tuple[int, ServerInfoResponse] | ServerInfoResponse:
             response = fn(request)
             if isinstance(response, tuple):
                 code, response = response

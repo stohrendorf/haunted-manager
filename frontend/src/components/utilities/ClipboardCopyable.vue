@@ -17,11 +17,11 @@ export default class ClipboardCopyable extends Vue {
 </script>
 
 <template>
-  <span class="btn-">
+  <div style="display: inline-block; white-space: nowrap">
     <slot />&hairsp;<bs-btn variant="primary" small @click="copyToClipboard()">
       <span class="bi bi-clipboard" />
     </bs-btn>
-  </span>
+  </div>
 </template>
 
 <style scoped></style>

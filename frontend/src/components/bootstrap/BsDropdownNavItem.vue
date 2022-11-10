@@ -1,8 +1,15 @@
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
+import { Prop } from "vue-property-decorator";
 
 @Options({})
-export default class BsDropdownNavItem extends Vue {}
+export default class BsDropdownNavItem extends Vue {
+  @Prop({ required: false, default: null })
+  public minWidth!: string | null;
+
+  @Prop({ required: false, default: false })
+  public end!: boolean;
+}
 </script>
 
 <template>
@@ -15,7 +22,10 @@ export default class BsDropdownNavItem extends Vue {}
     >
       <slot name="toggle" />
     </a>
-    <div class="dropdown-menu dropdown-menu-end">
+    <div
+      :class="['dropdown-menu', end ? 'dropdown-menu-end' : '']"
+      :style="minWidth !== null ? 'min-width:' + minWidth : ''"
+    >
       <slot />
     </div>
   </li>
