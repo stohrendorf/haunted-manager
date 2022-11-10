@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from endpoints import Endpoint, gather_compounds
+from endpoints import Endpoint, HttpMethod, gather_compounds
 from generator_django import gen_django
 from generator_vue import gen_vue
 from structural import ArrayField, BooleanField, Compound, IntegerField, StringField
@@ -124,134 +124,139 @@ class AnnouncementsResponse(Compound):
     announcements = ArrayField(items=AnnouncementEntry())
 
 
-def write_vue_spec(output: Path, *endpoints: Endpoint):
-    all_compounds = gather_compounds(*endpoints)
+def write_vue_spec(output: Path, endpoints: dict[str, dict[HttpMethod, Endpoint]]):
+    all_compounds = gather_compounds(endpoints)
 
-    vue_spec = gen_vue([x() for x in all_compounds], list(endpoints))
+    vue_spec = gen_vue([x() for x in all_compounds], endpoints)
     output.write_text(vue_spec)
 
 
-def write_django_spec(output: Path, *endpoints: Endpoint):
-    all_compounds = gather_compounds(*endpoints)
+def write_django_spec(output: Path, endpoints: dict[str, dict[HttpMethod, Endpoint]]):
+    all_compounds = gather_compounds(endpoints)
 
-    django_spec = gen_django([x() for x in all_compounds], list(endpoints))
+    django_spec = gen_django([x() for x in all_compounds], endpoints)
     output.write_text(django_spec)
 
 
-endpoints = (
-    Endpoint(
-        operation_name="getStats",
-        path="/api/v0/stats",
-        method="get",
-        response=StatsResponse(),
-    ),
-    Endpoint(
-        operation_name="getTags",
-        path="/api/v0/tags",
-        method="get",
-        response=TagsResponse(),
-    ),
-    Endpoint(
-        operation_name="getSessions",
-        path="/api/v0/sessions",
-        method="get",
-        response=SessionsResponse(),
-    ),
-    Endpoint(
-        operation_name="createSession",
-        path="/api/v0/sessions/create",
-        method="post",
-        response=SuccessResponse(),
-        body=CreateSessionRequest(),
-    ),
-    Endpoint(
-        operation_name="deleteSession",
-        path="/api/v0/sessions/delete",
-        method="post",
-        response=SuccessResponse(),
-        body=DeleteSessionRequest(),
-    ),
-    Endpoint(
-        operation_name="checkSessionAccess",
-        path="/api/v0/sessions/check-access",
-        method="post",
-        response=SuccessResponse(),
-        body=SessionAccessRequest(),
-    ),
-    Endpoint(
-        operation_name="updateSessionsPlayers",
-        path="/api/v0/sessions/session-players",
-        method="post",
-        response=Empty(),
-        body=SessionsPlayersRequest(),
-    ),
-    Endpoint(
-        operation_name="getAnnouncements",
-        path="/api/v0/announcements",
-        method="get",
-        response=AnnouncementsResponse(),
-    ),
-    Endpoint(
-        operation_name="getProfile",
-        path="/api/v0/auth/profile",
-        method="get",
-        response=ProfileInfoResponse(),
-    ),
-    Endpoint(
-        operation_name="changeUsername",
-        path="/api/v0/auth/change-username",
-        method="post",
-        response=SuccessResponse(),
-        body=ChangeUsernameRequest(),
-    ),
-    Endpoint(
-        operation_name="regenerateToken",
-        path="/api/v0/auth/regenerate-token",
-        method="get",
-        response=Empty(),
-    ),
-    Endpoint(
-        operation_name="login",
-        path="/api/v0/auth/login",
-        method="post",
-        response=SuccessResponse(),
-        body=LoginRequest(),
-    ),
-    Endpoint(
-        operation_name="register",
-        path="/api/v0/auth/register",
-        method="post",
-        response=SuccessResponse(),
-        body=RegisterRequest(),
-    ),
-    Endpoint(
-        operation_name="changePassword",
-        path="/api/v0/auth/change-password",
-        method="post",
-        response=SuccessResponse(),
-        body=ChangePasswordRequest(),
-    ),
-    Endpoint(
-        operation_name="changeEmail",
-        path="/api/v0/auth/change-email",
-        method="post",
-        response=SuccessResponse(),
-        body=ChangeEmailRequest(),
-    ),
-    Endpoint(
-        operation_name="logout",
-        path="/api/v0/auth/logout",
-        method="get",
-        response=Empty(),
-    ),
-)
+def main():
+    endpoints = {
+        "/api/v0/stats": {
+            HttpMethod.GET: Endpoint(
+                operation_name="getStats",
+                response=StatsResponse(),
+            )
+        },
+        "/api/v0/tags": {
+            HttpMethod.GET: Endpoint(
+                operation_name="getTags",
+                response=TagsResponse(),
+            )
+        },
+        "/api/v0/sessions": {
+            HttpMethod.GET: Endpoint(
+                operation_name="getSessions",
+                response=SessionsResponse(),
+            )
+        },
+        "/api/v0/sessions/create": {
+            HttpMethod.POST: Endpoint(
+                operation_name="createSession",
+                response=SuccessResponse(),
+                body=CreateSessionRequest(),
+            )
+        },
+        "/api/v0/sessions/delete": {
+            HttpMethod.POST: Endpoint(
+                operation_name="deleteSession",
+                response=SuccessResponse(),
+                body=DeleteSessionRequest(),
+            )
+        },
+        "/api/v0/sessions/check-access": {
+            HttpMethod.POST: Endpoint(
+                operation_name="checkSessionAccess",
+                response=SuccessResponse(),
+                body=SessionAccessRequest(),
+            )
+        },
+        "/api/v0/sessions/session-players": {
+            HttpMethod.POST: Endpoint(
+                operation_name="updateSessionsPlayers",
+                response=Empty(),
+                body=SessionsPlayersRequest(),
+            )
+        },
+        "/api/v0/announcements": {
+            HttpMethod.GET: Endpoint(
+                operation_name="getAnnouncements",
+                response=AnnouncementsResponse(),
+            )
+        },
+        "/api/v0/auth/profile": {
+            HttpMethod.GET: Endpoint(
+                operation_name="getProfile",
+                response=ProfileInfoResponse(),
+            )
+        },
+        "/api/v0/auth/change-username": {
+            HttpMethod.POST: Endpoint(
+                operation_name="changeUsername",
+                response=SuccessResponse(),
+                body=ChangeUsernameRequest(),
+            )
+        },
+        "/api/v0/auth/regenerate-token": {
+            HttpMethod.GET: Endpoint(
+                operation_name="regenerateToken",
+                response=Empty(),
+            )
+        },
+        "/api/v0/auth/login": {
+            HttpMethod.POST: Endpoint(
+                operation_name="login",
+                response=SuccessResponse(),
+                body=LoginRequest(),
+            )
+        },
+        "/api/v0/auth/register": {
+            HttpMethod.POST: Endpoint(
+                operation_name="register",
+                response=SuccessResponse(),
+                body=RegisterRequest(),
+            )
+        },
+        "/api/v0/auth/change-password": {
+            HttpMethod.POST: Endpoint(
+                operation_name="changePassword",
+                response=SuccessResponse(),
+                body=ChangePasswordRequest(),
+            )
+        },
+        "/api/v0/auth/change-email": {
+            HttpMethod.POST: Endpoint(
+                operation_name="changeEmail",
+                response=SuccessResponse(),
+                body=ChangeEmailRequest(),
+            )
+        },
+        "/api/v0/auth/logout": {
+            HttpMethod.GET: Endpoint(
+                operation_name="logout",
+                response=Empty(),
+            )
+        },
+    }
 
-write_vue_spec(
-    Path(__file__).parent.parent.parent / "frontend" / "src" / "components" / "ApiService.ts",
-    *endpoints,
-)
+    write_vue_spec(
+        Path(__file__).parent.parent.parent / "frontend" / "src" / "components" / "ApiService.ts",
+        endpoints,
+    )
 
-write_django_spec(
-    Path(__file__).parent.parent / "hsutils" / "viewmodels.py",
-    *endpoints,
-)
+    write_django_spec(
+        Path(__file__).parent.parent / "hsutils" / "viewmodels.py",
+        endpoints,
+    )
+
+
+if __name__ == "__main__":
+    main()

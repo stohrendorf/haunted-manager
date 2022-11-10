@@ -1,5 +1,5 @@
 import humps
-from endpoints import Endpoint
+from endpoints import Endpoint, HttpMethod
 from structural import (
     ArrayField,
     BaseField,
@@ -85,7 +85,7 @@ def _gen_django_field_checks(context: str, accessor: str, field: BaseField) -> s
     return output
 
 
-def gen_django(schemas: list[BaseField | Compound], endpoints: list[Endpoint]) -> str:
+def gen_django(schemas: list[BaseField | Compound], endpoints: dict[str, dict[HttpMethod, Endpoint]]) -> str:
     output = "from typing import Callable, Optional, List\n"
     output += "from dataclasses import dataclass\n"
     output += "from dataclasses_json import DataClassJsonMixin, dataclass_json\n"
@@ -131,48 +131,49 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: list[Endpoint]) -
             output += _gen_django_field_checks(schema.typename(), "data", schema)
             output += "    return\n"
 
-    for endpoint in endpoints:
-        output += f"class {humps.decamelize(endpoint.operation_name)}:\n"
-        output += f'    path = "{endpoint.path.lstrip("/")}"\n'
-        output += f'    operation = "{humps.decamelize(endpoint.operation_name)}"\n'
-        output += "    @classmethod\n"
-        if endpoint.method == "post":
-            assert endpoint.body is not None
+    for path, methods_endpoints in endpoints.items():
+        for method, endpoint in methods_endpoints.items():
+            output += f"class {humps.decamelize(endpoint.operation_name)}:\n"
+            output += f'    path = "{path.lstrip("/")}"\n'
+            output += f'    operation = "{humps.decamelize(endpoint.operation_name)}"\n'
+            output += "    @classmethod\n"
+            if method == HttpMethod.POST:
+                assert endpoint.body is not None
+                output += (
+                    f"    def wrap(cls, fn: Callable[[HttpRequest, {endpoint.body.typename()}],"
+                    f" {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]]):\n"
+                )
+            elif method == HttpMethod.GET:
+                output += (
+                    f"    def wrap(cls, fn: Callable[[HttpRequest],"
+                    f" {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]]):\n"
+                )
+            else:
+                raise RuntimeError
+            output += "        @json_response\n"
             output += (
-                f"    def wrap(cls, fn: Callable[[HttpRequest, {endpoint.body.typename()}],"
-                f" {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]]):\n"
+                f"        def request_handler(request: HttpRequest)"
+                f" -> tuple[int, {endpoint.response.typename()}] | {endpoint.response.typename()}:\n"
             )
-        elif endpoint.method == "get":
-            output += (
-                f"    def wrap(cls, fn: Callable[[HttpRequest],"
-                f" {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]]):\n"
-            )
-        else:
-            raise RuntimeError
-        output += "        @json_response\n"
-        output += (
-            f"        def request_handler(request: HttpRequest)"
-            f" -> tuple[int, {endpoint.response.typename()}] | {endpoint.response.typename()}:\n"
-        )
-        if endpoint.method == "post":
-            assert endpoint.body is not None
-            output += (
-                f"            rq: {endpoint.body.typename()} = {endpoint.body.typename()}"
-                f".schema().loads(request.body.decode())\n"
-            )
-            output += "            rq.validate()\n"
-            output += "            response = fn(request, rq)\n"
-        elif endpoint.method == "get":
-            output += "            response = fn(request)\n"
-        else:
-            raise RuntimeError
+            if method == HttpMethod.POST:
+                assert endpoint.body is not None
+                output += (
+                    f"            rq: {endpoint.body.typename()} = {endpoint.body.typename()}"
+                    f".schema().loads(request.body.decode())\n"
+                )
+                output += "            rq.validate()\n"
+                output += "            response = fn(request, rq)\n"
+            elif method == HttpMethod.GET:
+                output += "            response = fn(request)\n"
+            else:
+                raise RuntimeError
 
-        output += "            if isinstance(response, tuple):\n"
-        output += "                code, response = response\n"
-        output += "            else:\n"
-        output += "                code = HttpResponse.status_code\n"
-        output += "            response.validate()\n"
-        output += "            return code, response\n"
-        output += "        return path(cls.path, request_handler, name=cls.operation)\n"
+            output += "            if isinstance(response, tuple):\n"
+            output += "                code, response = response\n"
+            output += "            else:\n"
+            output += "                code = HttpResponse.status_code\n"
+            output += "            response.validate()\n"
+            output += "            return code, response\n"
+            output += "        return path(cls.path, request_handler, name=cls.operation)\n"
 
     return output

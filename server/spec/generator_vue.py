@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Iterable
 
-from endpoints import Endpoint
+from endpoints import Endpoint, HttpMethod
 from structural import (
     ArrayField,
     BaseField,
@@ -63,7 +63,7 @@ def _field_to_type_sig(field: BaseField) -> str:
     return f"{t}|null" if field.nullable else t
 
 
-def gen_vue(schemas: list[BaseField | Compound], endpoints: list[Endpoint]) -> str:
+def gen_vue(schemas: list[BaseField | Compound], endpoints: dict[str, dict[HttpMethod, Endpoint]]) -> str:
     output = "/* eslint-disable no-empty */\n"
     output += "// noinspection RedundantIfStatementJS\n"
 
@@ -87,20 +87,21 @@ def gen_vue(schemas: list[BaseField | Compound], endpoints: list[Endpoint]) -> s
             output += "\n".join(_gen_vue_field_checks(schema.typename(), "data", schema))
             output += "}\n"
 
-    for endpoint in endpoints:
-        output += f"export async function { endpoint.operation_name }("
-        if endpoint.body is not None:
-            output += f"body: I{endpoint.body.typename()}"
-        output += f"): Promise<I{endpoint.response.typename()}> {{\n"
-        if endpoint.body is not None:
-            output += f"  validate{ endpoint.body.typename() }(body);\n"
-        output += f'  const result = (await { endpoint.method }("{ endpoint.path }"'
-        if endpoint.body is not None:
-            output += ", body"
-        output += f")) as I{endpoint.response.typename()};\n"
-        output += f"  validate{ endpoint.response.typename() }(result);\n"
-        output += "  return result;\n"
-        output += "}\n"
+    for path, methods_endpoints in endpoints.items():
+        for method, endpoint in methods_endpoints.items():
+            output += f"export async function { endpoint.operation_name }("
+            if endpoint.body is not None:
+                output += f"body: I{endpoint.body.typename()}"
+            output += f"): Promise<I{endpoint.response.typename()}> {{\n"
+            if endpoint.body is not None:
+                output += f"  validate{ endpoint.body.typename() }(body);\n"
+            output += f'  const result = (await {method.value.lower()}("{path}"'
+            if endpoint.body is not None:
+                output += ", body"
+            output += f")) as I{endpoint.response.typename()};\n"
+            output += f"  validate{ endpoint.response.typename() }(result);\n"
+            output += "  return result;\n"
+            output += "}\n"
 
     output += (Path(__file__).parent / "data" / "vue_django_common.ts").read_text()
 
