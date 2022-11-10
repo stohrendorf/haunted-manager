@@ -58,7 +58,7 @@ EMAIL_PAGE_DOMAIN=https://haunted.earvillage.net
 ```
 
 You can now start your `haunted-coop` instance with
-`--manager-url https://haunted.earvillage.net --manager-api-key ${SESSION_CHECK_API_KEY}` to connect to the backend.
+`--manager-url https://haunted.earvillage.net --manager-api-key ${COOP_API_KEY}` to connect to the backend.
 
 Follow the official `django` documentation for creating the initial admin user using `createsuperuser`. Then head over
 to the `/admin/` page and add some session tags as you please.

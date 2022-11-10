@@ -85,7 +85,7 @@ def delete_session(request, body: DeleteSessionRequest) -> tuple[int, SuccessRes
 
 @csrf_exempt
 def check_session_access(request: HttpRequest, body: SessionAccessRequest) -> SuccessResponse:
-    if body.api_key != settings.SESSION_CHECK_API_KEY:
+    if body.api_key != settings.COOP_API_KEY:
         return SuccessResponse(success=False, message="invalid api key")
 
     try:
@@ -117,7 +117,7 @@ def check_session_access(request: HttpRequest, body: SessionAccessRequest) -> Su
 @csrf_exempt
 @atomic
 def update_sessions_players(request, body: SessionsPlayersRequest) -> Empty:
-    if body.api_key != settings.SESSION_CHECK_API_KEY:
+    if body.api_key != settings.COOP_API_KEY:
         return Empty()
 
     for db_session in SessionModel.objects.all():
