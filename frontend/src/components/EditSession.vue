@@ -38,7 +38,7 @@ export default class EditSession extends Vue {
       tags: this.selectedTags,
     };
     editSession(request);
-    //this.$router.push("/");
+    this.$router.push("/");
   }
 }
 </script>
