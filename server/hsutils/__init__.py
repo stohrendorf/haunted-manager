@@ -16,11 +16,11 @@ RequestHandler = Callable[[HttpRequest], HttpResponse | T | tuple[int, T]]
 JsonResponseRequestHandler = Callable[[HttpRequest], JsonResponse]
 
 
-def json_response(fn: RequestHandler) -> JsonResponseRequestHandler:
-    @wraps(fn)
-    def wrapper(request: HttpRequest):
+def json_response(f: RequestHandler) -> JsonResponseRequestHandler:
+    @wraps(f)
+    def wrapper(request: HttpRequest, *args, **kwargs):
         try:
-            response_data = fn(request)
+            response_data = f(request, *args, **kwargs)
         except Exception:
             logging.error("request processing error", exc_info=True)
             return JsonResponse(

@@ -2,6 +2,8 @@ from hsutils.viewmodels import (
     check_session_access,
     create_session,
     delete_session,
+    edit_session,
+    get_session,
     get_sessions,
     get_tags,
     update_sessions_players,
@@ -14,6 +16,8 @@ urlpatterns = [
     get_sessions.wrap(views.get_sessions),
     create_session.wrap(views.create_session),
     delete_session.wrap(views.delete_session),
+    get_session.wrap(views.get_session),
+    edit_session.wrap(views.edit_session),
     check_session_access.wrap(views.check_session_access),
     update_sessions_players.wrap(views.update_sessions_players),
 ]

@@ -1,4 +1,5 @@
 import logging
+from typing import Union
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -11,6 +12,8 @@ from hsutils.viewmodels import (
     CreateSessionRequest,
     DeleteSessionRequest,
     Empty,
+    EditSessionRequest,
+    GetSessionResponse,
     Session,
     SessionAccessRequest,
     SessionsPlayersRequest,
@@ -60,8 +63,26 @@ def get_sessions(request) -> SessionsResponse:
         ],
     )
 
+def get_session(request: HttpRequest, id: str) -> Union[tuple[int, SuccessResponse], GetSessionResponse]:
+    try:
+        session = SessionModel.objects.get(key=id)
+    except SessionModel.DoesNotExist:
+        return 404, SuccessResponse(message="session {body.id} not found", success=False)
+    return Session(
+        id=session.key.hex,
+        tags=[
+            SessionTag(
+                name=t.name,
+                description=t.description,
+            )
+            for t in session.tags.all()
+        ],
+        owner=session.owner.username,
+        description=session.description,
+        players=[]
+    )
 
-def delete_session(request, body: DeleteSessionRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
+def delete_session(request, body: DeleteSessionRequest) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
     if not request.user.is_active or not request.user.is_authenticated:
         return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")
 
@@ -81,7 +102,6 @@ def delete_session(request, body: DeleteSessionRequest) -> tuple[int, SuccessRes
         message=f"session {body.session_id} deleted",
         success=True,
     )
-
 
 @csrf_exempt
 def check_session_access(request: HttpRequest, body: SessionAccessRequest) -> SuccessResponse:
@@ -153,3 +173,21 @@ def create_session(
         message="session created",
         success=True,
     )
+
+@atomic
+def edit_session(
+    request: HttpRequest,
+    data: EditSessionRequest,
+) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+    try:
+        if not request.user.is_active or not request.user.is_authenticated:
+            return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")
+        session = SessionModel.objects.get(key=data.id)
+        if session.owner != request.user:
+            return SuccessResponse(success=False, message="Not allowed to edit session")
+        session.tags.set(TagModel.objects.filter(id__in=data.tags).all())
+        session.description = data.description
+        session.save()
+        return SuccessResponse(message="session updated", success=True)
+    except SessionModel.DoesNotExist:
+        return SuccessResponse(success=False, message="session does not exist")

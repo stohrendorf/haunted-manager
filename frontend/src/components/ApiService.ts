@@ -24,6 +24,11 @@ export interface ICreateSessionRequest {
 export interface IDeleteSessionRequest {
   session_id: string;
 }
+export interface IEditSessionRequest {
+  id: String;
+  description: String;
+  tags: number[];
+}
 export interface IEmpty {}
 export interface ILoginRequest {
   password: string;
@@ -275,6 +280,24 @@ function validateSession(data: ISession): void {
     validateSessionTag(fieldData);
   }
 }
+function validateEditSessionRequest(data: IEditSessionRequest): void {
+  if (data.id === undefined)
+    throw new SchemaValidationError("EditSessionRequest.session_id");
+  if (data.id === null)
+    throw new SchemaValidationError("EditSessionRequest.session_id");
+  if (data.id.length < 1)
+    throw new SchemaValidationError("EditSessionRequest.session_id");
+  if (data.description === undefined)
+    throw new SchemaValidationError("EditSessionRequest.description");
+  if (data.description === null)
+    throw new SchemaValidationError("EditSessionRequest.description");
+  if (data.description.length < 1)
+    throw new SchemaValidationError("EditSessionRequest.description");
+  if (data.tags === undefined)
+    throw new SchemaValidationError("EditSessionRequest.tags");
+  if (data.tags === null)
+    throw new SchemaValidationError("EditSessionRequest.tags");
+}
 function validateSessionAccessRequest(data: ISessionAccessRequest): void {
   if (data.api_key === undefined)
     throw new SchemaValidationError("SessionAccessRequest.api_key");
@@ -423,6 +446,17 @@ export async function deleteSession(
   validateSuccessResponse(result);
   return result;
 }
+export async function editSession(
+  body: IEditSessionRequest
+): Promise<ISuccessResponse> {
+  validateEditSessionRequest(body);
+  const result = (await post(
+    "/api/v0/sessions/edit",
+    body
+  )) as ISuccessResponse;
+  validateSuccessResponse(result);
+  return result;
+}
 export async function checkSessionAccess(
   body: ISessionAccessRequest
 ): Promise<ISuccessResponse> {
@@ -443,6 +477,12 @@ export async function updateSessionsPlayers(
     body
   )) as IEmpty;
   validateEmpty(result);
+  return result;
+}
+
+export async function getSession(id: String): Promise<ISession> {
+  const result = (await get("/api/v0/sessions/" + id)) as ISession;
+  validateSession(result);
   return result;
 }
 export async function getAnnouncements(): Promise<IAnnouncementsResponse> {

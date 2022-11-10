@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass
-from typing import Callable, List, Optional
-
+from typing import Callable, List, Optional, Union
+from urllib import response
 from dataclasses_json import DataClassJsonMixin, dataclass_json
 from django.http import HttpRequest, HttpResponse
 from django.urls import path
@@ -86,10 +86,19 @@ class DeleteSessionRequest(DataClassJsonMixin):
 
 @dataclass_json
 @dataclass(kw_only=True)
-class Empty(DataClassJsonMixin):
+class Empty:
     def validate(self):
         validate_empty(self)
 
+@dataclass_json
+@dataclass(kw_only=True)
+class EditSessionRequest:
+    id: str
+    description: str
+    tags: list[int]
+
+    def validate(self):
+        validate_edit_session_request(self)
 
 @dataclass_json
 @dataclass(kw_only=True)
@@ -193,12 +202,28 @@ class SessionsPlayersRequest(DataClassJsonMixin):
 
 @dataclass_json
 @dataclass(kw_only=True)
+class StatsResponse:
+    total_sessions: int
+    total_users: int
+
+    def validate(self):
+        validate_sessions_response(self)
+
+@dataclass_json
+@dataclass(kw_only=True)
+class GetSessionResponse:
+    session: Session
+
+    def validate(self):
+        validate_get_session_response(self)
+
+@dataclass_json
+@dataclass(kw_only=True)
 class SessionsResponse(DataClassJsonMixin):
     sessions: List["Session"]
 
     def validate(self):
         validate_sessions_response(self)
-
 
 @dataclass_json
 @dataclass(kw_only=True)
@@ -290,11 +315,30 @@ def validate_create_session_request(data: CreateSessionRequest):
     return
 
 
+def validate_edit_session_request(data: EditSessionRequest):
+    if data.id is None:
+        raise SchemaValidationError("EditSessionRequest.id")
+    if data.description is None:
+        raise SchemaValidationError("EditSessionRequest.description")
+    if data.tags is None:
+        raise SchemaValidationError("EditSessionRequest.tags")
+    for feild_data in data.tags:
+        pass
+    return
+
+
 def validate_delete_session_request(data: DeleteSessionRequest):
     if data.session_id is None:
         raise SchemaValidationError("DeleteSessionRequest.session_id")
     if len(data.session_id) < 1:
         raise SchemaValidationError("DeleteSessionRequest.session_id")
+    return
+
+
+def validate_get_session_response(data: GetSessionResponse):
+    if data.session is None:
+        raise SchemaValidationError("GetSessionResponse.session")
+    validate_session(data.session)
     return
 
 
@@ -571,6 +615,46 @@ class delete_session:
         @json_response
         def request_handler(request: HttpRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
             rq: DeleteSessionRequest = DeleteSessionRequest.schema().loads(request.body.decode())
+            rq.validate()
+            response = fn(request, rq)
+            if isinstance(response, tuple):
+                code, response = response
+            else:
+                code = HttpResponse.status_code
+            response.validate()
+            return code, response
+
+        return path(cls.path, request_handler, name=cls.operation)
+
+
+class get_session:
+    path = "api/v0/sessions/<str:id>/"
+    operation = "get_session"
+
+    @classmethod
+    def wrap(cls, fn: Callable[[HttpRequest, str], GetSessionResponse]):
+        @json_response
+        def request_handler(request, id) -> Union[tuple[int, GetSessionResponse], SuccessResponse]:
+            response = fn(request, id)
+            if isinstance(response, tuple):
+                code, response = response
+            else:
+                code = HttpResponse.status_code
+            response.validate()
+            return code, response
+
+        return path(cls.path, request_handler, name=cls.operation)
+
+
+class edit_session:
+    path = "api/v0/sessions/edit"
+    operation = "edit_session"
+
+    @classmethod
+    def wrap(cls, fn: Callable[[HttpRequest, EditSessionRequest], SuccessResponse]):
+        @json_response
+        def request_handler(request) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+            rq: EditSessionRequest = EditSessionRequest.schema().loads(request.body.decode())
             rq.validate()
             response = fn(request, rq)
             if isinstance(response, tuple):
