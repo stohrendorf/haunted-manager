@@ -1,3 +1,15 @@
 <h1>You are almost there, {{ user.username }}!</h1><br>
-<h2>Please click <a href="{{ link }}">here</a> to confirm your account.</h2>
-<h2>The token expires on {{ expiry }}.</h2>
+<p>
+    Please click <strong><a href="{{ link }}">here</a></strong> to confirm your account.
+</p>
+<p>
+    You will be redirected to the main page when you click that link and you need to log in using the username or email
+    you used to register, as well as your password. Once you are logged in, you will be able to join sessions or
+    create sessions yourself.
+</p>
+<p>
+    The token expires on {{ expiry }}.
+</p>
+<p>
+    If you didn't register for a Haunted Server account, please ignore this email.
+</p>
