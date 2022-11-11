@@ -143,7 +143,7 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[str, dict[Ht
                     f"    def wrap(cls, fn: Callable[[HttpRequest, {endpoint.body.typename()}],"
                     f" {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]]):\n"
                 )
-            elif method == HttpMethod.GET:
+            elif method in (HttpMethod.GET, HttpMethod.DELETE):
                 output += (
                     f"    def wrap(cls, fn: Callable[[HttpRequest],"
                     f" {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]]):\n"
@@ -163,7 +163,7 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[str, dict[Ht
                 )
                 output += "            rq.validate()\n"
                 output += "            response = fn(request, rq)\n"
-            elif method == HttpMethod.GET:
+            elif method in (HttpMethod.GET, HttpMethod.DELETE):
                 output += "            response = fn(request)\n"
             else:
                 raise RuntimeError
