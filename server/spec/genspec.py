@@ -90,6 +90,10 @@ class SessionsResponse(Compound):
     sessions = ArrayField(items=Session())
 
 
+class SessionResponse(Compound):
+    session = Session(nullable=True)
+
+
 class DeleteSessionRequest(Compound):
     session_id = StringField(min_length=1)
 
@@ -157,6 +161,12 @@ def main():
             HttpMethod.GET: Endpoint(
                 operation_name="getSessions",
                 response=SessionsResponse(),
+            )
+        },
+        "/api/v0/sessions/<str:sessionid>": {
+            HttpMethod.GET: Endpoint(
+                operation_name="getSession",
+                response=SessionResponse(),
             )
         },
         "/api/v0/sessions/create": {

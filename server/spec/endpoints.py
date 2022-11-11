@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass
 from enum import Enum, unique
 from typing import Optional
@@ -32,3 +33,24 @@ def gather_compounds(endpoints: dict[str, dict[HttpMethod, Endpoint]]) -> list[t
             if endpoint.body is not None:
                 all_compounds |= gather_dependencies(type(endpoint.body))
     return sorted(all_compounds, key=lambda x: x.typename())
+
+
+_URL_PARAM_PATTERN = re.compile(r"<(?P<type>[^:]+):(?P<name>[^>]+)>")
+
+
+@dataclass(kw_only=True)
+class UrlParam:
+    type: str
+    span: tuple[int, int]
+
+
+def get_url_params(url: str) -> dict[str, UrlParam]:
+    search_start = 0
+    params = dict()
+    while match := _URL_PARAM_PATTERN.search(url, pos=search_start):
+        params[match.group("name")] = UrlParam(
+            type=match.group("type"),
+            span=match.span(),
+        )
+        search_start = match.end()
+    return params

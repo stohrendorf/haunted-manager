@@ -173,6 +173,15 @@ class SessionPlayers(DataClassJsonMixin):
 
 @dataclass_json
 @dataclass(kw_only=True)
+class SessionResponse(DataClassJsonMixin):
+    session: Optional["Session"]
+
+    def validate(self):
+        validate_session_response(self)
+
+
+@dataclass_json
+@dataclass(kw_only=True)
 class SessionTag(DataClassJsonMixin):
     description: str
     name: str
@@ -424,6 +433,12 @@ def validate_session_players(data: SessionPlayers):
     return
 
 
+def validate_session_response(data: SessionResponse):
+    if data.session is not None:
+        pass
+    return
+
+
 def validate_session_tag(data: SessionTag):
     if data.description is None:
         raise SchemaValidationError("SessionTag.description")
@@ -491,8 +506,10 @@ class get_server_info:
     @classmethod
     def wrap(cls, fn: Callable[[HttpRequest], ServerInfoResponse | tuple[int, ServerInfoResponse]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, ServerInfoResponse] | ServerInfoResponse:
-            response = fn(request)
+        def request_handler(
+            request: HttpRequest, *args, **kwargs
+        ) -> tuple[int, ServerInfoResponse] | ServerInfoResponse:
+            response = fn(request, *args, **kwargs)
             if isinstance(response, tuple):
                 code, response = response
             else:
@@ -510,8 +527,8 @@ class get_tags:
     @classmethod
     def wrap(cls, fn: Callable[[HttpRequest], TagsResponse | tuple[int, TagsResponse]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, TagsResponse] | TagsResponse:
-            response = fn(request)
+        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, TagsResponse] | TagsResponse:
+            response = fn(request, *args, **kwargs)
             if isinstance(response, tuple):
                 code, response = response
             else:
@@ -529,8 +546,27 @@ class get_sessions:
     @classmethod
     def wrap(cls, fn: Callable[[HttpRequest], SessionsResponse | tuple[int, SessionsResponse]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, SessionsResponse] | SessionsResponse:
-            response = fn(request)
+        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SessionsResponse] | SessionsResponse:
+            response = fn(request, *args, **kwargs)
+            if isinstance(response, tuple):
+                code, response = response
+            else:
+                code = HttpResponse.status_code
+            response.validate()
+            return code, response
+
+        return path(cls.path, request_handler, name=cls.operation)
+
+
+class get_session:
+    path = "api/v0/sessions/<str:sessionid>"
+    operation = "get_session"
+
+    @classmethod
+    def wrap(cls, fn: Callable[[HttpRequest, str], SessionResponse | tuple[int, SessionResponse]]):
+        @json_response
+        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SessionResponse] | SessionResponse:
+            response = fn(request, *args, **kwargs)
             if isinstance(response, tuple):
                 code, response = response
             else:
@@ -548,10 +584,10 @@ class create_session:
     @classmethod
     def wrap(cls, fn: Callable[[HttpRequest, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
-            rq: CreateSessionRequest = CreateSessionRequest.schema().loads(request.body.decode())
-            rq.validate()
-            response = fn(request, rq)
+        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SuccessResponse] | SuccessResponse:
+            body: CreateSessionRequest = CreateSessionRequest.schema().loads(request.body.decode())
+            body.validate()
+            response = fn(request, *args, **kwargs, body=body)
             if isinstance(response, tuple):
                 code, response = response
             else:
@@ -569,10 +605,10 @@ class delete_session:
     @classmethod
     def wrap(cls, fn: Callable[[HttpRequest, DeleteSessionRequest], SuccessResponse | tuple[int, SuccessResponse]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
-            rq: DeleteSessionRequest = DeleteSessionRequest.schema().loads(request.body.decode())
-            rq.validate()
-            response = fn(request, rq)
+        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SuccessResponse] | SuccessResponse:
+            body: DeleteSessionRequest = DeleteSessionRequest.schema().loads(request.body.decode())
+            body.validate()
+            response = fn(request, *args, **kwargs, body=body)
             if isinstance(response, tuple):
                 code, response = response
             else:
@@ -590,10 +626,10 @@ class check_session_access:
     @classmethod
     def wrap(cls, fn: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse | tuple[int, SuccessResponse]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
-            rq: SessionAccessRequest = SessionAccessRequest.schema().loads(request.body.decode())
-            rq.validate()
-            response = fn(request, rq)
+        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SuccessResponse] | SuccessResponse:
+            body: SessionAccessRequest = SessionAccessRequest.schema().loads(request.body.decode())
+            body.validate()
+            response = fn(request, *args, **kwargs, body=body)
             if isinstance(response, tuple):
                 code, response = response
             else:
@@ -611,10 +647,10 @@ class update_sessions_players:
     @classmethod
     def wrap(cls, fn: Callable[[HttpRequest, SessionsPlayersRequest], Empty | tuple[int, Empty]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, Empty] | Empty:
-            rq: SessionsPlayersRequest = SessionsPlayersRequest.schema().loads(request.body.decode())
-            rq.validate()
-            response = fn(request, rq)
+        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, Empty] | Empty:
+            body: SessionsPlayersRequest = SessionsPlayersRequest.schema().loads(request.body.decode())
+            body.validate()
+            response = fn(request, *args, **kwargs, body=body)
             if isinstance(response, tuple):
                 code, response = response
             else:
@@ -632,8 +668,10 @@ class get_announcements:
     @classmethod
     def wrap(cls, fn: Callable[[HttpRequest], AnnouncementsResponse | tuple[int, AnnouncementsResponse]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, AnnouncementsResponse] | AnnouncementsResponse:
-            response = fn(request)
+        def request_handler(
+            request: HttpRequest, *args, **kwargs
+        ) -> tuple[int, AnnouncementsResponse] | AnnouncementsResponse:
+            response = fn(request, *args, **kwargs)
             if isinstance(response, tuple):
                 code, response = response
             else:
@@ -651,8 +689,10 @@ class get_profile:
     @classmethod
     def wrap(cls, fn: Callable[[HttpRequest], ProfileInfoResponse | tuple[int, ProfileInfoResponse]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, ProfileInfoResponse] | ProfileInfoResponse:
-            response = fn(request)
+        def request_handler(
+            request: HttpRequest, *args, **kwargs
+        ) -> tuple[int, ProfileInfoResponse] | ProfileInfoResponse:
+            response = fn(request, *args, **kwargs)
             if isinstance(response, tuple):
                 code, response = response
             else:
@@ -670,10 +710,10 @@ class change_username:
     @classmethod
     def wrap(cls, fn: Callable[[HttpRequest, ChangeUsernameRequest], SuccessResponse | tuple[int, SuccessResponse]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
-            rq: ChangeUsernameRequest = ChangeUsernameRequest.schema().loads(request.body.decode())
-            rq.validate()
-            response = fn(request, rq)
+        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SuccessResponse] | SuccessResponse:
+            body: ChangeUsernameRequest = ChangeUsernameRequest.schema().loads(request.body.decode())
+            body.validate()
+            response = fn(request, *args, **kwargs, body=body)
             if isinstance(response, tuple):
                 code, response = response
             else:
@@ -691,8 +731,8 @@ class regenerate_token:
     @classmethod
     def wrap(cls, fn: Callable[[HttpRequest], Empty | tuple[int, Empty]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, Empty] | Empty:
-            response = fn(request)
+        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, Empty] | Empty:
+            response = fn(request, *args, **kwargs)
             if isinstance(response, tuple):
                 code, response = response
             else:
@@ -710,10 +750,10 @@ class login:
     @classmethod
     def wrap(cls, fn: Callable[[HttpRequest, LoginRequest], SuccessResponse | tuple[int, SuccessResponse]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
-            rq: LoginRequest = LoginRequest.schema().loads(request.body.decode())
-            rq.validate()
-            response = fn(request, rq)
+        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SuccessResponse] | SuccessResponse:
+            body: LoginRequest = LoginRequest.schema().loads(request.body.decode())
+            body.validate()
+            response = fn(request, *args, **kwargs, body=body)
             if isinstance(response, tuple):
                 code, response = response
             else:
@@ -731,10 +771,10 @@ class register:
     @classmethod
     def wrap(cls, fn: Callable[[HttpRequest, RegisterRequest], SuccessResponse | tuple[int, SuccessResponse]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
-            rq: RegisterRequest = RegisterRequest.schema().loads(request.body.decode())
-            rq.validate()
-            response = fn(request, rq)
+        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SuccessResponse] | SuccessResponse:
+            body: RegisterRequest = RegisterRequest.schema().loads(request.body.decode())
+            body.validate()
+            response = fn(request, *args, **kwargs, body=body)
             if isinstance(response, tuple):
                 code, response = response
             else:
@@ -752,10 +792,10 @@ class change_password:
     @classmethod
     def wrap(cls, fn: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse | tuple[int, SuccessResponse]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
-            rq: ChangePasswordRequest = ChangePasswordRequest.schema().loads(request.body.decode())
-            rq.validate()
-            response = fn(request, rq)
+        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SuccessResponse] | SuccessResponse:
+            body: ChangePasswordRequest = ChangePasswordRequest.schema().loads(request.body.decode())
+            body.validate()
+            response = fn(request, *args, **kwargs, body=body)
             if isinstance(response, tuple):
                 code, response = response
             else:
@@ -773,10 +813,10 @@ class change_email:
     @classmethod
     def wrap(cls, fn: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse | tuple[int, SuccessResponse]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
-            rq: ChangeEmailRequest = ChangeEmailRequest.schema().loads(request.body.decode())
-            rq.validate()
-            response = fn(request, rq)
+        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SuccessResponse] | SuccessResponse:
+            body: ChangeEmailRequest = ChangeEmailRequest.schema().loads(request.body.decode())
+            body.validate()
+            response = fn(request, *args, **kwargs, body=body)
             if isinstance(response, tuple):
                 code, response = response
             else:
@@ -794,8 +834,8 @@ class logout:
     @classmethod
     def wrap(cls, fn: Callable[[HttpRequest], Empty | tuple[int, Empty]]):
         @json_response
-        def request_handler(request: HttpRequest) -> tuple[int, Empty] | Empty:
-            response = fn(request)
+        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, Empty] | Empty:
+            response = fn(request, *args, **kwargs)
             if isinstance(response, tuple):
                 code, response = response
             else:

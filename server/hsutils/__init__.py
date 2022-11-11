@@ -12,15 +12,15 @@ from django.utils import timezone
 
 T = TypeVar("T", bound=DataClassJsonMixin)
 
-RequestHandler = Callable[[HttpRequest], HttpResponse | T | tuple[int, T]]
+RequestHandler = Callable[[HttpRequest, ...], HttpResponse | T | tuple[int, T]]
 JsonResponseRequestHandler = Callable[[HttpRequest], JsonResponse]
 
 
 def json_response(fn: RequestHandler) -> JsonResponseRequestHandler:
     @wraps(fn)
-    def wrapper(request: HttpRequest):
+    def wrapper(request: HttpRequest, *args, **kwargs):
         try:
-            response_data = fn(request)
+            response_data = fn(request, *args, **kwargs)
         except Exception:
             logging.error("request processing error", exc_info=True)
             return JsonResponse(

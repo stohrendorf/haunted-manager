@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Iterable
 
-from endpoints import Endpoint, HttpMethod
+from endpoints import Endpoint, HttpMethod, get_url_params
 from structural import (
     ArrayField,
     BaseField,
@@ -41,6 +41,8 @@ def _gen_vue_field_checks(context: str, accessor: str, field: BaseField) -> Iter
         else:
             yield from _gen_vue_field_checks(context, "fieldData", field.items)
         yield "}\n"
+    elif isinstance(field, Compound):
+        yield f"      validate{field.typename()}({accessor});\n"
 
     if field.nullable:
         yield "  }"
@@ -88,14 +90,36 @@ def gen_vue(schemas: list[BaseField | Compound], endpoints: dict[str, dict[HttpM
             output += "}\n"
 
     for path, methods_endpoints in endpoints.items():
+        url_params = get_url_params(path)
+
+        def convert_type(type: str) -> str:
+            return {
+                "int": "number",
+                "str": "string",
+            }[type]
+
+        ts_url = path
+        for p_name, p_spec in url_params.items():
+            ts_url = ts_url.replace(
+                f"<{p_spec.type}:{p_name}>",
+                f"${{encodeURIComponent({p_name})}}",
+            )
+
+        args_str = ", ".join(
+            (f"{p_name}: {convert_type(p_spec.type)}" for p_name, p_spec in url_params.items()),
+        )
         for method, endpoint in methods_endpoints.items():
-            output += f"export async function { endpoint.operation_name }("
+            output += f"export async function {endpoint.operation_name}("
+            if args_str:
+                output += args_str
             if endpoint.body is not None:
+                if args_str:
+                    output += ", "
                 output += f"body: I{endpoint.body.typename()}"
             output += f"): Promise<I{endpoint.response.typename()}> {{\n"
             if endpoint.body is not None:
-                output += f"  validate{ endpoint.body.typename() }(body);\n"
-            output += f'  const result = (await {method.value.lower()}("{path}"'
+                output += f"  validate{endpoint.body.typename()}(body);\n"
+            output += f"  const result = (await {method.value.lower()}(`{ts_url}`"
             if endpoint.body is not None:
                 output += ", body"
             output += f")) as I{endpoint.response.typename()};\n"

@@ -13,6 +13,7 @@ from hsutils.viewmodels import (
     Empty,
     Session,
     SessionAccessRequest,
+    SessionResponse,
     SessionsPlayersRequest,
     SessionsResponse,
     SessionTag,
@@ -58,6 +59,29 @@ def get_sessions(request) -> SessionsResponse:
             )
             for session in SessionModel.objects.order_by("-created_at").all()
         ],
+    )
+
+
+def get_session(request, sessionid: str) -> SessionResponse | tuple[int, SessionResponse]:
+    try:
+        session = SessionModel.objects.get(key=sessionid)
+    except SessionModel.DoesNotExist:
+        return HttpResponseNotFound.status_code, SessionResponse(session=None)
+
+    return SessionResponse(
+        session=Session(
+            id=session.key.hex,
+            tags=[
+                SessionTag(
+                    name=t.name,
+                    description=t.description,
+                )
+                for t in session.tags.all()
+            ],
+            owner=session.owner.username,
+            description=session.description,
+            players=[u.username for u in session.players.all()],
+        ),
     )
 
 

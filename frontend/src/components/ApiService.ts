@@ -63,6 +63,9 @@ export interface ISessionPlayers {
   session_id: string;
   usernames: string[];
 }
+export interface ISessionResponse {
+  session: ISession | null;
+}
 export interface ISessionTag {
   description: string;
   name: string;
@@ -321,6 +324,13 @@ function validateSessionPlayers(data: ISessionPlayers): void {
       throw new SchemaValidationError("SessionPlayers.usernames");
   }
 }
+function validateSessionResponse(data: ISessionResponse): void {
+  if (data.session === undefined)
+    throw new SchemaValidationError("SessionResponse.session");
+  if (data.session !== null) {
+    validateSession(data.session);
+  }
+}
 function validateSessionTag(data: ISessionTag): void {
   if (data.description === undefined)
     throw new SchemaValidationError("SessionTag.description");
@@ -387,18 +397,25 @@ function validateTagsResponse(data: ITagsResponse): void {
   }
 }
 export async function getServerInfo(): Promise<IServerInfoResponse> {
-  const result = (await get("/api/v0/server-info")) as IServerInfoResponse;
+  const result = (await get(`/api/v0/server-info`)) as IServerInfoResponse;
   validateServerInfoResponse(result);
   return result;
 }
 export async function getTags(): Promise<ITagsResponse> {
-  const result = (await get("/api/v0/tags")) as ITagsResponse;
+  const result = (await get(`/api/v0/tags`)) as ITagsResponse;
   validateTagsResponse(result);
   return result;
 }
 export async function getSessions(): Promise<ISessionsResponse> {
-  const result = (await get("/api/v0/sessions")) as ISessionsResponse;
+  const result = (await get(`/api/v0/sessions`)) as ISessionsResponse;
   validateSessionsResponse(result);
+  return result;
+}
+export async function getSession(sessionid: string): Promise<ISessionResponse> {
+  const result = (await get(
+    `/api/v0/sessions/${encodeURIComponent(sessionid)}`
+  )) as ISessionResponse;
+  validateSessionResponse(result);
   return result;
 }
 export async function createSession(
@@ -406,7 +423,7 @@ export async function createSession(
 ): Promise<ISuccessResponse> {
   validateCreateSessionRequest(body);
   const result = (await post(
-    "/api/v0/sessions/create",
+    `/api/v0/sessions/create`,
     body
   )) as ISuccessResponse;
   validateSuccessResponse(result);
@@ -417,7 +434,7 @@ export async function deleteSession(
 ): Promise<ISuccessResponse> {
   validateDeleteSessionRequest(body);
   const result = (await post(
-    "/api/v0/sessions/delete",
+    `/api/v0/sessions/delete`,
     body
   )) as ISuccessResponse;
   validateSuccessResponse(result);
@@ -428,7 +445,7 @@ export async function checkSessionAccess(
 ): Promise<ISuccessResponse> {
   validateSessionAccessRequest(body);
   const result = (await post(
-    "/api/v0/sessions/check-access",
+    `/api/v0/sessions/check-access`,
     body
   )) as ISuccessResponse;
   validateSuccessResponse(result);
@@ -439,19 +456,19 @@ export async function updateSessionsPlayers(
 ): Promise<IEmpty> {
   validateSessionsPlayersRequest(body);
   const result = (await post(
-    "/api/v0/sessions/session-players",
+    `/api/v0/sessions/session-players`,
     body
   )) as IEmpty;
   validateEmpty(result);
   return result;
 }
 export async function getAnnouncements(): Promise<IAnnouncementsResponse> {
-  const result = (await get("/api/v0/announcements")) as IAnnouncementsResponse;
+  const result = (await get(`/api/v0/announcements`)) as IAnnouncementsResponse;
   validateAnnouncementsResponse(result);
   return result;
 }
 export async function getProfile(): Promise<IProfileInfoResponse> {
-  const result = (await get("/api/v0/auth/profile")) as IProfileInfoResponse;
+  const result = (await get(`/api/v0/auth/profile`)) as IProfileInfoResponse;
   validateProfileInfoResponse(result);
   return result;
 }
@@ -460,20 +477,20 @@ export async function changeUsername(
 ): Promise<ISuccessResponse> {
   validateChangeUsernameRequest(body);
   const result = (await post(
-    "/api/v0/auth/change-username",
+    `/api/v0/auth/change-username`,
     body
   )) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
 }
 export async function regenerateToken(): Promise<IEmpty> {
-  const result = (await get("/api/v0/auth/regenerate-token")) as IEmpty;
+  const result = (await get(`/api/v0/auth/regenerate-token`)) as IEmpty;
   validateEmpty(result);
   return result;
 }
 export async function login(body: ILoginRequest): Promise<ISuccessResponse> {
   validateLoginRequest(body);
-  const result = (await post("/api/v0/auth/login", body)) as ISuccessResponse;
+  const result = (await post(`/api/v0/auth/login`, body)) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
 }
@@ -482,7 +499,7 @@ export async function register(
 ): Promise<ISuccessResponse> {
   validateRegisterRequest(body);
   const result = (await post(
-    "/api/v0/auth/register",
+    `/api/v0/auth/register`,
     body
   )) as ISuccessResponse;
   validateSuccessResponse(result);
@@ -493,7 +510,7 @@ export async function changePassword(
 ): Promise<ISuccessResponse> {
   validateChangePasswordRequest(body);
   const result = (await post(
-    "/api/v0/auth/change-password",
+    `/api/v0/auth/change-password`,
     body
   )) as ISuccessResponse;
   validateSuccessResponse(result);
@@ -504,14 +521,14 @@ export async function changeEmail(
 ): Promise<ISuccessResponse> {
   validateChangeEmailRequest(body);
   const result = (await post(
-    "/api/v0/auth/change-email",
+    `/api/v0/auth/change-email`,
     body
   )) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
 }
 export async function logout(): Promise<IEmpty> {
-  const result = (await get("/api/v0/auth/logout")) as IEmpty;
+  const result = (await get(`/api/v0/auth/logout`)) as IEmpty;
   validateEmpty(result);
   return result;
 }

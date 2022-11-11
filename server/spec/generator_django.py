@@ -1,5 +1,5 @@
 import humps
-from endpoints import Endpoint, HttpMethod
+from endpoints import Endpoint, HttpMethod, get_url_params
 from structural import (
     ArrayField,
     BaseField,
@@ -132,6 +132,13 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[str, dict[Ht
             output += "    return\n"
 
     for path, methods_endpoints in endpoints.items():
+        url_params = get_url_params(path)
+        args_str = ""
+        if url_params:
+            args_str = ", " + ", ".join(
+                (p_spec.type for p_name, p_spec in url_params.items()),
+            )
+
         for method, endpoint in methods_endpoints.items():
             output += f"class {humps.decamelize(endpoint.operation_name)}:\n"
             output += f'    path = "{path.lstrip("/")}"\n'
@@ -140,31 +147,31 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[str, dict[Ht
             if method == HttpMethod.POST:
                 assert endpoint.body is not None
                 output += (
-                    f"    def wrap(cls, fn: Callable[[HttpRequest, {endpoint.body.typename()}],"
+                    f"    def wrap(cls, fn: Callable[[HttpRequest{args_str}, {endpoint.body.typename()}],"
                     f" {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]]):\n"
                 )
             elif method in (HttpMethod.GET, HttpMethod.DELETE):
                 output += (
-                    f"    def wrap(cls, fn: Callable[[HttpRequest],"
+                    f"    def wrap(cls, fn: Callable[[HttpRequest{args_str}],"
                     f" {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]]):\n"
                 )
             else:
                 raise RuntimeError
             output += "        @json_response\n"
             output += (
-                f"        def request_handler(request: HttpRequest)"
+                f"        def request_handler(request: HttpRequest, *args, **kwargs)"
                 f" -> tuple[int, {endpoint.response.typename()}] | {endpoint.response.typename()}:\n"
             )
             if method == HttpMethod.POST:
                 assert endpoint.body is not None
                 output += (
-                    f"            rq: {endpoint.body.typename()} = {endpoint.body.typename()}"
+                    f"            body: {endpoint.body.typename()} = {endpoint.body.typename()}"
                     f".schema().loads(request.body.decode())\n"
                 )
-                output += "            rq.validate()\n"
-                output += "            response = fn(request, rq)\n"
+                output += "            body.validate()\n"
+                output += "            response = fn(request, *args, **kwargs, body=body)\n"
             elif method in (HttpMethod.GET, HttpMethod.DELETE):
-                output += "            response = fn(request)\n"
+                output += "            response = fn(request, *args, **kwargs)\n"
             else:
                 raise RuntimeError
 
