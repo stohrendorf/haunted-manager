@@ -27,6 +27,7 @@ export default class SiteAnnouncementsList extends Vue {
     >
       <div class="card-body row justify-content-start">
         <i class="bi bi-info-square col col-auto" />
+        <!-- eslint-disable-next-line -->
         <div class="col align-self-stretch" v-html="announcement.message" />
       </div>
     </div>
