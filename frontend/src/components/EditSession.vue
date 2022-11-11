@@ -19,16 +19,15 @@ export default class EditSession extends Vue {
 
   async created(): Promise<void> {
     this.tags = (await getTags()).tags;
-    let session = await getSession(this.$route.params.id as String);
-    this.description = session.description;
-
-    for (let tag of session.tags) {
-      let tagById = this.tags.find((t) => {
+    const response = await getSession(this.$route.params.id as String);
+    this.description = response.session.description;
+    this.id = response.session.id;
+    for (const tag of response.session.tags) {
+      const tagById = this.tags.find((t) => {
         return t.name == tag.name;
       });
-      if (tagById != undefined) this.selectedTags.push(tagById.id);
+      if (tagById !== undefined) this.selectedTags.push(tagById.id);
     }
-    this.id = session.id;
   }
 
   async updateSession(): Promise<void> {
@@ -37,7 +36,7 @@ export default class EditSession extends Vue {
       description: this.description,
       tags: this.selectedTags,
     };
-    editSession(request);
+    await editSession(request);
     this.$router.push("/");
   }
 }

@@ -67,8 +67,9 @@ def get_session(request: HttpRequest, id: str) -> Union[tuple[int, SuccessRespon
     try:
         session = SessionModel.objects.get(key=id)
     except SessionModel.DoesNotExist:
-        return 404, SuccessResponse(message="session {body.id} not found", success=False)
-    return Session(
+        return HttpResponseNotFound.status_code, SuccessResponse(message=f"session {id} not found", success=False)
+    return GetSessionResponse(
+        session=Session(
         id=session.key.hex,
         tags=[
             SessionTag(
@@ -80,9 +81,9 @@ def get_session(request: HttpRequest, id: str) -> Union[tuple[int, SuccessRespon
         owner=session.owner.username,
         description=session.description,
         players=[]
-    )
+    ))
 
-def delete_session(request, body: DeleteSessionRequest) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+def delete_session(request, body: DeleteSessionRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
     if not request.user.is_active or not request.user.is_authenticated:
         return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")
 
@@ -179,15 +180,15 @@ def edit_session(
     request: HttpRequest,
     data: EditSessionRequest,
 ) -> Union[tuple[int, SuccessResponse], SuccessResponse]:
+    if not request.user.is_active or not request.user.is_authenticated:
+        return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")
     try:
-        if not request.user.is_active or not request.user.is_authenticated:
-            return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")
         session = SessionModel.objects.get(key=data.id)
-        if session.owner != request.user:
-            return SuccessResponse(success=False, message="Not allowed to edit session")
-        session.tags.set(TagModel.objects.filter(id__in=data.tags).all())
-        session.description = data.description
-        session.save()
-        return SuccessResponse(message="session updated", success=True)
     except SessionModel.DoesNotExist:
         return SuccessResponse(success=False, message="session does not exist")
+    if session.owner != request.user:
+        return SuccessResponse(success=False, message="Not allowed to edit session")
+    session.tags.set(TagModel.objects.filter(id__in=data.tags).all())
+    session.description = data.description
+    session.save()
+    return SuccessResponse(message="session updated", success=True)

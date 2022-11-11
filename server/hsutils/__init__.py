@@ -12,7 +12,7 @@ from django.utils import timezone
 
 T = TypeVar("T", bound=DataClassJsonMixin)
 
-RequestHandler = Callable[[HttpRequest], HttpResponse | T | tuple[int, T]]
+RequestHandler = Callable[[HttpRequest, ...], HttpResponse | T | tuple[int, T]]
 JsonResponseRequestHandler = Callable[[HttpRequest], JsonResponse]
 
 

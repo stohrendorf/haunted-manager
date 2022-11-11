@@ -79,6 +79,11 @@ export interface ISessionsPlayersRequest {
 export interface ISessionsResponse {
   sessions: ISession[];
 }
+
+export interface ISessionResponse {
+  session : ISession
+}
+
 export interface ISuccessResponse {
   message: string;
   success: boolean;
@@ -168,6 +173,15 @@ function validateDeleteSessionRequest(data: IDeleteSessionRequest): void {
   if (data.session_id.length < 1)
     throw new SchemaValidationError("DeleteSessionRequest.session_id");
 }
+
+function validateGetSessionResponse(data: ISessionResponse) {
+  if (data.session === undefined) 
+    throw new SchemaValidationError("SessionsResponse.sessions");
+  if (data.session === null) 
+    throw new SchemaValidationError("SessionsResponse.sessions");
+  validateSession(data.session);
+}
+
 function validateEmpty(data: IEmpty): void {}
 function validateLoginRequest(data: ILoginRequest): void {
   if (data.password === undefined)
@@ -480,9 +494,9 @@ export async function updateSessionsPlayers(
   return result;
 }
 
-export async function getSession(id: String): Promise<ISession> {
-  const result = (await get("/api/v0/sessions/" + id)) as ISession;
-  validateSession(result);
+export async function getSession(id: String): Promise<ISessionResponse> {
+  const result = (await get("/api/v0/sessions/" + id)) as ISessionResponse;
+  validateGetSessionResponse(result);
   return result;
 }
 export async function getAnnouncements(): Promise<IAnnouncementsResponse> {

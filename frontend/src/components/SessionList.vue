@@ -105,7 +105,8 @@ export default class SessionList extends Vue {
           variant="primary"
           small
           @click="editSession(session.id)"
-          ><i class="bi bi-pencil" /> Edit
+          >
+            <i class="bi bi-pencil" /> Edit
         </bs-btn>
       </div>
     </div>
