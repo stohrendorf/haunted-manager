@@ -415,6 +415,18 @@ export async function getSession(sessionid: string): Promise<ISessionResponse> {
   validateSessionResponse(result);
   return result;
 }
+export async function editSession(
+  sessionid: string,
+  body: ICreateSessionRequest
+): Promise<ISuccessResponse> {
+  validateCreateSessionRequest(body);
+  const result = (await doPost(
+    `/api/v0/sessions/${encodeURIComponent(sessionid)}`,
+    body
+  )) as ISuccessResponse;
+  validateSuccessResponse(result);
+  return result;
+}
 export async function deleteSession(
   sessionid: string
 ): Promise<ISuccessResponse> {

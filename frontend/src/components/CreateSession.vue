@@ -2,12 +2,10 @@
 import { Options, Vue } from "vue-class-component";
 import { createSession, ISession } from "@/components/ApiService";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
-import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
-import BsCheckbox from "@/components/bootstrap/BsCheckbox.vue";
-import EditSession from "@/components/EditSession.vue";
+import SessionEditor from "@/components/SessionEditor.vue";
 
 @Options({
-  components: { BsCheckbox, BsBtn, FloatingSingleLineInput, EditSession },
+  components: { BsBtn, SessionEditor },
 })
 export default class CreateSession extends Vue {
   private session: ISession = {
@@ -30,9 +28,9 @@ export default class CreateSession extends Vue {
 </script>
 
 <template>
-  <edit-session :session="session" :selected-tags="selectedTags">
+  <session-editor :session="session" :selected-tags="selectedTags">
     <bs-btn variant="success" @click="createSession()">Create</bs-btn>
-  </edit-session>
+  </session-editor>
 </template>
 
 <style scoped></style>

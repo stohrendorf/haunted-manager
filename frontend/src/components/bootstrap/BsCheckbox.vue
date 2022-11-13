@@ -40,6 +40,7 @@ export default class BsCheckbox extends Vue {
       class="form-check-input"
       type="checkbox"
       :value="value"
+      :checked="selectedValues?.includes(value) ?? false"
       @input="changed"
     />
     <label :for="$.uid"><slot /></label>

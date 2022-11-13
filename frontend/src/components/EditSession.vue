@@ -1,53 +1,50 @@
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import { getTags, ISession, ITag } from "@/components/ApiService";
+import { editSession, getSession, ISession } from "@/components/ApiService";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
-import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
-import BsCheckbox from "@/components/bootstrap/BsCheckbox.vue";
-import { Prop } from "vue-property-decorator";
+import SessionEditor from "@/components/SessionEditor.vue";
 
-@Options({ components: { BsCheckbox, BsBtn, FloatingSingleLineInput } })
+@Options({
+  components: { BsBtn, SessionEditor },
+})
 export default class EditSession extends Vue {
-  private tags: ITag[] = [];
-  @Prop({ required: false, default: () => [] })
-  private selectedTags!: number[];
+  private session: ISession = {
+    description: "",
+    id: "",
+    owner: "",
+    players: [],
+    tags: [],
+  };
+  private selectedTags: number[] = [];
 
-  @Prop({ required: true })
-  public session!: ISession;
+  async beforeCreate(): Promise<void> {
+    const session = (await getSession(this.$route.params.id as string)).session;
+    if (session === null) {
+      throw new Error("invalid session id");
+    }
+    this.session = session;
+  }
 
-  async created(): Promise<void> {
-    this.tags = (await getTags()).tags;
-    this.$watch(
-      "session",
-      () => {
-        this.session.tags = this.tags.filter((tag) =>
-          this.selectedTags.includes(tag.id)
-        );
-        this.$emit("update:session.tags");
-      },
-      { deep: true }
-    );
+  async updateSession(): Promise<void> {
+    let request = {
+      description: this.session.description,
+      tags: this.selectedTags,
+    };
+    await editSession(this.session.id, request);
+    this.$router.push("/");
   }
 }
 </script>
 
 <template>
-  <form>
-    <floating-single-line-input
-      v-model="session.description"
-      label="Description"
-      required
-    />
-    <ul class="list-unstyled">
-      <li v-for="tag in tags" :key="tag.id">
-        <bs-checkbox :value="tag.id" :selected-values="selectedTags">
-          <span class="badge bg-secondary">{{ tag.name }}</span>
-          {{ tag.description }}
-        </bs-checkbox>
-      </li>
-    </ul>
-    <slot />
-  </form>
+  <session-editor :session="session" :selected-tags="selectedTags">
+    <bs-btn variant="success" @click="updateSession()"
+      ><span class="bi bi-save" /> Save</bs-btn
+    >
+    <bs-btn variant="danger" @click="$router.push('/')"
+      ><span class="bi bi-x-square" /> Abort</bs-btn
+    >
+  </session-editor>
 </template>
 
 <style scoped></style>

@@ -24,6 +24,10 @@ export default class SessionList extends Vue {
     await deleteSessionRequest(id);
     this.sessions = (await getSessions()).sessions;
   }
+
+  editSession(id: String): void {
+    this.$router.push("/edit-session/" + id);
+  }
 }
 </script>
 
@@ -48,14 +52,6 @@ export default class SessionList extends Vue {
           <div class="col col-auto">
             <div class="row">
               <div>
-                <bs-btn
-                  v-if="profile.$state.username === session.owner"
-                  variant="danger"
-                  small
-                  @click="deleteSession(session.id)"
-                >
-                  <i class="bi bi-trash" /> Delete
-                </bs-btn>
                 <clipboard-copyable :value="session.id">
                   <code>{{ session.id }}</code>
                 </clipboard-copyable>
@@ -93,6 +89,19 @@ export default class SessionList extends Vue {
                 <span class="bi bi-emoji-frown" />
               </div>
             </div>
+          </div>
+        </div>
+
+        <div v-if="profile.$state.username === session.owner" class="row mt-1">
+          <div class="col col-auto">
+            <bs-btn variant="danger" small @click="deleteSession(session.id)">
+              <i class="bi bi-trash" /> Delete
+            </bs-btn>
+          </div>
+          <div class="col col-auto">
+            <bs-btn variant="primary" small @click="editSession(session.id)">
+              <i class="bi bi-pencil" /> Edit
+            </bs-btn>
           </div>
         </div>
       </div>
