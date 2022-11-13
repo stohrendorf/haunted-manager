@@ -1,23 +1,27 @@
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import { createSession, getTags, ITag } from "@/components/ApiService";
+import { createSession, ISession } from "@/components/ApiService";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
 import BsCheckbox from "@/components/bootstrap/BsCheckbox.vue";
+import EditSession from "@/components/EditSession.vue";
 
-@Options({ components: { BsCheckbox, BsBtn, FloatingSingleLineInput } })
+@Options({
+  components: { BsCheckbox, BsBtn, FloatingSingleLineInput, EditSession },
+})
 export default class CreateSession extends Vue {
-  private tags: ITag[] = [];
-  private description: string = "";
+  private session: ISession = {
+    id: "",
+    owner: "",
+    description: "",
+    tags: [],
+    players: [],
+  };
   private selectedTags: number[] = [];
-
-  async created(): Promise<void> {
-    this.tags = (await getTags()).tags;
-  }
 
   async createSession(): Promise<void> {
     await createSession({
-      description: this.description,
+      description: this.session.description,
       tags: this.selectedTags,
     });
     this.$router.push("/");
@@ -26,22 +30,9 @@ export default class CreateSession extends Vue {
 </script>
 
 <template>
-  <form>
-    <floating-single-line-input
-      v-model="description"
-      label="Description"
-      required
-    />
-    <ul class="list-unstyled">
-      <li v-for="tag in tags" :key="tag.id">
-        <bs-checkbox :value="tag.id" :selected-values="selectedTags">
-          <span class="badge bg-secondary">{{ tag.name }}</span>
-          {{ tag.description }}
-        </bs-checkbox>
-      </li>
-    </ul>
+  <edit-session :session="session" :selected-tags="selectedTags">
     <bs-btn variant="success" @click="createSession()">Create</bs-btn>
-  </form>
+  </edit-session>
 </template>
 
 <style scoped></style>
