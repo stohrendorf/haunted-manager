@@ -28,6 +28,7 @@ export default class SessionEditor extends Vue {
 
   async beforeCreate(): Promise<void> {
     this.tags = (await getTags()).tags;
+    this.updateSelectedTagsFromSession();
     this.$watch(
       () => this.session,
       () => {
