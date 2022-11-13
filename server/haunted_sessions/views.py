@@ -9,7 +9,6 @@ from django.views.decorators.csrf import csrf_exempt
 from haunted_auth.models import ApiKey
 from hsutils.viewmodels import (
     CreateSessionRequest,
-    DeleteSessionRequest,
     Empty,
     Session,
     SessionAccessRequest,
@@ -85,24 +84,24 @@ def get_session(request, sessionid: str) -> SessionResponse | tuple[int, Session
     )
 
 
-def delete_session(request, body: DeleteSessionRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
+def delete_session(request, sessionid: str) -> tuple[int, SuccessResponse] | SuccessResponse:
     if not request.user.is_active or not request.user.is_authenticated:
         return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")
 
-    session = SessionModel.objects.get(key=body.session_id)
+    session = SessionModel.objects.get(key=sessionid)
     if not session:
         return HttpResponseNotFound.status_code, SuccessResponse(
-            message=f"session {body.session_id} not found",
+            message=f"session {sessionid} not found",
             success=False,
         )
     if session.owner != request.user:
         return 401, SuccessResponse(
-            message=f"not allowed to delete session {body.session_id}",
+            message=f"not allowed to delete session {sessionid}",
             success=False,
         )
     session.delete()
     return SuccessResponse(
-        message=f"session {body.session_id} deleted",
+        message=f"session {sessionid} deleted",
         success=True,
     )
 
@@ -163,16 +162,16 @@ def update_sessions_players(request, body: SessionsPlayersRequest) -> Empty:
 @atomic
 def create_session(
     request: HttpRequest,
-    data: CreateSessionRequest,
+    body: CreateSessionRequest,
 ) -> tuple[int, SuccessResponse] | SuccessResponse:
     if not request.user.is_active or not request.user.is_authenticated:
         return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")
 
     session = SessionModel.objects.create(
         owner=request.user,
-        description=data.description,
+        description=body.description,
     )
-    session.tags.add(*TagModel.objects.filter(id__in=data.tags).all())
+    session.tags.add(*TagModel.objects.filter(id__in=body.tags).all())
     return SuccessResponse(
         message="session created",
         success=True,

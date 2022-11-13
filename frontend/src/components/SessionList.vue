@@ -21,7 +21,7 @@ export default class SessionList extends Vue {
   }
 
   async deleteSession(id: string): Promise<void> {
-    await deleteSessionRequest({ session_id: id });
+    await deleteSessionRequest(id);
     this.sessions = (await getSessions()).sessions;
   }
 }

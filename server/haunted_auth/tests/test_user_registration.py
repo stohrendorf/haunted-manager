@@ -11,7 +11,7 @@ from hsutils.viewmodels import (
     ProfileInfoResponse,
     RegisterRequest,
     SuccessResponse,
-    get_profile,
+    profile,
     register,
 )
 
@@ -33,7 +33,7 @@ def try_register(
 @pytest.mark.django_db
 def test_not_registered(live_server: LiveServer, django_user_model):
     assert django_user_model.objects.count() == 0
-    code, response = get_test_url(live_server, get_profile.path, ProfileInfoResponse)
+    code, response = get_test_url(live_server, profile.path, ProfileInfoResponse)
     assert code == HttpResponse.status_code
     assert response is not None
     assert response.email is None

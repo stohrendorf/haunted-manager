@@ -84,15 +84,6 @@ class CreateSessionRequest(DataClassJsonMixin):
 
 @dataclass_json
 @dataclass(kw_only=True)
-class DeleteSessionRequest(DataClassJsonMixin):
-    session_id: str
-
-    def validate(self):
-        validate_delete_session_request(self)
-
-
-@dataclass_json
-@dataclass(kw_only=True)
 class Empty(DataClassJsonMixin):
     def validate(self):
         validate_empty(self)
@@ -306,14 +297,6 @@ def validate_create_session_request(data: CreateSessionRequest):
     return
 
 
-def validate_delete_session_request(data: DeleteSessionRequest):
-    if data.session_id is None:
-        raise SchemaValidationError("DeleteSessionRequest.session_id")
-    if len(data.session_id) < 1:
-        raise SchemaValidationError("DeleteSessionRequest.session_id")
-    return
-
-
 def validate_empty(data: Empty):
     return
 
@@ -506,18 +489,26 @@ def validate_tags_response(data: TagsResponse):
     return
 
 
-class get_server_info:
+class server_info:
     path = "api/v0/server-info"
-    method = HttpMethod.GET
-    operation = "get_server_info"
+    name = "serverInfo"
 
     @classmethod
-    def wrap(cls, handler: Callable[[HttpRequest], ServerInfoResponse | tuple[int, ServerInfoResponse]]):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
+    def wrap(
+        cls,
+        *,
+        get_handler: Callable[[HttpRequest], ServerInfoResponse | tuple[int, ServerInfoResponse]],
+    ):
+        def dispatch(request: HttpRequest, *args, **kwargs):
+            if request.method == "GET":
+                return cls.do_get(get_handler, request, *args, **kwargs)
+            raise RuntimeError
+
+        return path(cls.path, dispatch, name=cls.name)
 
     @json_response
     @staticmethod
-    def handle_request(
+    def do_get(
         handler: Callable[[HttpRequest], ServerInfoResponse | tuple[int, ServerInfoResponse]], request: HttpRequest
     ) -> ServerInfoResponse | tuple[int, ServerInfoResponse]:
         response = handler(request)
@@ -529,18 +520,26 @@ class get_server_info:
         return code, response
 
 
-class get_tags:
+class tags:
     path = "api/v0/tags"
-    method = HttpMethod.GET
-    operation = "get_tags"
+    name = "tags"
 
     @classmethod
-    def wrap(cls, handler: Callable[[HttpRequest], TagsResponse | tuple[int, TagsResponse]]):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
+    def wrap(
+        cls,
+        *,
+        get_handler: Callable[[HttpRequest], TagsResponse | tuple[int, TagsResponse]],
+    ):
+        def dispatch(request: HttpRequest, *args, **kwargs):
+            if request.method == "GET":
+                return cls.do_get(get_handler, request, *args, **kwargs)
+            raise RuntimeError
+
+        return path(cls.path, dispatch, name=cls.name)
 
     @json_response
     @staticmethod
-    def handle_request(
+    def do_get(
         handler: Callable[[HttpRequest], TagsResponse | tuple[int, TagsResponse]], request: HttpRequest
     ) -> TagsResponse | tuple[int, TagsResponse]:
         response = handler(request)
@@ -552,18 +551,29 @@ class get_tags:
         return code, response
 
 
-class get_sessions:
+class sessions:
     path = "api/v0/sessions"
-    method = HttpMethod.GET
-    operation = "get_sessions"
+    name = "sessions"
 
     @classmethod
-    def wrap(cls, handler: Callable[[HttpRequest], SessionsResponse | tuple[int, SessionsResponse]]):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
+    def wrap(
+        cls,
+        *,
+        get_handler: Callable[[HttpRequest], SessionsResponse | tuple[int, SessionsResponse]],
+        post_handler: Callable[[HttpRequest, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
+    ):
+        def dispatch(request: HttpRequest, *args, **kwargs):
+            if request.method == "GET":
+                return cls.do_get(get_handler, request, *args, **kwargs)
+            if request.method == "POST":
+                return cls.do_post(post_handler, request, *args, **kwargs)
+            raise RuntimeError
+
+        return path(cls.path, dispatch, name=cls.name)
 
     @json_response
     @staticmethod
-    def handle_request(
+    def do_get(
         handler: Callable[[HttpRequest], SessionsResponse | tuple[int, SessionsResponse]], request: HttpRequest
     ) -> SessionsResponse | tuple[int, SessionsResponse]:
         response = handler(request)
@@ -574,47 +584,9 @@ class get_sessions:
         response.validate()
         return code, response
 
-
-class get_session:
-    path = "api/v0/sessions/<str:sessionid>"
-    method = HttpMethod.GET
-    operation = "get_session"
-
-    @classmethod
-    def wrap(cls, handler: Callable[[HttpRequest, str], SessionResponse | tuple[int, SessionResponse]]):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
-
     @json_response
     @staticmethod
-    def handle_request(
-        handler: Callable[[HttpRequest, str], SessionResponse | tuple[int, SessionResponse]],
-        request: HttpRequest,
-        *args,
-        **kwargs,
-    ) -> SessionResponse | tuple[int, SessionResponse]:
-        response = handler(request, *args, **kwargs)
-        if isinstance(response, tuple):
-            code, response = response
-        else:
-            code = HttpResponse.status_code
-        response.validate()
-        return code, response
-
-
-class create_session:
-    path = "api/v0/sessions/create"
-    method = HttpMethod.POST
-    operation = "create_session"
-
-    @classmethod
-    def wrap(
-        cls, handler: Callable[[HttpRequest, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]]
-    ):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
-
-    @json_response
-    @staticmethod
-    def handle_request(
+    def do_post(
         handler: Callable[[HttpRequest, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
         *args,
@@ -631,28 +603,51 @@ class create_session:
         return code, response
 
 
-class delete_session:
-    path = "api/v0/sessions/delete"
-    method = HttpMethod.POST
-    operation = "delete_session"
+class session:
+    path = "api/v0/sessions/<str:sessionid>"
+    name = "session"
 
     @classmethod
     def wrap(
-        cls, handler: Callable[[HttpRequest, DeleteSessionRequest], SuccessResponse | tuple[int, SuccessResponse]]
+        cls,
+        *,
+        get_handler: Callable[[HttpRequest, str], SessionResponse | tuple[int, SessionResponse]],
+        delete_handler: Callable[[HttpRequest, str], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
+        def dispatch(request: HttpRequest, *args, **kwargs):
+            if request.method == "GET":
+                return cls.do_get(get_handler, request, *args, **kwargs)
+            if request.method == "DELETE":
+                return cls.do_delete(delete_handler, request, *args, **kwargs)
+            raise RuntimeError
+
+        return path(cls.path, dispatch, name=cls.name)
 
     @json_response
     @staticmethod
-    def handle_request(
-        handler: Callable[[HttpRequest, DeleteSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
+    def do_get(
+        handler: Callable[[HttpRequest, str], SessionResponse | tuple[int, SessionResponse]],
+        request: HttpRequest,
+        *args,
+        **kwargs,
+    ) -> SessionResponse | tuple[int, SessionResponse]:
+        response = handler(request, *args, **kwargs)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
+
+    @json_response
+    @staticmethod
+    def do_delete(
+        handler: Callable[[HttpRequest, str], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
         *args,
         **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
-        body: DeleteSessionRequest = DeleteSessionRequest.schema().loads(request.body.decode())
-        body.validate()
-        response = handler(request, *args, **kwargs, body=body)
+        response = handler(request, *args, **kwargs)
         if isinstance(response, tuple):
             code, response = response
         else:
@@ -661,20 +656,26 @@ class delete_session:
         return code, response
 
 
-class check_session_access:
+class session_access:
     path = "api/v0/sessions/check-access"
-    method = HttpMethod.POST
-    operation = "check_session_access"
+    name = "sessionAccess"
 
     @classmethod
     def wrap(
-        cls, handler: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse | tuple[int, SuccessResponse]]
+        cls,
+        *,
+        post_handler: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
+        def dispatch(request: HttpRequest, *args, **kwargs):
+            if request.method == "POST":
+                return cls.do_post(post_handler, request, *args, **kwargs)
+            raise RuntimeError
+
+        return path(cls.path, dispatch, name=cls.name)
 
     @json_response
     @staticmethod
-    def handle_request(
+    def do_post(
         handler: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
         *args,
@@ -691,18 +692,26 @@ class check_session_access:
         return code, response
 
 
-class update_sessions_players:
+class session_players:
     path = "api/v0/sessions/session-players"
-    method = HttpMethod.POST
-    operation = "update_sessions_players"
+    name = "sessionPlayers"
 
     @classmethod
-    def wrap(cls, handler: Callable[[HttpRequest, SessionsPlayersRequest], Empty | tuple[int, Empty]]):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
+    def wrap(
+        cls,
+        *,
+        post_handler: Callable[[HttpRequest, SessionsPlayersRequest], Empty | tuple[int, Empty]],
+    ):
+        def dispatch(request: HttpRequest, *args, **kwargs):
+            if request.method == "POST":
+                return cls.do_post(post_handler, request, *args, **kwargs)
+            raise RuntimeError
+
+        return path(cls.path, dispatch, name=cls.name)
 
     @json_response
     @staticmethod
-    def handle_request(
+    def do_post(
         handler: Callable[[HttpRequest, SessionsPlayersRequest], Empty | tuple[int, Empty]],
         request: HttpRequest,
         *args,
@@ -719,18 +728,26 @@ class update_sessions_players:
         return code, response
 
 
-class get_announcements:
+class announcements:
     path = "api/v0/announcements"
-    method = HttpMethod.GET
-    operation = "get_announcements"
+    name = "announcements"
 
     @classmethod
-    def wrap(cls, handler: Callable[[HttpRequest], AnnouncementsResponse | tuple[int, AnnouncementsResponse]]):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
+    def wrap(
+        cls,
+        *,
+        get_handler: Callable[[HttpRequest], AnnouncementsResponse | tuple[int, AnnouncementsResponse]],
+    ):
+        def dispatch(request: HttpRequest, *args, **kwargs):
+            if request.method == "GET":
+                return cls.do_get(get_handler, request, *args, **kwargs)
+            raise RuntimeError
+
+        return path(cls.path, dispatch, name=cls.name)
 
     @json_response
     @staticmethod
-    def handle_request(
+    def do_get(
         handler: Callable[[HttpRequest], AnnouncementsResponse | tuple[int, AnnouncementsResponse]],
         request: HttpRequest,
     ) -> AnnouncementsResponse | tuple[int, AnnouncementsResponse]:
@@ -743,18 +760,26 @@ class get_announcements:
         return code, response
 
 
-class get_profile:
+class profile:
     path = "api/v0/auth/profile"
-    method = HttpMethod.GET
-    operation = "get_profile"
+    name = "profile"
 
     @classmethod
-    def wrap(cls, handler: Callable[[HttpRequest], ProfileInfoResponse | tuple[int, ProfileInfoResponse]]):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
+    def wrap(
+        cls,
+        *,
+        get_handler: Callable[[HttpRequest], ProfileInfoResponse | tuple[int, ProfileInfoResponse]],
+    ):
+        def dispatch(request: HttpRequest, *args, **kwargs):
+            if request.method == "GET":
+                return cls.do_get(get_handler, request, *args, **kwargs)
+            raise RuntimeError
+
+        return path(cls.path, dispatch, name=cls.name)
 
     @json_response
     @staticmethod
-    def handle_request(
+    def do_get(
         handler: Callable[[HttpRequest], ProfileInfoResponse | tuple[int, ProfileInfoResponse]], request: HttpRequest
     ) -> ProfileInfoResponse | tuple[int, ProfileInfoResponse]:
         response = handler(request)
@@ -768,18 +793,24 @@ class get_profile:
 
 class change_username:
     path = "api/v0/auth/change-username"
-    method = HttpMethod.POST
-    operation = "change_username"
+    name = "changeUsername"
 
     @classmethod
     def wrap(
-        cls, handler: Callable[[HttpRequest, ChangeUsernameRequest], SuccessResponse | tuple[int, SuccessResponse]]
+        cls,
+        *,
+        post_handler: Callable[[HttpRequest, ChangeUsernameRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
+        def dispatch(request: HttpRequest, *args, **kwargs):
+            if request.method == "POST":
+                return cls.do_post(post_handler, request, *args, **kwargs)
+            raise RuntimeError
+
+        return path(cls.path, dispatch, name=cls.name)
 
     @json_response
     @staticmethod
-    def handle_request(
+    def do_post(
         handler: Callable[[HttpRequest, ChangeUsernameRequest], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
         *args,
@@ -798,16 +829,24 @@ class change_username:
 
 class regenerate_token:
     path = "api/v0/auth/regenerate-token"
-    method = HttpMethod.GET
-    operation = "regenerate_token"
+    name = "regenerateToken"
 
     @classmethod
-    def wrap(cls, handler: Callable[[HttpRequest], Empty | tuple[int, Empty]]):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
+    def wrap(
+        cls,
+        *,
+        get_handler: Callable[[HttpRequest], Empty | tuple[int, Empty]],
+    ):
+        def dispatch(request: HttpRequest, *args, **kwargs):
+            if request.method == "GET":
+                return cls.do_get(get_handler, request, *args, **kwargs)
+            raise RuntimeError
+
+        return path(cls.path, dispatch, name=cls.name)
 
     @json_response
     @staticmethod
-    def handle_request(
+    def do_get(
         handler: Callable[[HttpRequest], Empty | tuple[int, Empty]], request: HttpRequest
     ) -> Empty | tuple[int, Empty]:
         response = handler(request)
@@ -821,16 +860,24 @@ class regenerate_token:
 
 class login:
     path = "api/v0/auth/login"
-    method = HttpMethod.POST
-    operation = "login"
+    name = "login"
 
     @classmethod
-    def wrap(cls, handler: Callable[[HttpRequest, LoginRequest], SuccessResponse | tuple[int, SuccessResponse]]):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
+    def wrap(
+        cls,
+        *,
+        post_handler: Callable[[HttpRequest, LoginRequest], SuccessResponse | tuple[int, SuccessResponse]],
+    ):
+        def dispatch(request: HttpRequest, *args, **kwargs):
+            if request.method == "POST":
+                return cls.do_post(post_handler, request, *args, **kwargs)
+            raise RuntimeError
+
+        return path(cls.path, dispatch, name=cls.name)
 
     @json_response
     @staticmethod
-    def handle_request(
+    def do_post(
         handler: Callable[[HttpRequest, LoginRequest], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
         *args,
@@ -849,16 +896,24 @@ class login:
 
 class register:
     path = "api/v0/auth/register"
-    method = HttpMethod.POST
-    operation = "register"
+    name = "register"
 
     @classmethod
-    def wrap(cls, handler: Callable[[HttpRequest, RegisterRequest], SuccessResponse | tuple[int, SuccessResponse]]):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
+    def wrap(
+        cls,
+        *,
+        post_handler: Callable[[HttpRequest, RegisterRequest], SuccessResponse | tuple[int, SuccessResponse]],
+    ):
+        def dispatch(request: HttpRequest, *args, **kwargs):
+            if request.method == "POST":
+                return cls.do_post(post_handler, request, *args, **kwargs)
+            raise RuntimeError
+
+        return path(cls.path, dispatch, name=cls.name)
 
     @json_response
     @staticmethod
-    def handle_request(
+    def do_post(
         handler: Callable[[HttpRequest, RegisterRequest], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
         *args,
@@ -877,18 +932,24 @@ class register:
 
 class change_password:
     path = "api/v0/auth/change-password"
-    method = HttpMethod.POST
-    operation = "change_password"
+    name = "changePassword"
 
     @classmethod
     def wrap(
-        cls, handler: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse | tuple[int, SuccessResponse]]
+        cls,
+        *,
+        post_handler: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
+        def dispatch(request: HttpRequest, *args, **kwargs):
+            if request.method == "POST":
+                return cls.do_post(post_handler, request, *args, **kwargs)
+            raise RuntimeError
+
+        return path(cls.path, dispatch, name=cls.name)
 
     @json_response
     @staticmethod
-    def handle_request(
+    def do_post(
         handler: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
         *args,
@@ -907,16 +968,24 @@ class change_password:
 
 class change_email:
     path = "api/v0/auth/change-email"
-    method = HttpMethod.POST
-    operation = "change_email"
+    name = "changeEmail"
 
     @classmethod
-    def wrap(cls, handler: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse | tuple[int, SuccessResponse]]):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
+    def wrap(
+        cls,
+        *,
+        post_handler: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse | tuple[int, SuccessResponse]],
+    ):
+        def dispatch(request: HttpRequest, *args, **kwargs):
+            if request.method == "POST":
+                return cls.do_post(post_handler, request, *args, **kwargs)
+            raise RuntimeError
+
+        return path(cls.path, dispatch, name=cls.name)
 
     @json_response
     @staticmethod
-    def handle_request(
+    def do_post(
         handler: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
         *args,
@@ -935,16 +1004,24 @@ class change_email:
 
 class logout:
     path = "api/v0/auth/logout"
-    method = HttpMethod.GET
-    operation = "logout"
+    name = "logout"
 
     @classmethod
-    def wrap(cls, handler: Callable[[HttpRequest], Empty | tuple[int, Empty]]):
-        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
+    def wrap(
+        cls,
+        *,
+        get_handler: Callable[[HttpRequest], Empty | tuple[int, Empty]],
+    ):
+        def dispatch(request: HttpRequest, *args, **kwargs):
+            if request.method == "GET":
+                return cls.do_get(get_handler, request, *args, **kwargs)
+            raise RuntimeError
+
+        return path(cls.path, dispatch, name=cls.name)
 
     @json_response
     @staticmethod
-    def handle_request(
+    def do_get(
         handler: Callable[[HttpRequest], Empty | tuple[int, Empty]], request: HttpRequest
     ) -> Empty | tuple[int, Empty]:
         response = handler(request)

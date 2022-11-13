@@ -1,8 +1,8 @@
-from hsutils.viewmodels import get_announcements, get_server_info
+from hsutils.viewmodels import announcements, server_info
 
 from . import views
 
 urlpatterns = [
-    get_announcements.wrap(views.get_announcements),
-    get_server_info.wrap(views.get_server_info),
+    announcements.wrap(get_handler=views.get_announcements),
+    server_info.wrap(get_handler=views.get_server_info),
 ]

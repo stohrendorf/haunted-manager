@@ -18,14 +18,22 @@ function getCsrfHeader(): Headers {
   return headers;
 }
 
-export async function get(url: string): Promise<object> {
+export async function doGet(url: string): Promise<object> {
   return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
     credentials: "include",
     headers: getCsrfHeader(),
   }).then((r) => r.json());
 }
 
-export async function post(url: string, body: object): Promise<object> {
+export async function doDelete(url: string): Promise<object> {
+  return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: getCsrfHeader(),
+  }).then((r) => r.json());
+}
+
+export async function doPost(url: string, body: object): Promise<object> {
   return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
     method: "POST",
     credentials: "include",

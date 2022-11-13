@@ -20,14 +20,24 @@ class Endpoint:
     body: Optional[Compound] = None
 
 
-def gather_compounds(endpoints: dict[str, dict[HttpMethod, Endpoint]]) -> list[type[BaseField | Compound]]:
-    if len(
-        {
+@dataclass(frozen=True, unsafe_hash=True, order=True)
+class ApiPath:
+    path: str
+    name: str
+
+
+def gather_compounds(endpoints: dict[ApiPath, dict[HttpMethod, Endpoint]]) -> list[type[BaseField | Compound]]:
+    all_operation_names = sorted(
+        (
             endpoint.operation_name
             for endpoints_methods in endpoints.values()
             for endpoint in endpoints_methods.values()
-        },
-    ) != len(endpoints):
+        ),
+    )
+    all_operations = sum(
+        (len(endpoints_methods) for endpoints_methods in endpoints.values()),
+    )
+    if len(set(all_operation_names)) != all_operations:
         raise RuntimeError("operation names must be unique")
 
     all_compounds: set[type[BaseField | Compound]] = set()

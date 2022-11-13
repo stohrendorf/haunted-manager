@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Iterable
 
-from endpoints import Endpoint, HttpMethod, get_url_params
+from endpoints import ApiPath, Endpoint, HttpMethod, get_url_params
 from structural import (
     ArrayField,
     BaseField,
@@ -65,7 +65,7 @@ def _field_to_type_sig(field: BaseField) -> str:
     return f"{t}|null" if field.nullable else t
 
 
-def gen_vue(schemas: list[BaseField | Compound], endpoints: dict[str, dict[HttpMethod, Endpoint]]) -> str:
+def gen_vue(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dict[HttpMethod, Endpoint]]) -> str:
     output = "/* eslint-disable no-empty */\n"
     output += "// noinspection RedundantIfStatementJS\n"
 
@@ -90,7 +90,7 @@ def gen_vue(schemas: list[BaseField | Compound], endpoints: dict[str, dict[HttpM
             output += "}\n"
 
     for path, methods_endpoints in endpoints.items():
-        url_params = get_url_params(path)
+        url_params = get_url_params(path.path)
 
         def convert_type(type: str) -> str:
             return {
@@ -98,7 +98,7 @@ def gen_vue(schemas: list[BaseField | Compound], endpoints: dict[str, dict[HttpM
                 "str": "string",
             }[type]
 
-        ts_url = path
+        ts_url = path.path
         for p_name, p_spec in url_params.items():
             ts_url = ts_url.replace(
                 f"<{p_spec.type}:{p_name}>",
@@ -119,7 +119,7 @@ def gen_vue(schemas: list[BaseField | Compound], endpoints: dict[str, dict[HttpM
             output += f"): Promise<I{endpoint.response.typename()}> {{\n"
             if endpoint.body is not None:
                 output += f"  validate{endpoint.body.typename()}(body);\n"
-            output += f"  const result = (await {method.value.lower()}(`{ts_url}`"
+            output += f"  const result = (await do{method.value.capitalize()}(`{ts_url}`"
             if endpoint.body is not None:
                 output += ", body"
             output += f")) as I{endpoint.response.typename()};\n"

@@ -21,9 +21,6 @@ export interface ICreateSessionRequest {
   description: string;
   tags: number[];
 }
-export interface IDeleteSessionRequest {
-  session_id: string;
-}
 export interface IEmpty {}
 export interface ILoginRequest {
   password: string;
@@ -157,14 +154,6 @@ function validateCreateSessionRequest(data: ICreateSessionRequest): void {
     if (fieldData === null)
       throw new SchemaValidationError("CreateSessionRequest.tags");
   }
-}
-function validateDeleteSessionRequest(data: IDeleteSessionRequest): void {
-  if (data.session_id === undefined)
-    throw new SchemaValidationError("DeleteSessionRequest.session_id");
-  if (data.session_id === null)
-    throw new SchemaValidationError("DeleteSessionRequest.session_id");
-  if (data.session_id.length < 1)
-    throw new SchemaValidationError("DeleteSessionRequest.session_id");
 }
 function validateEmpty(data: IEmpty): void {}
 function validateLoginRequest(data: ILoginRequest): void {
@@ -397,45 +386,40 @@ function validateTagsResponse(data: ITagsResponse): void {
   }
 }
 export async function getServerInfo(): Promise<IServerInfoResponse> {
-  const result = (await get(`/api/v0/server-info`)) as IServerInfoResponse;
+  const result = (await doGet(`/api/v0/server-info`)) as IServerInfoResponse;
   validateServerInfoResponse(result);
   return result;
 }
 export async function getTags(): Promise<ITagsResponse> {
-  const result = (await get(`/api/v0/tags`)) as ITagsResponse;
+  const result = (await doGet(`/api/v0/tags`)) as ITagsResponse;
   validateTagsResponse(result);
   return result;
 }
 export async function getSessions(): Promise<ISessionsResponse> {
-  const result = (await get(`/api/v0/sessions`)) as ISessionsResponse;
+  const result = (await doGet(`/api/v0/sessions`)) as ISessionsResponse;
   validateSessionsResponse(result);
-  return result;
-}
-export async function getSession(sessionid: string): Promise<ISessionResponse> {
-  const result = (await get(
-    `/api/v0/sessions/${encodeURIComponent(sessionid)}`
-  )) as ISessionResponse;
-  validateSessionResponse(result);
   return result;
 }
 export async function createSession(
   body: ICreateSessionRequest
 ): Promise<ISuccessResponse> {
   validateCreateSessionRequest(body);
-  const result = (await post(
-    `/api/v0/sessions/create`,
-    body
-  )) as ISuccessResponse;
+  const result = (await doPost(`/api/v0/sessions`, body)) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
 }
+export async function getSession(sessionid: string): Promise<ISessionResponse> {
+  const result = (await doGet(
+    `/api/v0/sessions/${encodeURIComponent(sessionid)}`
+  )) as ISessionResponse;
+  validateSessionResponse(result);
+  return result;
+}
 export async function deleteSession(
-  body: IDeleteSessionRequest
+  sessionid: string
 ): Promise<ISuccessResponse> {
-  validateDeleteSessionRequest(body);
-  const result = (await post(
-    `/api/v0/sessions/delete`,
-    body
+  const result = (await doDelete(
+    `/api/v0/sessions/${encodeURIComponent(sessionid)}`
   )) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
@@ -444,7 +428,7 @@ export async function checkSessionAccess(
   body: ISessionAccessRequest
 ): Promise<ISuccessResponse> {
   validateSessionAccessRequest(body);
-  const result = (await post(
+  const result = (await doPost(
     `/api/v0/sessions/check-access`,
     body
   )) as ISuccessResponse;
@@ -455,7 +439,7 @@ export async function updateSessionsPlayers(
   body: ISessionsPlayersRequest
 ): Promise<IEmpty> {
   validateSessionsPlayersRequest(body);
-  const result = (await post(
+  const result = (await doPost(
     `/api/v0/sessions/session-players`,
     body
   )) as IEmpty;
@@ -463,12 +447,14 @@ export async function updateSessionsPlayers(
   return result;
 }
 export async function getAnnouncements(): Promise<IAnnouncementsResponse> {
-  const result = (await get(`/api/v0/announcements`)) as IAnnouncementsResponse;
+  const result = (await doGet(
+    `/api/v0/announcements`
+  )) as IAnnouncementsResponse;
   validateAnnouncementsResponse(result);
   return result;
 }
 export async function getProfile(): Promise<IProfileInfoResponse> {
-  const result = (await get(`/api/v0/auth/profile`)) as IProfileInfoResponse;
+  const result = (await doGet(`/api/v0/auth/profile`)) as IProfileInfoResponse;
   validateProfileInfoResponse(result);
   return result;
 }
@@ -476,7 +462,7 @@ export async function changeUsername(
   body: IChangeUsernameRequest
 ): Promise<ISuccessResponse> {
   validateChangeUsernameRequest(body);
-  const result = (await post(
+  const result = (await doPost(
     `/api/v0/auth/change-username`,
     body
   )) as ISuccessResponse;
@@ -484,13 +470,13 @@ export async function changeUsername(
   return result;
 }
 export async function regenerateToken(): Promise<IEmpty> {
-  const result = (await get(`/api/v0/auth/regenerate-token`)) as IEmpty;
+  const result = (await doGet(`/api/v0/auth/regenerate-token`)) as IEmpty;
   validateEmpty(result);
   return result;
 }
 export async function login(body: ILoginRequest): Promise<ISuccessResponse> {
   validateLoginRequest(body);
-  const result = (await post(`/api/v0/auth/login`, body)) as ISuccessResponse;
+  const result = (await doPost(`/api/v0/auth/login`, body)) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
 }
@@ -498,7 +484,7 @@ export async function register(
   body: IRegisterRequest
 ): Promise<ISuccessResponse> {
   validateRegisterRequest(body);
-  const result = (await post(
+  const result = (await doPost(
     `/api/v0/auth/register`,
     body
   )) as ISuccessResponse;
@@ -509,7 +495,7 @@ export async function changePassword(
   body: IChangePasswordRequest
 ): Promise<ISuccessResponse> {
   validateChangePasswordRequest(body);
-  const result = (await post(
+  const result = (await doPost(
     `/api/v0/auth/change-password`,
     body
   )) as ISuccessResponse;
@@ -520,7 +506,7 @@ export async function changeEmail(
   body: IChangeEmailRequest
 ): Promise<ISuccessResponse> {
   validateChangeEmailRequest(body);
-  const result = (await post(
+  const result = (await doPost(
     `/api/v0/auth/change-email`,
     body
   )) as ISuccessResponse;
@@ -528,7 +514,7 @@ export async function changeEmail(
   return result;
 }
 export async function logout(): Promise<IEmpty> {
-  const result = (await get(`/api/v0/auth/logout`)) as IEmpty;
+  const result = (await doGet(`/api/v0/auth/logout`)) as IEmpty;
   validateEmpty(result);
   return result;
 }
@@ -552,14 +538,22 @@ function getCsrfHeader(): Headers {
   return headers;
 }
 
-export async function get(url: string): Promise<object> {
+export async function doGet(url: string): Promise<object> {
   return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
     credentials: "include",
     headers: getCsrfHeader(),
   }).then((r) => r.json());
 }
 
-export async function post(url: string, body: object): Promise<object> {
+export async function doDelete(url: string): Promise<object> {
+  return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: getCsrfHeader(),
+  }).then((r) => r.json());
+}
+
+export async function doPost(url: string, body: object): Promise<object> {
   return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
     method: "POST",
     credentials: "include",

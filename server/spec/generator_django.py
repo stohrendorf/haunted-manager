@@ -1,5 +1,5 @@
 import humps
-from endpoints import Endpoint, HttpMethod, get_url_params
+from endpoints import ApiPath, Endpoint, HttpMethod, get_url_params
 from structural import (
     ArrayField,
     BaseField,
@@ -85,7 +85,7 @@ def _gen_django_field_checks(context: str, accessor: str, field: BaseField) -> s
     return output
 
 
-def gen_django(schemas: list[BaseField | Compound], endpoints: dict[str, dict[HttpMethod, Endpoint]]) -> str:
+def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dict[HttpMethod, Endpoint]]) -> str:
     output = "from typing import Callable, Optional, List\n"
     output += "from dataclasses import dataclass\n"
     output += "from dataclasses_json import DataClassJsonMixin, dataclass_json\n"
@@ -136,42 +136,39 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[str, dict[Ht
             output += "    return\n"
 
     for path, methods_endpoints in endpoints.items():
-        url_params = get_url_params(path)
+        url_params = get_url_params(path.path)
         args_str = ""
         if url_params:
             args_str = ", " + ", ".join(
                 (p_spec.type for p_name, p_spec in url_params.items()),
             )
 
+        output += "\n"
+        output += f"class {humps.decamelize(path.name)}:\n"
+        output += f'    path = "{path.path.lstrip("/")}"\n'
+        output += f'    name = "{path.name}"\n'
+        output += "    @classmethod\n"
+        output += "    def wrap(\n"
+        output += "        cls,\n"
+        output += "        *,\n"
         for method, endpoint in methods_endpoints.items():
-            output += f"class {humps.decamelize(endpoint.operation_name)}:\n"
-            output += f'    path = "{path.lstrip("/")}"\n'
-            output += f"    method = HttpMethod.{method.name}\n"
-            output += f'    operation = "{humps.decamelize(endpoint.operation_name)}"\n'
-            output += "    @classmethod\n"
-            if method == HttpMethod.POST:
-                assert endpoint.body is not None
-                handler_signature = (
-                    f"Callable[[HttpRequest{args_str}, {endpoint.body.typename()}],"
-                    f" {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]]"
-                )
-            elif method in (HttpMethod.GET, HttpMethod.DELETE):
-                handler_signature = (
-                    f"Callable[[HttpRequest{args_str}],"
-                    f" {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]]"
-                )
-            else:
-                raise RuntimeError
-            output += f"    def wrap(cls, handler: {handler_signature}):\n"
-            output += "        return path(cls.path, lambda *args,**kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)\n"
+            handler_signature = make_handler_signature(args_str, endpoint, method)
+            output += f"        {method.name.lower()}_handler: {handler_signature},\n"
+        output += "    ):\n"
+        output += "        def dispatch(request: HttpRequest, *args, **kwargs):\n"
+        for method, endpoint in methods_endpoints.items():
+            output += f'            if request.method == "{method.value}":\n'
+            output += f"                return cls.do_{method.value.lower()}({method.value.lower()}_handler, request, *args, **kwargs)\n"
+        output += "            raise RuntimeError\n"
+        output += "        return path(cls.path, dispatch, name=cls.name)\n"
 
-            output += "\n"
-
+        for method, endpoint in methods_endpoints.items():
             kwargs = ", *args, **kwargs" if args_str or method == HttpMethod.POST else ""
             output += "    @json_response\n"
             output += "    @staticmethod\n"
+            handler_signature = make_handler_signature(args_str, endpoint, method)
             output += (
-                f"    def handle_request(handler: {handler_signature}, request: HttpRequest{kwargs})"
+                f"    def do_{method.value.lower()}(handler: {handler_signature}, request: HttpRequest{kwargs})"
                 f" -> {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]:\n"
             )
             if method == HttpMethod.POST:
@@ -195,3 +192,20 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[str, dict[Ht
             output += "        return code, response\n"
 
     return output
+
+
+def make_handler_signature(args_str, endpoint, method):
+    if method == HttpMethod.POST:
+        assert endpoint.body is not None
+        handler_signature = (
+            f"Callable[[HttpRequest{args_str}, {endpoint.body.typename()}],"
+            f" {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]]"
+        )
+    elif method in (HttpMethod.GET, HttpMethod.DELETE):
+        handler_signature = (
+            f"Callable[[HttpRequest{args_str}],"
+            f" {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]]"
+        )
+    else:
+        raise RuntimeError
+    return handler_signature

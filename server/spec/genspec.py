@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from endpoints import Endpoint, HttpMethod, gather_compounds
+from endpoints import ApiPath, Endpoint, HttpMethod, gather_compounds
 from generator_django import gen_django
 from generator_vue import gen_vue
 from structural import ArrayField, BooleanField, Compound, IntegerField, StringField
@@ -94,10 +94,6 @@ class SessionResponse(Compound):
     session = Session(nullable=True)
 
 
-class DeleteSessionRequest(Compound):
-    session_id = StringField(min_length=1)
-
-
 class SessionAccessRequest(Compound):
     username = StringField(min_length=1)
     auth_token = StringField(min_length=1)
@@ -129,14 +125,14 @@ class AnnouncementsResponse(Compound):
     announcements = ArrayField(items=AnnouncementEntry())
 
 
-def write_vue_spec(output: Path, endpoints: dict[str, dict[HttpMethod, Endpoint]]):
+def write_vue_spec(output: Path, endpoints: dict[ApiPath, dict[HttpMethod, Endpoint]]):
     all_compounds = gather_compounds(endpoints)
 
     vue_spec = gen_vue([x() for x in all_compounds], endpoints)
     output.write_text(vue_spec)
 
 
-def write_django_spec(output: Path, endpoints: dict[str, dict[HttpMethod, Endpoint]]):
+def write_django_spec(output: Path, endpoints: dict[ApiPath, dict[HttpMethod, Endpoint]]):
     all_compounds = gather_compounds(endpoints)
 
     django_spec = gen_django([x() for x in all_compounds], endpoints)
@@ -145,112 +141,107 @@ def write_django_spec(output: Path, endpoints: dict[str, dict[HttpMethod, Endpoi
 
 def main():
     endpoints = {
-        "/api/v0/server-info": {
+        ApiPath("/api/v0/server-info", "serverInfo"): {
             HttpMethod.GET: Endpoint(
                 operation_name="getServerInfo",
                 response=ServerInfoResponse(),
             ),
         },
-        "/api/v0/tags": {
+        ApiPath("/api/v0/tags", "tags"): {
             HttpMethod.GET: Endpoint(
                 operation_name="getTags",
                 response=TagsResponse(),
             ),
         },
-        "/api/v0/sessions": {
+        ApiPath("/api/v0/sessions", "sessions"): {
             HttpMethod.GET: Endpoint(
                 operation_name="getSessions",
                 response=SessionsResponse(),
             ),
-        },
-        "/api/v0/sessions/<str:sessionid>": {
-            HttpMethod.GET: Endpoint(
-                operation_name="getSession",
-                response=SessionResponse(),
-            ),
-        },
-        "/api/v0/sessions/create": {
             HttpMethod.POST: Endpoint(
                 operation_name="createSession",
                 response=SuccessResponse(),
                 body=CreateSessionRequest(),
             ),
         },
-        "/api/v0/sessions/delete": {
-            HttpMethod.POST: Endpoint(
+        ApiPath("/api/v0/sessions/<str:sessionid>", "session"): {
+            HttpMethod.GET: Endpoint(
+                operation_name="getSession",
+                response=SessionResponse(),
+            ),
+            HttpMethod.DELETE: Endpoint(
                 operation_name="deleteSession",
                 response=SuccessResponse(),
-                body=DeleteSessionRequest(),
             ),
         },
-        "/api/v0/sessions/check-access": {
+        ApiPath("/api/v0/sessions/check-access", "sessionAccess"): {
             HttpMethod.POST: Endpoint(
                 operation_name="checkSessionAccess",
                 response=SuccessResponse(),
                 body=SessionAccessRequest(),
             ),
         },
-        "/api/v0/sessions/session-players": {
+        ApiPath("/api/v0/sessions/session-players", "sessionPlayers"): {
             HttpMethod.POST: Endpoint(
                 operation_name="updateSessionsPlayers",
                 response=Empty(),
                 body=SessionsPlayersRequest(),
             ),
         },
-        "/api/v0/announcements": {
+        ApiPath("/api/v0/announcements", "announcements"): {
             HttpMethod.GET: Endpoint(
                 operation_name="getAnnouncements",
                 response=AnnouncementsResponse(),
             ),
         },
-        "/api/v0/auth/profile": {
+        ApiPath("/api/v0/auth/profile", "profile"): {
             HttpMethod.GET: Endpoint(
                 operation_name="getProfile",
                 response=ProfileInfoResponse(),
             ),
         },
-        "/api/v0/auth/change-username": {
+        ApiPath("/api/v0/auth/change-username", "changeUsername"): {
             HttpMethod.POST: Endpoint(
                 operation_name="changeUsername",
                 response=SuccessResponse(),
                 body=ChangeUsernameRequest(),
             ),
         },
-        "/api/v0/auth/regenerate-token": {
+        ApiPath("/api/v0/auth/regenerate-token", "regenerateToken"): {
             HttpMethod.GET: Endpoint(
                 operation_name="regenerateToken",
                 response=Empty(),
             ),
         },
-        "/api/v0/auth/login": {
+        ApiPath("/api/v0/auth/login", "login"): {
             HttpMethod.POST: Endpoint(
                 operation_name="login",
                 response=SuccessResponse(),
                 body=LoginRequest(),
             ),
         },
-        "/api/v0/auth/register": {
+        ApiPath("/api/v0/auth/register", "register"): {
             HttpMethod.POST: Endpoint(
                 operation_name="register",
                 response=SuccessResponse(),
                 body=RegisterRequest(),
             ),
         },
-        "/api/v0/auth/change-password": {
+        ApiPath("/api/v0/auth/change-password", "changePassword"): {
             HttpMethod.POST: Endpoint(
                 operation_name="changePassword",
                 response=SuccessResponse(),
                 body=ChangePasswordRequest(),
             ),
         },
-        "/api/v0/auth/change-email": {
+        ApiPath("/api/v0/auth/change-email", "changeEmail"): {
             HttpMethod.POST: Endpoint(
                 operation_name="changeEmail",
                 response=SuccessResponse(),
                 body=ChangeEmailRequest(),
             ),
         },
-        "/api/v0/auth/logout": {
+        ApiPath("/api/v0/auth/logout", "logout"): {
             HttpMethod.GET: Endpoint(
                 operation_name="logout",
                 response=Empty(),
