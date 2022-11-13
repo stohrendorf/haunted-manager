@@ -1,5 +1,5 @@
 import pytest
-from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
 from django.http import HttpResponseBase, HttpResponseForbidden
 from pytest_django.live_server_helper import LiveServer
 
@@ -8,9 +8,8 @@ from hsutils.viewmodels import LoginRequest, SuccessResponse, login
 
 
 @pytest.mark.django_db
-def test_login(live_server: LiveServer):
-    User = get_user_model()
-    assert User.objects.count() == 0
+def test_login(live_server: LiveServer, django_user_model):
+    assert django_user_model.objects.count() == 0
 
     code, response = post_test_url(
         live_server,
@@ -21,7 +20,7 @@ def test_login(live_server: LiveServer):
     assert code == HttpResponseForbidden.status_code
     assert response is not None
     assert response.success is False
-    user = User.objects.create_user(
+    user: AbstractUser = django_user_model.objects.create_user(
         is_active=False,
         username="username",
         email="test@example.com",

@@ -1,5 +1,6 @@
 import re
 from dataclasses import dataclass
+from enum import Enum
 from typing import Callable, List, Optional
 
 from dataclasses_json import DataClassJsonMixin, dataclass_json
@@ -16,6 +17,12 @@ class SchemaValidationError(Exception):
 
     def __str__(self):
         return f"Schema validation error at {self.path}"
+
+
+class HttpMethod(Enum):
+    GET = "GET"
+    POST = "POST"
+    DELETE = "DELETE"
 
 
 @dataclass_json
@@ -501,346 +508,449 @@ def validate_tags_response(data: TagsResponse):
 
 class get_server_info:
     path = "api/v0/server-info"
+    method = HttpMethod.GET
     operation = "get_server_info"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest], ServerInfoResponse | tuple[int, ServerInfoResponse]]):
-        @json_response
-        def request_handler(
-            request: HttpRequest, *args, **kwargs
-        ) -> tuple[int, ServerInfoResponse] | ServerInfoResponse:
-            response = fn(request, *args, **kwargs)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(cls, handler: Callable[[HttpRequest], ServerInfoResponse | tuple[int, ServerInfoResponse]]):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest], ServerInfoResponse | tuple[int, ServerInfoResponse]], request: HttpRequest
+    ) -> ServerInfoResponse | tuple[int, ServerInfoResponse]:
+        response = handler(request)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
 
 
 class get_tags:
     path = "api/v0/tags"
+    method = HttpMethod.GET
     operation = "get_tags"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest], TagsResponse | tuple[int, TagsResponse]]):
-        @json_response
-        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, TagsResponse] | TagsResponse:
-            response = fn(request, *args, **kwargs)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(cls, handler: Callable[[HttpRequest], TagsResponse | tuple[int, TagsResponse]]):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest], TagsResponse | tuple[int, TagsResponse]], request: HttpRequest
+    ) -> TagsResponse | tuple[int, TagsResponse]:
+        response = handler(request)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
 
 
 class get_sessions:
     path = "api/v0/sessions"
+    method = HttpMethod.GET
     operation = "get_sessions"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest], SessionsResponse | tuple[int, SessionsResponse]]):
-        @json_response
-        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SessionsResponse] | SessionsResponse:
-            response = fn(request, *args, **kwargs)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(cls, handler: Callable[[HttpRequest], SessionsResponse | tuple[int, SessionsResponse]]):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest], SessionsResponse | tuple[int, SessionsResponse]], request: HttpRequest
+    ) -> SessionsResponse | tuple[int, SessionsResponse]:
+        response = handler(request)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
 
 
 class get_session:
     path = "api/v0/sessions/<str:sessionid>"
+    method = HttpMethod.GET
     operation = "get_session"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, str], SessionResponse | tuple[int, SessionResponse]]):
-        @json_response
-        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SessionResponse] | SessionResponse:
-            response = fn(request, *args, **kwargs)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(cls, handler: Callable[[HttpRequest, str], SessionResponse | tuple[int, SessionResponse]]):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest, str], SessionResponse | tuple[int, SessionResponse]],
+        request: HttpRequest,
+        *args,
+        **kwargs,
+    ) -> SessionResponse | tuple[int, SessionResponse]:
+        response = handler(request, *args, **kwargs)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
 
 
 class create_session:
     path = "api/v0/sessions/create"
+    method = HttpMethod.POST
     operation = "create_session"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]]):
-        @json_response
-        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SuccessResponse] | SuccessResponse:
-            body: CreateSessionRequest = CreateSessionRequest.schema().loads(request.body.decode())
-            body.validate()
-            response = fn(request, *args, **kwargs, body=body)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(
+        cls, handler: Callable[[HttpRequest, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]]
+    ):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
+        request: HttpRequest,
+        *args,
+        **kwargs,
+    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+        body: CreateSessionRequest = CreateSessionRequest.schema().loads(request.body.decode())
+        body.validate()
+        response = handler(request, *args, **kwargs, body=body)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
 
 
 class delete_session:
     path = "api/v0/sessions/delete"
+    method = HttpMethod.POST
     operation = "delete_session"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, DeleteSessionRequest], SuccessResponse | tuple[int, SuccessResponse]]):
-        @json_response
-        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SuccessResponse] | SuccessResponse:
-            body: DeleteSessionRequest = DeleteSessionRequest.schema().loads(request.body.decode())
-            body.validate()
-            response = fn(request, *args, **kwargs, body=body)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(
+        cls, handler: Callable[[HttpRequest, DeleteSessionRequest], SuccessResponse | tuple[int, SuccessResponse]]
+    ):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest, DeleteSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
+        request: HttpRequest,
+        *args,
+        **kwargs,
+    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+        body: DeleteSessionRequest = DeleteSessionRequest.schema().loads(request.body.decode())
+        body.validate()
+        response = handler(request, *args, **kwargs, body=body)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
 
 
 class check_session_access:
     path = "api/v0/sessions/check-access"
+    method = HttpMethod.POST
     operation = "check_session_access"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse | tuple[int, SuccessResponse]]):
-        @json_response
-        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SuccessResponse] | SuccessResponse:
-            body: SessionAccessRequest = SessionAccessRequest.schema().loads(request.body.decode())
-            body.validate()
-            response = fn(request, *args, **kwargs, body=body)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(
+        cls, handler: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse | tuple[int, SuccessResponse]]
+    ):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse | tuple[int, SuccessResponse]],
+        request: HttpRequest,
+        *args,
+        **kwargs,
+    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+        body: SessionAccessRequest = SessionAccessRequest.schema().loads(request.body.decode())
+        body.validate()
+        response = handler(request, *args, **kwargs, body=body)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
 
 
 class update_sessions_players:
     path = "api/v0/sessions/session-players"
+    method = HttpMethod.POST
     operation = "update_sessions_players"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, SessionsPlayersRequest], Empty | tuple[int, Empty]]):
-        @json_response
-        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, Empty] | Empty:
-            body: SessionsPlayersRequest = SessionsPlayersRequest.schema().loads(request.body.decode())
-            body.validate()
-            response = fn(request, *args, **kwargs, body=body)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(cls, handler: Callable[[HttpRequest, SessionsPlayersRequest], Empty | tuple[int, Empty]]):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest, SessionsPlayersRequest], Empty | tuple[int, Empty]],
+        request: HttpRequest,
+        *args,
+        **kwargs,
+    ) -> Empty | tuple[int, Empty]:
+        body: SessionsPlayersRequest = SessionsPlayersRequest.schema().loads(request.body.decode())
+        body.validate()
+        response = handler(request, *args, **kwargs, body=body)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
 
 
 class get_announcements:
     path = "api/v0/announcements"
+    method = HttpMethod.GET
     operation = "get_announcements"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest], AnnouncementsResponse | tuple[int, AnnouncementsResponse]]):
-        @json_response
-        def request_handler(
-            request: HttpRequest, *args, **kwargs
-        ) -> tuple[int, AnnouncementsResponse] | AnnouncementsResponse:
-            response = fn(request, *args, **kwargs)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(cls, handler: Callable[[HttpRequest], AnnouncementsResponse | tuple[int, AnnouncementsResponse]]):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest], AnnouncementsResponse | tuple[int, AnnouncementsResponse]],
+        request: HttpRequest,
+    ) -> AnnouncementsResponse | tuple[int, AnnouncementsResponse]:
+        response = handler(request)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
 
 
 class get_profile:
     path = "api/v0/auth/profile"
+    method = HttpMethod.GET
     operation = "get_profile"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest], ProfileInfoResponse | tuple[int, ProfileInfoResponse]]):
-        @json_response
-        def request_handler(
-            request: HttpRequest, *args, **kwargs
-        ) -> tuple[int, ProfileInfoResponse] | ProfileInfoResponse:
-            response = fn(request, *args, **kwargs)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(cls, handler: Callable[[HttpRequest], ProfileInfoResponse | tuple[int, ProfileInfoResponse]]):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest], ProfileInfoResponse | tuple[int, ProfileInfoResponse]], request: HttpRequest
+    ) -> ProfileInfoResponse | tuple[int, ProfileInfoResponse]:
+        response = handler(request)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
 
 
 class change_username:
     path = "api/v0/auth/change-username"
+    method = HttpMethod.POST
     operation = "change_username"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, ChangeUsernameRequest], SuccessResponse | tuple[int, SuccessResponse]]):
-        @json_response
-        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SuccessResponse] | SuccessResponse:
-            body: ChangeUsernameRequest = ChangeUsernameRequest.schema().loads(request.body.decode())
-            body.validate()
-            response = fn(request, *args, **kwargs, body=body)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(
+        cls, handler: Callable[[HttpRequest, ChangeUsernameRequest], SuccessResponse | tuple[int, SuccessResponse]]
+    ):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest, ChangeUsernameRequest], SuccessResponse | tuple[int, SuccessResponse]],
+        request: HttpRequest,
+        *args,
+        **kwargs,
+    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+        body: ChangeUsernameRequest = ChangeUsernameRequest.schema().loads(request.body.decode())
+        body.validate()
+        response = handler(request, *args, **kwargs, body=body)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
 
 
 class regenerate_token:
     path = "api/v0/auth/regenerate-token"
+    method = HttpMethod.GET
     operation = "regenerate_token"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest], Empty | tuple[int, Empty]]):
-        @json_response
-        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, Empty] | Empty:
-            response = fn(request, *args, **kwargs)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(cls, handler: Callable[[HttpRequest], Empty | tuple[int, Empty]]):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest], Empty | tuple[int, Empty]], request: HttpRequest
+    ) -> Empty | tuple[int, Empty]:
+        response = handler(request)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
 
 
 class login:
     path = "api/v0/auth/login"
+    method = HttpMethod.POST
     operation = "login"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, LoginRequest], SuccessResponse | tuple[int, SuccessResponse]]):
-        @json_response
-        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SuccessResponse] | SuccessResponse:
-            body: LoginRequest = LoginRequest.schema().loads(request.body.decode())
-            body.validate()
-            response = fn(request, *args, **kwargs, body=body)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(cls, handler: Callable[[HttpRequest, LoginRequest], SuccessResponse | tuple[int, SuccessResponse]]):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest, LoginRequest], SuccessResponse | tuple[int, SuccessResponse]],
+        request: HttpRequest,
+        *args,
+        **kwargs,
+    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+        body: LoginRequest = LoginRequest.schema().loads(request.body.decode())
+        body.validate()
+        response = handler(request, *args, **kwargs, body=body)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
 
 
 class register:
     path = "api/v0/auth/register"
+    method = HttpMethod.POST
     operation = "register"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, RegisterRequest], SuccessResponse | tuple[int, SuccessResponse]]):
-        @json_response
-        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SuccessResponse] | SuccessResponse:
-            body: RegisterRequest = RegisterRequest.schema().loads(request.body.decode())
-            body.validate()
-            response = fn(request, *args, **kwargs, body=body)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(cls, handler: Callable[[HttpRequest, RegisterRequest], SuccessResponse | tuple[int, SuccessResponse]]):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest, RegisterRequest], SuccessResponse | tuple[int, SuccessResponse]],
+        request: HttpRequest,
+        *args,
+        **kwargs,
+    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+        body: RegisterRequest = RegisterRequest.schema().loads(request.body.decode())
+        body.validate()
+        response = handler(request, *args, **kwargs, body=body)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
 
 
 class change_password:
     path = "api/v0/auth/change-password"
+    method = HttpMethod.POST
     operation = "change_password"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse | tuple[int, SuccessResponse]]):
-        @json_response
-        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SuccessResponse] | SuccessResponse:
-            body: ChangePasswordRequest = ChangePasswordRequest.schema().loads(request.body.decode())
-            body.validate()
-            response = fn(request, *args, **kwargs, body=body)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(
+        cls, handler: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse | tuple[int, SuccessResponse]]
+    ):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse | tuple[int, SuccessResponse]],
+        request: HttpRequest,
+        *args,
+        **kwargs,
+    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+        body: ChangePasswordRequest = ChangePasswordRequest.schema().loads(request.body.decode())
+        body.validate()
+        response = handler(request, *args, **kwargs, body=body)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
 
 
 class change_email:
     path = "api/v0/auth/change-email"
+    method = HttpMethod.POST
     operation = "change_email"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse | tuple[int, SuccessResponse]]):
-        @json_response
-        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, SuccessResponse] | SuccessResponse:
-            body: ChangeEmailRequest = ChangeEmailRequest.schema().loads(request.body.decode())
-            body.validate()
-            response = fn(request, *args, **kwargs, body=body)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(cls, handler: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse | tuple[int, SuccessResponse]]):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse | tuple[int, SuccessResponse]],
+        request: HttpRequest,
+        *args,
+        **kwargs,
+    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+        body: ChangeEmailRequest = ChangeEmailRequest.schema().loads(request.body.decode())
+        body.validate()
+        response = handler(request, *args, **kwargs, body=body)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
 
 
 class logout:
     path = "api/v0/auth/logout"
+    method = HttpMethod.GET
     operation = "logout"
 
     @classmethod
-    def wrap(cls, fn: Callable[[HttpRequest], Empty | tuple[int, Empty]]):
-        @json_response
-        def request_handler(request: HttpRequest, *args, **kwargs) -> tuple[int, Empty] | Empty:
-            response = fn(request, *args, **kwargs)
-            if isinstance(response, tuple):
-                code, response = response
-            else:
-                code = HttpResponse.status_code
-            response.validate()
-            return code, response
+    def wrap(cls, handler: Callable[[HttpRequest], Empty | tuple[int, Empty]]):
+        return path(cls.path, lambda *args, **kwargs: cls.handle_request(handler, *args, **kwargs), name=cls.operation)
 
-        return path(cls.path, request_handler, name=cls.operation)
+    @json_response
+    @staticmethod
+    def handle_request(
+        handler: Callable[[HttpRequest], Empty | tuple[int, Empty]], request: HttpRequest
+    ) -> Empty | tuple[int, Empty]:
+        response = handler(request)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response

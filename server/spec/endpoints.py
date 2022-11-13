@@ -22,7 +22,11 @@ class Endpoint:
 
 def gather_compounds(endpoints: dict[str, dict[HttpMethod, Endpoint]]) -> list[type[BaseField | Compound]]:
     if len(
-        {endpoint.operation_name for endpoints_methods in endpoints.values() for endpoint in endpoints_methods.values()}
+        {
+            endpoint.operation_name
+            for endpoints_methods in endpoints.values()
+            for endpoint in endpoints_methods.values()
+        },
     ) != len(endpoints):
         raise RuntimeError("operation names must be unique")
 

@@ -1,6 +1,6 @@
 import logging
 from functools import wraps
-from typing import Any, Callable, TypeVar
+from typing import Callable, TypeVar
 
 from dataclasses_json import DataClassJsonMixin
 from django.db import models

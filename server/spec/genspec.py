@@ -149,112 +149,112 @@ def main():
             HttpMethod.GET: Endpoint(
                 operation_name="getServerInfo",
                 response=ServerInfoResponse(),
-            )
+            ),
         },
         "/api/v0/tags": {
             HttpMethod.GET: Endpoint(
                 operation_name="getTags",
                 response=TagsResponse(),
-            )
+            ),
         },
         "/api/v0/sessions": {
             HttpMethod.GET: Endpoint(
                 operation_name="getSessions",
                 response=SessionsResponse(),
-            )
+            ),
         },
         "/api/v0/sessions/<str:sessionid>": {
             HttpMethod.GET: Endpoint(
                 operation_name="getSession",
                 response=SessionResponse(),
-            )
+            ),
         },
         "/api/v0/sessions/create": {
             HttpMethod.POST: Endpoint(
                 operation_name="createSession",
                 response=SuccessResponse(),
                 body=CreateSessionRequest(),
-            )
+            ),
         },
         "/api/v0/sessions/delete": {
             HttpMethod.POST: Endpoint(
                 operation_name="deleteSession",
                 response=SuccessResponse(),
                 body=DeleteSessionRequest(),
-            )
+            ),
         },
         "/api/v0/sessions/check-access": {
             HttpMethod.POST: Endpoint(
                 operation_name="checkSessionAccess",
                 response=SuccessResponse(),
                 body=SessionAccessRequest(),
-            )
+            ),
         },
         "/api/v0/sessions/session-players": {
             HttpMethod.POST: Endpoint(
                 operation_name="updateSessionsPlayers",
                 response=Empty(),
                 body=SessionsPlayersRequest(),
-            )
+            ),
         },
         "/api/v0/announcements": {
             HttpMethod.GET: Endpoint(
                 operation_name="getAnnouncements",
                 response=AnnouncementsResponse(),
-            )
+            ),
         },
         "/api/v0/auth/profile": {
             HttpMethod.GET: Endpoint(
                 operation_name="getProfile",
                 response=ProfileInfoResponse(),
-            )
+            ),
         },
         "/api/v0/auth/change-username": {
             HttpMethod.POST: Endpoint(
                 operation_name="changeUsername",
                 response=SuccessResponse(),
                 body=ChangeUsernameRequest(),
-            )
+            ),
         },
         "/api/v0/auth/regenerate-token": {
             HttpMethod.GET: Endpoint(
                 operation_name="regenerateToken",
                 response=Empty(),
-            )
+            ),
         },
         "/api/v0/auth/login": {
             HttpMethod.POST: Endpoint(
                 operation_name="login",
                 response=SuccessResponse(),
                 body=LoginRequest(),
-            )
+            ),
         },
         "/api/v0/auth/register": {
             HttpMethod.POST: Endpoint(
                 operation_name="register",
                 response=SuccessResponse(),
                 body=RegisterRequest(),
-            )
+            ),
         },
         "/api/v0/auth/change-password": {
             HttpMethod.POST: Endpoint(
                 operation_name="changePassword",
                 response=SuccessResponse(),
                 body=ChangePasswordRequest(),
-            )
+            ),
         },
         "/api/v0/auth/change-email": {
             HttpMethod.POST: Endpoint(
                 operation_name="changeEmail",
                 response=SuccessResponse(),
                 body=ChangeEmailRequest(),
-            )
+            ),
         },
         "/api/v0/auth/logout": {
             HttpMethod.GET: Endpoint(
                 operation_name="logout",
                 response=Empty(),
-            )
+            ),
         },
     }
 
