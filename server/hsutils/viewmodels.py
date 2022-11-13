@@ -256,8 +256,8 @@ def validate_announcement_entry(data: AnnouncementEntry):
 def validate_announcements_response(data: AnnouncementsResponse):
     if data.announcements is None:
         raise SchemaValidationError("AnnouncementsResponse.announcements")
-    for field_data in data.announcements:
-        validate_announcement_entry(field_data)
+    for data_announcements_entry in data.announcements:
+        validate_announcement_entry(data_announcements_entry)
     return
 
 
@@ -290,8 +290,8 @@ def validate_create_session_request(data: CreateSessionRequest):
         raise SchemaValidationError("CreateSessionRequest.description")
     if data.tags is None:
         raise SchemaValidationError("CreateSessionRequest.tags")
-    for field_data in data.tags:
-        if field_data is None:
+    for data_tags_entry in data.tags:
+        if data_tags_entry is None:
             raise SchemaValidationError("CreateSessionRequest.tags")
         pass
     return
@@ -376,15 +376,15 @@ def validate_session(data: Session):
         raise SchemaValidationError("Session.owner")
     if data.players is None:
         raise SchemaValidationError("Session.players")
-    for field_data in data.players:
-        if field_data is None:
+    for data_players_entry in data.players:
+        if data_players_entry is None:
             raise SchemaValidationError("Session.players")
-        if len(field_data) < 1:
+        if len(data_players_entry) < 1:
             raise SchemaValidationError("Session.players")
     if data.tags is None:
         raise SchemaValidationError("Session.tags")
-    for field_data in data.tags:
-        validate_session_tag(field_data)
+    for data_tags_entry in data.tags:
+        validate_session_tag(data_tags_entry)
     return
 
 
@@ -415,10 +415,10 @@ def validate_session_players(data: SessionPlayers):
         raise SchemaValidationError("SessionPlayers.session_id")
     if data.usernames is None:
         raise SchemaValidationError("SessionPlayers.usernames")
-    for field_data in data.usernames:
-        if field_data is None:
+    for data_usernames_entry in data.usernames:
+        if data_usernames_entry is None:
             raise SchemaValidationError("SessionPlayers.usernames")
-        if len(field_data) < 1:
+        if len(data_usernames_entry) < 1:
             raise SchemaValidationError("SessionPlayers.usernames")
     return
 
@@ -448,16 +448,16 @@ def validate_sessions_players_request(data: SessionsPlayersRequest):
         raise SchemaValidationError("SessionsPlayersRequest.api_key")
     if data.sessions is None:
         raise SchemaValidationError("SessionsPlayersRequest.sessions")
-    for field_data in data.sessions:
-        validate_session_players(field_data)
+    for data_sessions_entry in data.sessions:
+        validate_session_players(data_sessions_entry)
     return
 
 
 def validate_sessions_response(data: SessionsResponse):
     if data.sessions is None:
         raise SchemaValidationError("SessionsResponse.sessions")
-    for field_data in data.sessions:
-        validate_session(field_data)
+    for data_sessions_entry in data.sessions:
+        validate_session(data_sessions_entry)
     return
 
 
@@ -484,8 +484,8 @@ def validate_tag(data: Tag):
 def validate_tags_response(data: TagsResponse):
     if data.tags is None:
         raise SchemaValidationError("TagsResponse.tags")
-    for field_data in data.tags:
-        validate_tag(field_data)
+    for data_tags_entry in data.tags:
+        validate_tag(data_tags_entry)
     return
 
 
@@ -501,7 +501,7 @@ class server_info:
     ):
         def dispatch(request: HttpRequest, *args, **kwargs):
             if request.method == "GET":
-                return cls.do_get(get_handler, request, *args, **kwargs)
+                return cls.do_get(request, get_handler, *args, **kwargs)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -509,7 +509,7 @@ class server_info:
     @json_response
     @staticmethod
     def do_get(
-        handler: Callable[[HttpRequest], ServerInfoResponse | tuple[int, ServerInfoResponse]], request: HttpRequest
+        request: HttpRequest, handler: Callable[[HttpRequest], ServerInfoResponse | tuple[int, ServerInfoResponse]]
     ) -> ServerInfoResponse | tuple[int, ServerInfoResponse]:
         response = handler(request)
         if isinstance(response, tuple):
@@ -532,7 +532,7 @@ class tags:
     ):
         def dispatch(request: HttpRequest, *args, **kwargs):
             if request.method == "GET":
-                return cls.do_get(get_handler, request, *args, **kwargs)
+                return cls.do_get(request, get_handler, *args, **kwargs)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -540,7 +540,7 @@ class tags:
     @json_response
     @staticmethod
     def do_get(
-        handler: Callable[[HttpRequest], TagsResponse | tuple[int, TagsResponse]], request: HttpRequest
+        request: HttpRequest, handler: Callable[[HttpRequest], TagsResponse | tuple[int, TagsResponse]]
     ) -> TagsResponse | tuple[int, TagsResponse]:
         response = handler(request)
         if isinstance(response, tuple):
@@ -564,9 +564,9 @@ class sessions:
     ):
         def dispatch(request: HttpRequest, *args, **kwargs):
             if request.method == "GET":
-                return cls.do_get(get_handler, request, *args, **kwargs)
+                return cls.do_get(request, get_handler, *args, **kwargs)
             if request.method == "POST":
-                return cls.do_post(post_handler, request, *args, **kwargs)
+                return cls.do_post(request, post_handler, *args, **kwargs)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -574,7 +574,7 @@ class sessions:
     @json_response
     @staticmethod
     def do_get(
-        handler: Callable[[HttpRequest], SessionsResponse | tuple[int, SessionsResponse]], request: HttpRequest
+        request: HttpRequest, handler: Callable[[HttpRequest], SessionsResponse | tuple[int, SessionsResponse]]
     ) -> SessionsResponse | tuple[int, SessionsResponse]:
         response = handler(request)
         if isinstance(response, tuple):
@@ -587,8 +587,8 @@ class sessions:
     @json_response
     @staticmethod
     def do_post(
-        handler: Callable[[HttpRequest, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
+        handler: Callable[[HttpRequest, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
         *args,
         **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
@@ -617,11 +617,11 @@ class session:
     ):
         def dispatch(request: HttpRequest, *args, **kwargs):
             if request.method == "GET":
-                return cls.do_get(get_handler, request, *args, **kwargs)
+                return cls.do_get(request, get_handler, *args, **kwargs)
             if request.method == "POST":
-                return cls.do_post(post_handler, request, *args, **kwargs)
+                return cls.do_post(request, post_handler, *args, **kwargs)
             if request.method == "DELETE":
-                return cls.do_delete(delete_handler, request, *args, **kwargs)
+                return cls.do_delete(request, delete_handler, *args, **kwargs)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -629,8 +629,8 @@ class session:
     @json_response
     @staticmethod
     def do_get(
-        handler: Callable[[HttpRequest, str], SessionResponse | tuple[int, SessionResponse]],
         request: HttpRequest,
+        handler: Callable[[HttpRequest, str], SessionResponse | tuple[int, SessionResponse]],
         *args,
         **kwargs,
     ) -> SessionResponse | tuple[int, SessionResponse]:
@@ -645,8 +645,8 @@ class session:
     @json_response
     @staticmethod
     def do_post(
-        handler: Callable[[HttpRequest, str, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
+        handler: Callable[[HttpRequest, str, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
         *args,
         **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
@@ -663,8 +663,8 @@ class session:
     @json_response
     @staticmethod
     def do_delete(
-        handler: Callable[[HttpRequest, str], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
+        handler: Callable[[HttpRequest, str], SuccessResponse | tuple[int, SuccessResponse]],
         *args,
         **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
@@ -689,7 +689,7 @@ class session_access:
     ):
         def dispatch(request: HttpRequest, *args, **kwargs):
             if request.method == "POST":
-                return cls.do_post(post_handler, request, *args, **kwargs)
+                return cls.do_post(request, post_handler, *args, **kwargs)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -697,8 +697,8 @@ class session_access:
     @json_response
     @staticmethod
     def do_post(
-        handler: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
+        handler: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse | tuple[int, SuccessResponse]],
         *args,
         **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
@@ -725,7 +725,7 @@ class session_players:
     ):
         def dispatch(request: HttpRequest, *args, **kwargs):
             if request.method == "POST":
-                return cls.do_post(post_handler, request, *args, **kwargs)
+                return cls.do_post(request, post_handler, *args, **kwargs)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -733,8 +733,8 @@ class session_players:
     @json_response
     @staticmethod
     def do_post(
-        handler: Callable[[HttpRequest, SessionsPlayersRequest], Empty | tuple[int, Empty]],
         request: HttpRequest,
+        handler: Callable[[HttpRequest, SessionsPlayersRequest], Empty | tuple[int, Empty]],
         *args,
         **kwargs,
     ) -> Empty | tuple[int, Empty]:
@@ -761,7 +761,7 @@ class announcements:
     ):
         def dispatch(request: HttpRequest, *args, **kwargs):
             if request.method == "GET":
-                return cls.do_get(get_handler, request, *args, **kwargs)
+                return cls.do_get(request, get_handler, *args, **kwargs)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -769,8 +769,8 @@ class announcements:
     @json_response
     @staticmethod
     def do_get(
-        handler: Callable[[HttpRequest], AnnouncementsResponse | tuple[int, AnnouncementsResponse]],
         request: HttpRequest,
+        handler: Callable[[HttpRequest], AnnouncementsResponse | tuple[int, AnnouncementsResponse]],
     ) -> AnnouncementsResponse | tuple[int, AnnouncementsResponse]:
         response = handler(request)
         if isinstance(response, tuple):
@@ -793,7 +793,7 @@ class profile:
     ):
         def dispatch(request: HttpRequest, *args, **kwargs):
             if request.method == "GET":
-                return cls.do_get(get_handler, request, *args, **kwargs)
+                return cls.do_get(request, get_handler, *args, **kwargs)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -801,7 +801,7 @@ class profile:
     @json_response
     @staticmethod
     def do_get(
-        handler: Callable[[HttpRequest], ProfileInfoResponse | tuple[int, ProfileInfoResponse]], request: HttpRequest
+        request: HttpRequest, handler: Callable[[HttpRequest], ProfileInfoResponse | tuple[int, ProfileInfoResponse]]
     ) -> ProfileInfoResponse | tuple[int, ProfileInfoResponse]:
         response = handler(request)
         if isinstance(response, tuple):
@@ -824,7 +824,7 @@ class change_username:
     ):
         def dispatch(request: HttpRequest, *args, **kwargs):
             if request.method == "POST":
-                return cls.do_post(post_handler, request, *args, **kwargs)
+                return cls.do_post(request, post_handler, *args, **kwargs)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -832,8 +832,8 @@ class change_username:
     @json_response
     @staticmethod
     def do_post(
-        handler: Callable[[HttpRequest, ChangeUsernameRequest], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
+        handler: Callable[[HttpRequest, ChangeUsernameRequest], SuccessResponse | tuple[int, SuccessResponse]],
         *args,
         **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
@@ -860,7 +860,7 @@ class regenerate_token:
     ):
         def dispatch(request: HttpRequest, *args, **kwargs):
             if request.method == "GET":
-                return cls.do_get(get_handler, request, *args, **kwargs)
+                return cls.do_get(request, get_handler, *args, **kwargs)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -868,7 +868,7 @@ class regenerate_token:
     @json_response
     @staticmethod
     def do_get(
-        handler: Callable[[HttpRequest], Empty | tuple[int, Empty]], request: HttpRequest
+        request: HttpRequest, handler: Callable[[HttpRequest], Empty | tuple[int, Empty]]
     ) -> Empty | tuple[int, Empty]:
         response = handler(request)
         if isinstance(response, tuple):
@@ -891,7 +891,7 @@ class login:
     ):
         def dispatch(request: HttpRequest, *args, **kwargs):
             if request.method == "POST":
-                return cls.do_post(post_handler, request, *args, **kwargs)
+                return cls.do_post(request, post_handler, *args, **kwargs)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -899,8 +899,8 @@ class login:
     @json_response
     @staticmethod
     def do_post(
-        handler: Callable[[HttpRequest, LoginRequest], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
+        handler: Callable[[HttpRequest, LoginRequest], SuccessResponse | tuple[int, SuccessResponse]],
         *args,
         **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
@@ -927,7 +927,7 @@ class register:
     ):
         def dispatch(request: HttpRequest, *args, **kwargs):
             if request.method == "POST":
-                return cls.do_post(post_handler, request, *args, **kwargs)
+                return cls.do_post(request, post_handler, *args, **kwargs)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -935,8 +935,8 @@ class register:
     @json_response
     @staticmethod
     def do_post(
-        handler: Callable[[HttpRequest, RegisterRequest], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
+        handler: Callable[[HttpRequest, RegisterRequest], SuccessResponse | tuple[int, SuccessResponse]],
         *args,
         **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
@@ -963,7 +963,7 @@ class change_password:
     ):
         def dispatch(request: HttpRequest, *args, **kwargs):
             if request.method == "POST":
-                return cls.do_post(post_handler, request, *args, **kwargs)
+                return cls.do_post(request, post_handler, *args, **kwargs)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -971,8 +971,8 @@ class change_password:
     @json_response
     @staticmethod
     def do_post(
-        handler: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
+        handler: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse | tuple[int, SuccessResponse]],
         *args,
         **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
@@ -999,7 +999,7 @@ class change_email:
     ):
         def dispatch(request: HttpRequest, *args, **kwargs):
             if request.method == "POST":
-                return cls.do_post(post_handler, request, *args, **kwargs)
+                return cls.do_post(request, post_handler, *args, **kwargs)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -1007,8 +1007,8 @@ class change_email:
     @json_response
     @staticmethod
     def do_post(
-        handler: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse | tuple[int, SuccessResponse]],
         request: HttpRequest,
+        handler: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse | tuple[int, SuccessResponse]],
         *args,
         **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
@@ -1035,7 +1035,7 @@ class logout:
     ):
         def dispatch(request: HttpRequest, *args, **kwargs):
             if request.method == "GET":
-                return cls.do_get(get_handler, request, *args, **kwargs)
+                return cls.do_get(request, get_handler, *args, **kwargs)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -1043,7 +1043,7 @@ class logout:
     @json_response
     @staticmethod
     def do_get(
-        handler: Callable[[HttpRequest], Empty | tuple[int, Empty]], request: HttpRequest
+        request: HttpRequest, handler: Callable[[HttpRequest], Empty | tuple[int, Empty]]
     ) -> Empty | tuple[int, Empty]:
         response = handler(request)
         if isinstance(response, tuple):

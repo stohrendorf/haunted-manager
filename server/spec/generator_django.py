@@ -1,3 +1,5 @@
+import re
+
 import humps
 from endpoints import ApiPath, Endpoint, HttpMethod, get_url_params
 from structural import (
@@ -63,12 +65,13 @@ def _gen_check(context: str, indent: str, field: BaseField, accessor: str) -> tu
             output += f'{indent}if {accessor} > {field.max}: raise SchemaValidationError("{context}")\n'
             empty = False
     elif isinstance(field, ArrayField):
-        output += f"{indent}for field_data in {accessor}:\n"
+        varname = re.sub(r"[^a-zA-Z0-9]", "_", accessor) + "_entry"
+        output += f"{indent}for {varname} in {accessor}:\n"
         if isinstance(field.items, Compound):
-            output += f"{indent}    validate_{humps.decamelize(field.items.typename())}(field_data)\n"
+            output += f"{indent}    validate_{humps.decamelize(field.items.typename())}({varname})\n"
             empty = False
         else:
-            field_output, empty = _gen_check(context, indent + base_indent, field.items, "field_data")
+            field_output, empty = _gen_check(context, indent + base_indent, field.items, varname)
             output += field_output
         if empty:
             output += f"{indent}    pass\n"
@@ -158,7 +161,7 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dic
         output += "        def dispatch(request: HttpRequest, *args, **kwargs):\n"
         for method, endpoint in methods_endpoints.items():
             output += f'            if request.method == "{method.value}":\n'
-            output += f"                return cls.do_{method.value.lower()}({method.value.lower()}_handler, request, *args, **kwargs)\n"
+            output += f"                return cls.do_{method.value.lower()}(request, {method.value.lower()}_handler, *args, **kwargs)\n"
         output += "            raise RuntimeError\n"
         output += "        return path(cls.path, dispatch, name=cls.name)\n"
 
@@ -168,7 +171,7 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dic
             output += "    @staticmethod\n"
             handler_signature = make_handler_signature(args_str, endpoint, method)
             output += (
-                f"    def do_{method.value.lower()}(handler: {handler_signature}, request: HttpRequest{kwargs})"
+                f"    def do_{method.value.lower()}(request: HttpRequest, handler: {handler_signature}{kwargs})"
                 f" -> {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]:\n"
             )
             if method == HttpMethod.POST:
