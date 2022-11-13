@@ -84,6 +84,24 @@ def get_session(request, sessionid: str) -> SessionResponse | tuple[int, Session
     )
 
 
+def edit_session(request, sessionid: str, body: CreateSessionRequest) -> SuccessResponse | tuple[int, SuccessResponse]:
+    try:
+        session = SessionModel.objects.get(key=sessionid)
+    except SessionModel.DoesNotExist:
+        return HttpResponseNotFound.status_code, SuccessResponse(message="invalid session id", success=False)
+
+    if request.user != session.owner:
+        return HttpResponseForbidden.status_code, SuccessResponse(
+            message="not allowed to edit this session",
+            success=False,
+        )
+
+    session.tags.set(body.tags)
+    session.description = body.description
+    session.save()
+    return SuccessResponse(message="", success=True)
+
+
 def delete_session(request, sessionid: str) -> tuple[int, SuccessResponse] | SuccessResponse:
     if not request.user.is_active or not request.user.is_authenticated:
         return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")

@@ -612,11 +612,14 @@ class session:
         cls,
         *,
         get_handler: Callable[[HttpRequest, str], SessionResponse | tuple[int, SessionResponse]],
+        post_handler: Callable[[HttpRequest, str, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
         delete_handler: Callable[[HttpRequest, str], SuccessResponse | tuple[int, SuccessResponse]],
     ):
         def dispatch(request: HttpRequest, *args, **kwargs):
             if request.method == "GET":
                 return cls.do_get(get_handler, request, *args, **kwargs)
+            if request.method == "POST":
+                return cls.do_post(post_handler, request, *args, **kwargs)
             if request.method == "DELETE":
                 return cls.do_delete(delete_handler, request, *args, **kwargs)
             raise RuntimeError
@@ -632,6 +635,24 @@ class session:
         **kwargs,
     ) -> SessionResponse | tuple[int, SessionResponse]:
         response = handler(request, *args, **kwargs)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HttpResponse.status_code
+        response.validate()
+        return code, response
+
+    @json_response
+    @staticmethod
+    def do_post(
+        handler: Callable[[HttpRequest, str, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
+        request: HttpRequest,
+        *args,
+        **kwargs,
+    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+        body: CreateSessionRequest = CreateSessionRequest.schema().loads(request.body.decode())
+        body.validate()
+        response = handler(request, *args, **kwargs, body=body)
         if isinstance(response, tuple):
             code, response = response
         else:

@@ -169,6 +169,11 @@ def main():
                 operation_name="getSession",
                 response=SessionResponse(),
             ),
+            HttpMethod.POST: Endpoint(
+                operation_name="editSession",
+                response=SuccessResponse(),
+                body=CreateSessionRequest(),
+            ),
             HttpMethod.DELETE: Endpoint(
                 operation_name="deleteSession",
                 response=SuccessResponse(),
