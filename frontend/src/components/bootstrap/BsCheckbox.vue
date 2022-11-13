@@ -5,20 +5,37 @@ import { Prop } from "vue-property-decorator";
 @Options({})
 export default class BsCheckbox extends Vue {
   @Prop()
-  public key: any = undefined!;
+  public key: any | undefined;
 
   @Prop()
-  public value: any = undefined!;
+  public value!: any;
 
-  @Prop({ default: null })
-  public selectedValues?: any[] | null | undefined = undefined;
+  @Prop({ default: () => [] })
+  public selectedValues!: any[];
 
   private checked: boolean = false;
 
-  changed(): void {
-    if (this.selectedValues === null || this.selectedValues === undefined)
-      return;
+  created(): void {
+    const updateChecked = () => {
+      this.checked = this.selectedValues.includes(this.value) ?? false;
+    };
 
+    this.$watch(
+      () => this.selectedValues,
+      () => {
+        updateChecked();
+      }
+    );
+    this.$watch(
+      () => this.value,
+      () => {
+        updateChecked();
+      }
+    );
+    updateChecked();
+  }
+
+  changed(): void {
     const checked = (
       document.getElementById(String(this.$.uid)) as HTMLInputElement
     ).checked;
@@ -40,7 +57,6 @@ export default class BsCheckbox extends Vue {
       class="form-check-input"
       type="checkbox"
       :value="value"
-      :checked="selectedValues?.includes(value) ?? false"
       @input="changed"
     />
     <label :for="$.uid"><slot /></label>

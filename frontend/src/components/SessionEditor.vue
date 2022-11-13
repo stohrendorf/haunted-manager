@@ -8,9 +8,9 @@ import { Prop } from "vue-property-decorator";
 
 @Options({ components: { BsCheckbox, BsBtn, FloatingSingleLineInput } })
 export default class SessionEditor extends Vue {
-  private tags: ITag[] = [];
+  private tags: ITag[] | null = null;
 
-  @Prop({ required: true })
+  @Prop({ required: true, default: { tags: [] } })
   public session!: ISession;
 
   @Prop({ required: true, default: () => [] })
@@ -20,13 +20,14 @@ export default class SessionEditor extends Vue {
     this.selectedTags.splice(0, this.selectedTags.length);
     this.selectedTags.push(
       ...this.session.tags.map(
-        (t) => this.tags.filter((tt) => tt.name === t.name)[0].id
+        (sessionTag) =>
+          this.tags!.filter((tag) => tag.name === sessionTag.name)[0].id
       )
     );
     this.$emit("update:selectedTags", this.selectedTags);
   }
 
-  async beforeCreate(): Promise<void> {
+  async created(): Promise<void> {
     this.tags = (await getTags()).tags;
     this.updateSelectedTagsFromSession();
     this.$watch(
@@ -41,7 +42,7 @@ export default class SessionEditor extends Vue {
 </script>
 
 <template>
-  <form>
+  <form v-if="tags != null">
     <floating-single-line-input
       v-model="session.description"
       label="Description"
