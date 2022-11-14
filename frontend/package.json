@@ -39,6 +39,7 @@
     "@vue/cli-service": "^5.0.8",
     "@vue/eslint-config-typescript": "^9.1.0",
     "cypress": "^10.11.0",
+    "cypress-teamcity-reporter": "^3.0.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.2.1",
