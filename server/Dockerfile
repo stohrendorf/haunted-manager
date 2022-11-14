@@ -6,6 +6,7 @@ COPY poetry.lock .
 ENV POETRY_VERSION=1.2.2
 ENV POETRY_HOME=/etc/poetry
 ENV PATH="$POETRY_HOME/bin:$PATH"
+ARG TEAMCITY_VERSION=""
 
 RUN apt-get update -y \
     && apt-get install -y libmariadb-dev python-is-python3 dos2unix \
