@@ -88,299 +88,383 @@ export interface ITagsResponse {
 }
 function validateAnnouncementEntry(data: IAnnouncementEntry): void {
   if (data.background_color === undefined)
-    throw new SchemaValidationError("AnnouncementEntry.background_color");
+    throw new SchemaValidationError(
+      "AnnouncementEntry.background_color is undefined"
+    );
   if (data.background_color === null)
-    throw new SchemaValidationError("AnnouncementEntry.background_color");
+    throw new SchemaValidationError(
+      "AnnouncementEntry.background_color is null"
+    );
   if (data.background_color.length < 1)
-    throw new SchemaValidationError("AnnouncementEntry.background_color");
+    throw new SchemaValidationError(
+      "AnnouncementEntry.background_color is too short"
+    );
   if (data.message === undefined)
-    throw new SchemaValidationError("AnnouncementEntry.message");
+    throw new SchemaValidationError("AnnouncementEntry.message is undefined");
   if (data.message === null)
-    throw new SchemaValidationError("AnnouncementEntry.message");
+    throw new SchemaValidationError("AnnouncementEntry.message is null");
   if (data.message.length < 1)
-    throw new SchemaValidationError("AnnouncementEntry.message");
+    throw new SchemaValidationError("AnnouncementEntry.message is too short");
   if (data.text_color === undefined)
-    throw new SchemaValidationError("AnnouncementEntry.text_color");
+    throw new SchemaValidationError(
+      "AnnouncementEntry.text_color is undefined"
+    );
   if (data.text_color === null)
-    throw new SchemaValidationError("AnnouncementEntry.text_color");
+    throw new SchemaValidationError("AnnouncementEntry.text_color is null");
   if (data.text_color.length < 1)
-    throw new SchemaValidationError("AnnouncementEntry.text_color");
+    throw new SchemaValidationError(
+      "AnnouncementEntry.text_color is too short"
+    );
 }
 function validateAnnouncementsResponse(data: IAnnouncementsResponse): void {
   if (data.announcements === undefined)
-    throw new SchemaValidationError("AnnouncementsResponse.announcements");
+    throw new SchemaValidationError(
+      "AnnouncementsResponse.announcements is undefined"
+    );
   if (data.announcements === null)
-    throw new SchemaValidationError("AnnouncementsResponse.announcements");
+    throw new SchemaValidationError(
+      "AnnouncementsResponse.announcements is null"
+    );
   for (const fieldData of data.announcements) {
     validateAnnouncementEntry(fieldData);
   }
 }
 function validateChangeEmailRequest(data: IChangeEmailRequest): void {
   if (data.email === undefined)
-    throw new SchemaValidationError("ChangeEmailRequest.email");
+    throw new SchemaValidationError("ChangeEmailRequest.email is undefined");
   if (data.email === null)
-    throw new SchemaValidationError("ChangeEmailRequest.email");
+    throw new SchemaValidationError("ChangeEmailRequest.email is null");
   if (data.email.length < 1)
-    throw new SchemaValidationError("ChangeEmailRequest.email");
+    throw new SchemaValidationError("ChangeEmailRequest.email is too short");
 }
 function validateChangePasswordRequest(data: IChangePasswordRequest): void {
   if (data.password === undefined)
-    throw new SchemaValidationError("ChangePasswordRequest.password");
+    throw new SchemaValidationError(
+      "ChangePasswordRequest.password is undefined"
+    );
   if (data.password === null)
-    throw new SchemaValidationError("ChangePasswordRequest.password");
+    throw new SchemaValidationError("ChangePasswordRequest.password is null");
   if (data.password.length < 1)
-    throw new SchemaValidationError("ChangePasswordRequest.password");
+    throw new SchemaValidationError(
+      "ChangePasswordRequest.password is too short"
+    );
 }
 function validateChangeUsernameRequest(data: IChangeUsernameRequest): void {
   if (data.username === undefined)
-    throw new SchemaValidationError("ChangeUsernameRequest.username");
+    throw new SchemaValidationError(
+      "ChangeUsernameRequest.username is undefined"
+    );
   if (data.username === null)
-    throw new SchemaValidationError("ChangeUsernameRequest.username");
+    throw new SchemaValidationError("ChangeUsernameRequest.username is null");
   if (data.username.length < 1)
-    throw new SchemaValidationError("ChangeUsernameRequest.username");
+    throw new SchemaValidationError(
+      "ChangeUsernameRequest.username is too short"
+    );
 }
 function validateCreateSessionRequest(data: ICreateSessionRequest): void {
   if (data.description === undefined)
-    throw new SchemaValidationError("CreateSessionRequest.description");
+    throw new SchemaValidationError(
+      "CreateSessionRequest.description is undefined"
+    );
   if (data.description === null)
-    throw new SchemaValidationError("CreateSessionRequest.description");
+    throw new SchemaValidationError("CreateSessionRequest.description is null");
   if (data.tags === undefined)
-    throw new SchemaValidationError("CreateSessionRequest.tags");
+    throw new SchemaValidationError("CreateSessionRequest.tags is undefined");
   if (data.tags === null)
-    throw new SchemaValidationError("CreateSessionRequest.tags");
+    throw new SchemaValidationError("CreateSessionRequest.tags is null");
   for (const fieldData of data.tags) {
     if (fieldData === undefined)
-      throw new SchemaValidationError("CreateSessionRequest.tags");
+      throw new SchemaValidationError("CreateSessionRequest.tags is undefined");
     if (fieldData === null)
-      throw new SchemaValidationError("CreateSessionRequest.tags");
+      throw new SchemaValidationError("CreateSessionRequest.tags is null");
   }
 }
 function validateEmpty(data: IEmpty): void {}
 function validateLoginRequest(data: ILoginRequest): void {
   if (data.password === undefined)
-    throw new SchemaValidationError("LoginRequest.password");
+    throw new SchemaValidationError("LoginRequest.password is undefined");
   if (data.password === null)
-    throw new SchemaValidationError("LoginRequest.password");
+    throw new SchemaValidationError("LoginRequest.password is null");
   if (data.password.length < 1)
-    throw new SchemaValidationError("LoginRequest.password");
+    throw new SchemaValidationError("LoginRequest.password is too short");
   if (data.username === undefined)
-    throw new SchemaValidationError("LoginRequest.username");
+    throw new SchemaValidationError("LoginRequest.username is undefined");
   if (data.username === null)
-    throw new SchemaValidationError("LoginRequest.username");
+    throw new SchemaValidationError("LoginRequest.username is null");
   if (data.username.length < 1)
-    throw new SchemaValidationError("LoginRequest.username");
+    throw new SchemaValidationError("LoginRequest.username is too short");
 }
 function validateProfileInfoResponse(data: IProfileInfoResponse): void {
   if (data.auth_token === undefined)
-    throw new SchemaValidationError("ProfileInfoResponse.auth_token");
+    throw new SchemaValidationError(
+      "ProfileInfoResponse.auth_token is undefined"
+    );
   if (data.auth_token !== null) {
     if (data.auth_token.length < 1)
-      throw new SchemaValidationError("ProfileInfoResponse.auth_token");
+      throw new SchemaValidationError(
+        "ProfileInfoResponse.auth_token is too short"
+      );
   }
   if (data.authenticated === undefined)
-    throw new SchemaValidationError("ProfileInfoResponse.authenticated");
+    throw new SchemaValidationError(
+      "ProfileInfoResponse.authenticated is undefined"
+    );
   if (data.authenticated === null)
-    throw new SchemaValidationError("ProfileInfoResponse.authenticated");
+    throw new SchemaValidationError(
+      "ProfileInfoResponse.authenticated is null"
+    );
   if (data.email === undefined)
-    throw new SchemaValidationError("ProfileInfoResponse.email");
+    throw new SchemaValidationError("ProfileInfoResponse.email is undefined");
   if (data.email !== null) {
     if (data.email.length < 1)
-      throw new SchemaValidationError("ProfileInfoResponse.email");
+      throw new SchemaValidationError("ProfileInfoResponse.email is too short");
   }
   if (data.username === undefined)
-    throw new SchemaValidationError("ProfileInfoResponse.username");
+    throw new SchemaValidationError(
+      "ProfileInfoResponse.username is undefined"
+    );
   if (data.username === null)
-    throw new SchemaValidationError("ProfileInfoResponse.username");
+    throw new SchemaValidationError("ProfileInfoResponse.username is null");
   if (data.username.length < 1)
-    throw new SchemaValidationError("ProfileInfoResponse.username");
+    throw new SchemaValidationError(
+      "ProfileInfoResponse.username is too short"
+    );
   if (data.verified === undefined)
-    throw new SchemaValidationError("ProfileInfoResponse.verified");
+    throw new SchemaValidationError(
+      "ProfileInfoResponse.verified is undefined"
+    );
   if (data.verified === null)
-    throw new SchemaValidationError("ProfileInfoResponse.verified");
+    throw new SchemaValidationError("ProfileInfoResponse.verified is null");
 }
 function validateRegisterRequest(data: IRegisterRequest): void {
   if (data.email === undefined)
-    throw new SchemaValidationError("RegisterRequest.email");
+    throw new SchemaValidationError("RegisterRequest.email is undefined");
   if (data.email === null)
-    throw new SchemaValidationError("RegisterRequest.email");
+    throw new SchemaValidationError("RegisterRequest.email is null");
   if (data.email.length < 1)
-    throw new SchemaValidationError("RegisterRequest.email");
+    throw new SchemaValidationError("RegisterRequest.email is too short");
   if (data.password === undefined)
-    throw new SchemaValidationError("RegisterRequest.password");
+    throw new SchemaValidationError("RegisterRequest.password is undefined");
   if (data.password === null)
-    throw new SchemaValidationError("RegisterRequest.password");
+    throw new SchemaValidationError("RegisterRequest.password is null");
   if (data.password.length < 1)
-    throw new SchemaValidationError("RegisterRequest.password");
+    throw new SchemaValidationError("RegisterRequest.password is too short");
   if (data.username === undefined)
-    throw new SchemaValidationError("RegisterRequest.username");
+    throw new SchemaValidationError("RegisterRequest.username is undefined");
   if (data.username === null)
-    throw new SchemaValidationError("RegisterRequest.username");
+    throw new SchemaValidationError("RegisterRequest.username is null");
   if (data.username.length < 1)
-    throw new SchemaValidationError("RegisterRequest.username");
+    throw new SchemaValidationError("RegisterRequest.username is too short");
 }
 function validateServerInfoResponse(data: IServerInfoResponse): void {
   if (data.coop_url === undefined)
-    throw new SchemaValidationError("ServerInfoResponse.coop_url");
+    throw new SchemaValidationError("ServerInfoResponse.coop_url is undefined");
   if (data.coop_url === null)
-    throw new SchemaValidationError("ServerInfoResponse.coop_url");
+    throw new SchemaValidationError("ServerInfoResponse.coop_url is null");
   if (data.coop_url.length < 1)
-    throw new SchemaValidationError("ServerInfoResponse.coop_url");
+    throw new SchemaValidationError("ServerInfoResponse.coop_url is too short");
   if (data.total_sessions === undefined)
-    throw new SchemaValidationError("ServerInfoResponse.total_sessions");
+    throw new SchemaValidationError(
+      "ServerInfoResponse.total_sessions is undefined"
+    );
   if (data.total_sessions === null)
-    throw new SchemaValidationError("ServerInfoResponse.total_sessions");
+    throw new SchemaValidationError(
+      "ServerInfoResponse.total_sessions is null"
+    );
   if (data.total_sessions < 0)
-    throw new SchemaValidationError("ServerInfoResponse.total_sessions");
+    throw new SchemaValidationError(
+      "ServerInfoResponse.total_sessions has a value below minimum"
+    );
   if (data.total_users === undefined)
-    throw new SchemaValidationError("ServerInfoResponse.total_users");
+    throw new SchemaValidationError(
+      "ServerInfoResponse.total_users is undefined"
+    );
   if (data.total_users === null)
-    throw new SchemaValidationError("ServerInfoResponse.total_users");
+    throw new SchemaValidationError("ServerInfoResponse.total_users is null");
   if (data.total_users < 0)
-    throw new SchemaValidationError("ServerInfoResponse.total_users");
+    throw new SchemaValidationError(
+      "ServerInfoResponse.total_users has a value below minimum"
+    );
 }
 function validateSession(data: ISession): void {
   if (data.description === undefined)
-    throw new SchemaValidationError("Session.description");
+    throw new SchemaValidationError("Session.description is undefined");
   if (data.description === null)
-    throw new SchemaValidationError("Session.description");
-  if (data.id === undefined) throw new SchemaValidationError("Session.id");
-  if (data.id === null) throw new SchemaValidationError("Session.id");
-  if (data.id.length < 1) throw new SchemaValidationError("Session.id");
+    throw new SchemaValidationError("Session.description is null");
+  if (data.id === undefined)
+    throw new SchemaValidationError("Session.id is undefined");
+  if (data.id === null) throw new SchemaValidationError("Session.id is null");
+  if (data.id.length < 1)
+    throw new SchemaValidationError("Session.id is too short");
   if (data.owner === undefined)
-    throw new SchemaValidationError("Session.owner");
-  if (data.owner === null) throw new SchemaValidationError("Session.owner");
-  if (data.owner.length < 1) throw new SchemaValidationError("Session.owner");
+    throw new SchemaValidationError("Session.owner is undefined");
+  if (data.owner === null)
+    throw new SchemaValidationError("Session.owner is null");
+  if (data.owner.length < 1)
+    throw new SchemaValidationError("Session.owner is too short");
   if (data.players === undefined)
-    throw new SchemaValidationError("Session.players");
-  if (data.players === null) throw new SchemaValidationError("Session.players");
+    throw new SchemaValidationError("Session.players is undefined");
+  if (data.players === null)
+    throw new SchemaValidationError("Session.players is null");
   for (const fieldData of data.players) {
     if (fieldData === undefined)
-      throw new SchemaValidationError("Session.players");
-    if (fieldData === null) throw new SchemaValidationError("Session.players");
+      throw new SchemaValidationError("Session.players is undefined");
+    if (fieldData === null)
+      throw new SchemaValidationError("Session.players is null");
     if (fieldData.length < 1)
-      throw new SchemaValidationError("Session.players");
+      throw new SchemaValidationError("Session.players is too short");
   }
 
-  if (data.tags === undefined) throw new SchemaValidationError("Session.tags");
-  if (data.tags === null) throw new SchemaValidationError("Session.tags");
+  if (data.tags === undefined)
+    throw new SchemaValidationError("Session.tags is undefined");
+  if (data.tags === null)
+    throw new SchemaValidationError("Session.tags is null");
   for (const fieldData of data.tags) {
     validateSessionTag(fieldData);
   }
 }
 function validateSessionAccessRequest(data: ISessionAccessRequest): void {
   if (data.api_key === undefined)
-    throw new SchemaValidationError("SessionAccessRequest.api_key");
+    throw new SchemaValidationError(
+      "SessionAccessRequest.api_key is undefined"
+    );
   if (data.api_key === null)
-    throw new SchemaValidationError("SessionAccessRequest.api_key");
+    throw new SchemaValidationError("SessionAccessRequest.api_key is null");
   if (data.api_key.length < 1)
-    throw new SchemaValidationError("SessionAccessRequest.api_key");
+    throw new SchemaValidationError(
+      "SessionAccessRequest.api_key is too short"
+    );
   if (data.auth_token === undefined)
-    throw new SchemaValidationError("SessionAccessRequest.auth_token");
+    throw new SchemaValidationError(
+      "SessionAccessRequest.auth_token is undefined"
+    );
   if (data.auth_token === null)
-    throw new SchemaValidationError("SessionAccessRequest.auth_token");
+    throw new SchemaValidationError("SessionAccessRequest.auth_token is null");
   if (data.auth_token.length < 1)
-    throw new SchemaValidationError("SessionAccessRequest.auth_token");
+    throw new SchemaValidationError(
+      "SessionAccessRequest.auth_token is too short"
+    );
   if (data.session_id === undefined)
-    throw new SchemaValidationError("SessionAccessRequest.session_id");
+    throw new SchemaValidationError(
+      "SessionAccessRequest.session_id is undefined"
+    );
   if (data.session_id === null)
-    throw new SchemaValidationError("SessionAccessRequest.session_id");
+    throw new SchemaValidationError("SessionAccessRequest.session_id is null");
   if (data.session_id.length < 1)
-    throw new SchemaValidationError("SessionAccessRequest.session_id");
+    throw new SchemaValidationError(
+      "SessionAccessRequest.session_id is too short"
+    );
   if (data.username === undefined)
-    throw new SchemaValidationError("SessionAccessRequest.username");
+    throw new SchemaValidationError(
+      "SessionAccessRequest.username is undefined"
+    );
   if (data.username === null)
-    throw new SchemaValidationError("SessionAccessRequest.username");
+    throw new SchemaValidationError("SessionAccessRequest.username is null");
   if (data.username.length < 1)
-    throw new SchemaValidationError("SessionAccessRequest.username");
+    throw new SchemaValidationError(
+      "SessionAccessRequest.username is too short"
+    );
 }
 function validateSessionPlayers(data: ISessionPlayers): void {
   if (data.session_id === undefined)
-    throw new SchemaValidationError("SessionPlayers.session_id");
+    throw new SchemaValidationError("SessionPlayers.session_id is undefined");
   if (data.session_id === null)
-    throw new SchemaValidationError("SessionPlayers.session_id");
+    throw new SchemaValidationError("SessionPlayers.session_id is null");
   if (data.session_id.length < 1)
-    throw new SchemaValidationError("SessionPlayers.session_id");
+    throw new SchemaValidationError("SessionPlayers.session_id is too short");
   if (data.usernames === undefined)
-    throw new SchemaValidationError("SessionPlayers.usernames");
+    throw new SchemaValidationError("SessionPlayers.usernames is undefined");
   if (data.usernames === null)
-    throw new SchemaValidationError("SessionPlayers.usernames");
+    throw new SchemaValidationError("SessionPlayers.usernames is null");
   for (const fieldData of data.usernames) {
     if (fieldData === undefined)
-      throw new SchemaValidationError("SessionPlayers.usernames");
+      throw new SchemaValidationError("SessionPlayers.usernames is undefined");
     if (fieldData === null)
-      throw new SchemaValidationError("SessionPlayers.usernames");
+      throw new SchemaValidationError("SessionPlayers.usernames is null");
     if (fieldData.length < 1)
-      throw new SchemaValidationError("SessionPlayers.usernames");
+      throw new SchemaValidationError("SessionPlayers.usernames is too short");
   }
 }
 function validateSessionResponse(data: ISessionResponse): void {
   if (data.session === undefined)
-    throw new SchemaValidationError("SessionResponse.session");
+    throw new SchemaValidationError("SessionResponse.session is undefined");
   if (data.session !== null) {
     validateSession(data.session);
   }
 }
 function validateSessionTag(data: ISessionTag): void {
   if (data.description === undefined)
-    throw new SchemaValidationError("SessionTag.description");
+    throw new SchemaValidationError("SessionTag.description is undefined");
   if (data.description === null)
-    throw new SchemaValidationError("SessionTag.description");
+    throw new SchemaValidationError("SessionTag.description is null");
   if (data.description.length < 1)
-    throw new SchemaValidationError("SessionTag.description");
+    throw new SchemaValidationError("SessionTag.description is too short");
   if (data.name === undefined)
-    throw new SchemaValidationError("SessionTag.name");
-  if (data.name === null) throw new SchemaValidationError("SessionTag.name");
-  if (data.name.length < 1) throw new SchemaValidationError("SessionTag.name");
+    throw new SchemaValidationError("SessionTag.name is undefined");
+  if (data.name === null)
+    throw new SchemaValidationError("SessionTag.name is null");
+  if (data.name.length < 1)
+    throw new SchemaValidationError("SessionTag.name is too short");
 }
 function validateSessionsPlayersRequest(data: ISessionsPlayersRequest): void {
   if (data.api_key === undefined)
-    throw new SchemaValidationError("SessionsPlayersRequest.api_key");
+    throw new SchemaValidationError(
+      "SessionsPlayersRequest.api_key is undefined"
+    );
   if (data.api_key === null)
-    throw new SchemaValidationError("SessionsPlayersRequest.api_key");
+    throw new SchemaValidationError("SessionsPlayersRequest.api_key is null");
   if (data.api_key.length < 1)
-    throw new SchemaValidationError("SessionsPlayersRequest.api_key");
+    throw new SchemaValidationError(
+      "SessionsPlayersRequest.api_key is too short"
+    );
   if (data.sessions === undefined)
-    throw new SchemaValidationError("SessionsPlayersRequest.sessions");
+    throw new SchemaValidationError(
+      "SessionsPlayersRequest.sessions is undefined"
+    );
   if (data.sessions === null)
-    throw new SchemaValidationError("SessionsPlayersRequest.sessions");
+    throw new SchemaValidationError("SessionsPlayersRequest.sessions is null");
   for (const fieldData of data.sessions) {
     validateSessionPlayers(fieldData);
   }
 }
 function validateSessionsResponse(data: ISessionsResponse): void {
   if (data.sessions === undefined)
-    throw new SchemaValidationError("SessionsResponse.sessions");
+    throw new SchemaValidationError("SessionsResponse.sessions is undefined");
   if (data.sessions === null)
-    throw new SchemaValidationError("SessionsResponse.sessions");
+    throw new SchemaValidationError("SessionsResponse.sessions is null");
   for (const fieldData of data.sessions) {
     validateSession(fieldData);
   }
 }
 function validateSuccessResponse(data: ISuccessResponse): void {
   if (data.message === undefined)
-    throw new SchemaValidationError("SuccessResponse.message");
+    throw new SchemaValidationError("SuccessResponse.message is undefined");
   if (data.message === null)
-    throw new SchemaValidationError("SuccessResponse.message");
+    throw new SchemaValidationError("SuccessResponse.message is null");
   if (data.success === undefined)
-    throw new SchemaValidationError("SuccessResponse.success");
+    throw new SchemaValidationError("SuccessResponse.success is undefined");
   if (data.success === null)
-    throw new SchemaValidationError("SuccessResponse.success");
+    throw new SchemaValidationError("SuccessResponse.success is null");
 }
 function validateTag(data: ITag): void {
   if (data.description === undefined)
-    throw new SchemaValidationError("Tag.description");
+    throw new SchemaValidationError("Tag.description is undefined");
   if (data.description === null)
-    throw new SchemaValidationError("Tag.description");
-  if (data.id === undefined) throw new SchemaValidationError("Tag.id");
-  if (data.id === null) throw new SchemaValidationError("Tag.id");
-  if (data.name === undefined) throw new SchemaValidationError("Tag.name");
-  if (data.name === null) throw new SchemaValidationError("Tag.name");
-  if (data.name.length < 1) throw new SchemaValidationError("Tag.name");
+    throw new SchemaValidationError("Tag.description is null");
+  if (data.id === undefined)
+    throw new SchemaValidationError("Tag.id is undefined");
+  if (data.id === null) throw new SchemaValidationError("Tag.id is null");
+  if (data.name === undefined)
+    throw new SchemaValidationError("Tag.name is undefined");
+  if (data.name === null) throw new SchemaValidationError("Tag.name is null");
+  if (data.name.length < 1)
+    throw new SchemaValidationError("Tag.name is too short");
 }
 function validateTagsResponse(data: ITagsResponse): void {
   if (data.tags === undefined)
-    throw new SchemaValidationError("TagsResponse.tags");
-  if (data.tags === null) throw new SchemaValidationError("TagsResponse.tags");
+    throw new SchemaValidationError("TagsResponse.tags is undefined");
+  if (data.tags === null)
+    throw new SchemaValidationError("TagsResponse.tags is null");
   for (const fieldData of data.tags) {
     validateTag(fieldData);
   }
@@ -408,30 +492,30 @@ export async function createSession(
   validateSuccessResponse(result);
   return result;
 }
-export async function getSession(sessionid: string): Promise<ISessionResponse> {
+export async function getSession(sessionId: string): Promise<ISessionResponse> {
   const result = (await doGet(
-    `/api/v0/sessions/${encodeURIComponent(sessionid)}`
+    `/api/v0/sessions/${encodeURIComponent(sessionId)}`
   )) as ISessionResponse;
   validateSessionResponse(result);
   return result;
 }
 export async function editSession(
-  sessionid: string,
+  sessionId: string,
   body: ICreateSessionRequest
 ): Promise<ISuccessResponse> {
   validateCreateSessionRequest(body);
   const result = (await doPost(
-    `/api/v0/sessions/${encodeURIComponent(sessionid)}`,
+    `/api/v0/sessions/${encodeURIComponent(sessionId)}`,
     body
   )) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
 }
 export async function deleteSession(
-  sessionid: string
+  sessionId: string
 ): Promise<ISuccessResponse> {
   const result = (await doDelete(
-    `/api/v0/sessions/${encodeURIComponent(sessionid)}`
+    `/api/v0/sessions/${encodeURIComponent(sessionId)}`
   )) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
