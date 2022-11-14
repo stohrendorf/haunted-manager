@@ -1,23 +1,22 @@
 from typing import Optional, TypeVar
 
-import requests
 from dataclasses_json import DataClassJsonMixin
-from pytest_django.live_server_helper import LiveServer
+from django.test import Client
 
 T = TypeVar("T", bound=DataClassJsonMixin)
 
 
-def get_test_url(live_server: LiveServer, path: str, response_class: type[T]) -> tuple[int, Optional[T]]:
-    r = requests.get(live_server.url + "/" + path)
+def get_test_url(client: Client, path: str, response_class: type[T]) -> tuple[int, Optional[T]]:
+    r = client.get("/" + path)
     try:
-        return r.status_code, response_class.schema().loads(r.text)
+        return r.status_code, response_class.schema().loads(r.content.decode())
     except Exception:
         return r.status_code, None
 
 
-def post_test_url(live_server: LiveServer, path: str, data, response_class: type[T]) -> tuple[int, Optional[T]]:
-    r = requests.post(live_server.url + "/" + path, data=data.schema().dumps(data).encode())
+def post_test_url(client: Client, path: str, data, response_class: type[T]) -> tuple[int, Optional[T]]:
+    r = client.post("/" + path, data=data.schema().dumps(data).encode(), content_type="text/json")
     try:
-        return r.status_code, response_class.schema().loads(r.text)
+        return r.status_code, response_class.schema().loads(r.content.decode())
     except Exception:
         return r.status_code, None

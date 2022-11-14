@@ -1,18 +1,18 @@
 import pytest
 from django.contrib.auth.models import AbstractUser
 from django.http import HttpResponseBase, HttpResponseForbidden
-from pytest_django.live_server_helper import LiveServer
+from django.test import Client
 
 from hsutils.test_utils import post_test_url
 from hsutils.viewmodels import LoginRequest, SuccessResponse, login
 
 
 @pytest.mark.django_db
-def test_login(live_server: LiveServer, django_user_model):
+def test_login(client: Client, django_user_model):
     assert django_user_model.objects.count() == 0
 
     code, response = post_test_url(
-        live_server,
+        client,
         login.path,
         LoginRequest(password="password!!!", username="username"),
         SuccessResponse,
@@ -27,7 +27,7 @@ def test_login(live_server: LiveServer, django_user_model):
         password="password!!!",
     )
     code, response = post_test_url(
-        live_server,
+        client,
         login.path,
         LoginRequest(password="password!!!", username="username"),
         SuccessResponse,
@@ -39,7 +39,7 @@ def test_login(live_server: LiveServer, django_user_model):
     user.is_active = True
     user.save()
     code, response = post_test_url(
-        live_server,
+        client,
         login.path,
         LoginRequest(password="password!!!", username="username"),
         SuccessResponse,
@@ -49,7 +49,7 @@ def test_login(live_server: LiveServer, django_user_model):
     assert response.success is True
 
     code, response = post_test_url(
-        live_server,
+        client,
         login.path,
         LoginRequest(password="password", username="username"),
         SuccessResponse,
@@ -59,7 +59,7 @@ def test_login(live_server: LiveServer, django_user_model):
     assert response.success is False
 
     code, response = post_test_url(
-        live_server,
+        client,
         login.path,
         LoginRequest(password="password!!!", username="xxx"),
         SuccessResponse,
