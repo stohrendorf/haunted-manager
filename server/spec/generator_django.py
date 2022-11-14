@@ -181,9 +181,9 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dic
                     f".schema().loads(request.body.decode())\n"
                 )
                 output += "        body.validate()\n"
-                output += f"        response = handler(" + ", ".join(["request", *url_args_out, "body"]) + ")\n"
+                output += "        response = handler(" + ", ".join(["request", *url_args_out, "body"]) + ")\n"
             elif method in (HttpMethod.GET, HttpMethod.DELETE):
-                output += f"        response = handler(" + ", ".join(["request", *url_args_out]) + ")\n"
+                output += "        response = handler(" + ", ".join(["request", *url_args_out]) + ")\n"
             else:
                 raise RuntimeError
 

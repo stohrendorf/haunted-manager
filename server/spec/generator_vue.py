@@ -25,18 +25,23 @@ def _gen_vue_field_checks(context: str, accessor: str, field: BaseField) -> Iter
 
     if isinstance(field, StringField):
         if field.min_length is not None:
-            yield f'  if({accessor}.length < {field.min_length}) throw new SchemaValidationError("{context} is too short");'
+            yield f"  if({accessor}.length < {field.min_length})"
+            yield f'    throw new SchemaValidationError("{context} is too short");'
         if field.max_length is not None:
-            yield f'  if({accessor}.length > {field.max_length}) throw new SchemaValidationError("{context} is too long");'
+            yield f"  if({accessor}.length > {field.max_length})"
+            yield f'    throw new SchemaValidationError("{context} is too long");'
         if field.regex is not None:
-            yield f'  if(!{accessor}.match(/^{field.regex}$/)) throw new SchemaValidationError("{context} has an invalid format");'
+            yield f"  if(!{accessor}.match(/^{field.regex}$/))"
+            yield f'    throw new SchemaValidationError("{context} has an invalid format");'
     elif isinstance(field, (IntegerField, FloatField)):
         if field.min is not None:
-            yield f'  if({accessor} < {field.min}) throw new SchemaValidationError("{context} has a value below minimum");'
+            yield f"  if({accessor} < {field.min})"
+            yield f'    throw new SchemaValidationError("{context} has a value below minimum");'
         if field.max is not None:
-            yield f'  if({accessor} > {field.max}) throw new SchemaValidationError("{context} has a value above maximum");'
+            yield f"  if({accessor} > {field.max})"
+            yield f'    throw new SchemaValidationError("{context} has a value above maximum");'
     elif isinstance(field, ArrayField):
-        yield f"  for ( const fieldData of {accessor} ) {{\n"
+        yield f"  for( const fieldData of {accessor} ) {{\n"
         if isinstance(field.items, Compound):
             yield f"      validate{field.items.typename()}(fieldData);\n"
         else:
