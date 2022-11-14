@@ -30,6 +30,7 @@ pytest-mypy = "*"
 coverage = "*"
 types-requests = "*"
 django-stubs = "*"
+teamcity-messages = "*"
 
 flake8 = "*"
 flake8-black = "*"
