@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Iterable
 
+import humps
 from endpoints import ApiPath, Endpoint, HttpMethod, get_url_params
 from structural import (
     ArrayField,
@@ -16,24 +17,24 @@ from structural import (
 
 
 def _gen_vue_field_checks(context: str, accessor: str, field: BaseField) -> Iterable[str]:
-    yield f'  if({accessor} === undefined) throw new SchemaValidationError("{context}");'
+    yield f'  if({accessor} === undefined) throw new SchemaValidationError("{context} is undefined");'
     if not field.nullable:
-        yield f'  if({accessor} === null) throw new SchemaValidationError("{context}");'
+        yield f'  if({accessor} === null) throw new SchemaValidationError("{context} is null");'
     else:
         yield f"  if({accessor} !== null) {{"
 
     if isinstance(field, StringField):
         if field.min_length is not None:
-            yield f'  if({accessor}.length < {field.min_length}) throw new SchemaValidationError("{context}");'
+            yield f'  if({accessor}.length < {field.min_length}) throw new SchemaValidationError("{context} is too short");'
         if field.max_length is not None:
-            yield f'  if({accessor}.length > {field.max_length}) throw new SchemaValidationError("{context}");'
+            yield f'  if({accessor}.length > {field.max_length}) throw new SchemaValidationError("{context} is too long");'
         if field.regex is not None:
-            yield f'  if(!{accessor}.match(/^{field.regex}$/)) throw new SchemaValidationError("{context}");'
+            yield f'  if(!{accessor}.match(/^{field.regex}$/)) throw new SchemaValidationError("{context} has an invalid format");'
     elif isinstance(field, (IntegerField, FloatField)):
         if field.min is not None:
-            yield f'  if({accessor} < {field.min}) throw new SchemaValidationError("{context}");'
+            yield f'  if({accessor} < {field.min}) throw new SchemaValidationError("{context} has a value below minimum");'
         if field.max is not None:
-            yield f'  if({accessor} > {field.max}) throw new SchemaValidationError("{context}");'
+            yield f'  if({accessor} > {field.max}) throw new SchemaValidationError("{context} has a value above maximum");'
     elif isinstance(field, ArrayField):
         yield f"  for ( const fieldData of {accessor} ) {{\n"
         if isinstance(field.items, Compound):
@@ -102,7 +103,7 @@ def gen_vue(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dict[H
         for p_name, p_spec in url_params.items():
             ts_url = ts_url.replace(
                 f"<{p_spec.type}:{p_name}>",
-                f"${{encodeURIComponent({p_name})}}",
+                f"${{encodeURIComponent({humps.camelize(p_name)})}}",
             )
 
         args_str = ", ".join(

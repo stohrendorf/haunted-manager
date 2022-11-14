@@ -239,23 +239,23 @@ class TagsResponse(DataClassJsonMixin):
 
 def validate_announcement_entry(data: AnnouncementEntry):
     if data.background_color is None:
-        raise SchemaValidationError("AnnouncementEntry.background_color")
+        raise SchemaValidationError("AnnouncementEntry.background_color is null")
     if len(data.background_color) < 1:
-        raise SchemaValidationError("AnnouncementEntry.background_color")
+        raise SchemaValidationError("AnnouncementEntry.background_color is too short")
     if data.message is None:
-        raise SchemaValidationError("AnnouncementEntry.message")
+        raise SchemaValidationError("AnnouncementEntry.message is null")
     if len(data.message) < 1:
-        raise SchemaValidationError("AnnouncementEntry.message")
+        raise SchemaValidationError("AnnouncementEntry.message is too short")
     if data.text_color is None:
-        raise SchemaValidationError("AnnouncementEntry.text_color")
+        raise SchemaValidationError("AnnouncementEntry.text_color is null")
     if len(data.text_color) < 1:
-        raise SchemaValidationError("AnnouncementEntry.text_color")
+        raise SchemaValidationError("AnnouncementEntry.text_color is too short")
     return
 
 
 def validate_announcements_response(data: AnnouncementsResponse):
     if data.announcements is None:
-        raise SchemaValidationError("AnnouncementsResponse.announcements")
+        raise SchemaValidationError("AnnouncementsResponse.announcements is null")
     for data_announcements_entry in data.announcements:
         validate_announcement_entry(data_announcements_entry)
     return
@@ -263,36 +263,36 @@ def validate_announcements_response(data: AnnouncementsResponse):
 
 def validate_change_email_request(data: ChangeEmailRequest):
     if data.email is None:
-        raise SchemaValidationError("ChangeEmailRequest.email")
+        raise SchemaValidationError("ChangeEmailRequest.email is null")
     if len(data.email) < 1:
-        raise SchemaValidationError("ChangeEmailRequest.email")
+        raise SchemaValidationError("ChangeEmailRequest.email is too short")
     return
 
 
 def validate_change_password_request(data: ChangePasswordRequest):
     if data.password is None:
-        raise SchemaValidationError("ChangePasswordRequest.password")
+        raise SchemaValidationError("ChangePasswordRequest.password is null")
     if len(data.password) < 1:
-        raise SchemaValidationError("ChangePasswordRequest.password")
+        raise SchemaValidationError("ChangePasswordRequest.password is too short")
     return
 
 
 def validate_change_username_request(data: ChangeUsernameRequest):
     if data.username is None:
-        raise SchemaValidationError("ChangeUsernameRequest.username")
+        raise SchemaValidationError("ChangeUsernameRequest.username is null")
     if len(data.username) < 1:
-        raise SchemaValidationError("ChangeUsernameRequest.username")
+        raise SchemaValidationError("ChangeUsernameRequest.username is too short")
     return
 
 
 def validate_create_session_request(data: CreateSessionRequest):
     if data.description is None:
-        raise SchemaValidationError("CreateSessionRequest.description")
+        raise SchemaValidationError("CreateSessionRequest.description is null")
     if data.tags is None:
-        raise SchemaValidationError("CreateSessionRequest.tags")
+        raise SchemaValidationError("CreateSessionRequest.tags is null")
     for data_tags_entry in data.tags:
         if data_tags_entry is None:
-            raise SchemaValidationError("CreateSessionRequest.tags")
+            raise SchemaValidationError("CreateSessionRequest.tags is null")
         pass
     return
 
@@ -303,86 +303,86 @@ def validate_empty(data: Empty):
 
 def validate_login_request(data: LoginRequest):
     if data.password is None:
-        raise SchemaValidationError("LoginRequest.password")
+        raise SchemaValidationError("LoginRequest.password is null")
     if len(data.password) < 1:
-        raise SchemaValidationError("LoginRequest.password")
+        raise SchemaValidationError("LoginRequest.password is too short")
     if data.username is None:
-        raise SchemaValidationError("LoginRequest.username")
+        raise SchemaValidationError("LoginRequest.username is null")
     if len(data.username) < 1:
-        raise SchemaValidationError("LoginRequest.username")
+        raise SchemaValidationError("LoginRequest.username is too short")
     return
 
 
 def validate_profile_info_response(data: ProfileInfoResponse):
     if data.auth_token is not None:
         if len(data.auth_token) < 1:
-            raise SchemaValidationError("ProfileInfoResponse.auth_token")
+            raise SchemaValidationError("ProfileInfoResponse.auth_token is too short")
     if data.authenticated is None:
-        raise SchemaValidationError("ProfileInfoResponse.authenticated")
+        raise SchemaValidationError("ProfileInfoResponse.authenticated is null")
     if data.email is not None:
         if len(data.email) < 1:
-            raise SchemaValidationError("ProfileInfoResponse.email")
+            raise SchemaValidationError("ProfileInfoResponse.email is too short")
     if data.username is None:
-        raise SchemaValidationError("ProfileInfoResponse.username")
+        raise SchemaValidationError("ProfileInfoResponse.username is null")
     if len(data.username) < 1:
-        raise SchemaValidationError("ProfileInfoResponse.username")
+        raise SchemaValidationError("ProfileInfoResponse.username is too short")
     if data.verified is None:
-        raise SchemaValidationError("ProfileInfoResponse.verified")
+        raise SchemaValidationError("ProfileInfoResponse.verified is null")
     return
 
 
 def validate_register_request(data: RegisterRequest):
     if data.email is None:
-        raise SchemaValidationError("RegisterRequest.email")
+        raise SchemaValidationError("RegisterRequest.email is null")
     if len(data.email) < 1:
-        raise SchemaValidationError("RegisterRequest.email")
+        raise SchemaValidationError("RegisterRequest.email is too short")
     if data.password is None:
-        raise SchemaValidationError("RegisterRequest.password")
+        raise SchemaValidationError("RegisterRequest.password is null")
     if len(data.password) < 1:
-        raise SchemaValidationError("RegisterRequest.password")
+        raise SchemaValidationError("RegisterRequest.password is too short")
     if data.username is None:
-        raise SchemaValidationError("RegisterRequest.username")
+        raise SchemaValidationError("RegisterRequest.username is null")
     if len(data.username) < 1:
-        raise SchemaValidationError("RegisterRequest.username")
+        raise SchemaValidationError("RegisterRequest.username is too short")
     return
 
 
 def validate_server_info_response(data: ServerInfoResponse):
     if data.coop_url is None:
-        raise SchemaValidationError("ServerInfoResponse.coop_url")
+        raise SchemaValidationError("ServerInfoResponse.coop_url is null")
     if len(data.coop_url) < 1:
-        raise SchemaValidationError("ServerInfoResponse.coop_url")
+        raise SchemaValidationError("ServerInfoResponse.coop_url is too short")
     if data.total_sessions is None:
-        raise SchemaValidationError("ServerInfoResponse.total_sessions")
+        raise SchemaValidationError("ServerInfoResponse.total_sessions is null")
     if data.total_sessions < 0:
-        raise SchemaValidationError("ServerInfoResponse.total_sessions")
+        raise SchemaValidationError("ServerInfoResponse.total_sessions has a value below minimum")
     if data.total_users is None:
-        raise SchemaValidationError("ServerInfoResponse.total_users")
+        raise SchemaValidationError("ServerInfoResponse.total_users is null")
     if data.total_users < 0:
-        raise SchemaValidationError("ServerInfoResponse.total_users")
+        raise SchemaValidationError("ServerInfoResponse.total_users has a value below minimum")
     return
 
 
 def validate_session(data: Session):
     if data.description is None:
-        raise SchemaValidationError("Session.description")
+        raise SchemaValidationError("Session.description is null")
     if data.id is None:
-        raise SchemaValidationError("Session.id")
+        raise SchemaValidationError("Session.id is null")
     if len(data.id) < 1:
-        raise SchemaValidationError("Session.id")
+        raise SchemaValidationError("Session.id is too short")
     if data.owner is None:
-        raise SchemaValidationError("Session.owner")
+        raise SchemaValidationError("Session.owner is null")
     if len(data.owner) < 1:
-        raise SchemaValidationError("Session.owner")
+        raise SchemaValidationError("Session.owner is too short")
     if data.players is None:
-        raise SchemaValidationError("Session.players")
+        raise SchemaValidationError("Session.players is null")
     for data_players_entry in data.players:
         if data_players_entry is None:
-            raise SchemaValidationError("Session.players")
+            raise SchemaValidationError("Session.players is null")
         if len(data_players_entry) < 1:
-            raise SchemaValidationError("Session.players")
+            raise SchemaValidationError("Session.players is too short")
     if data.tags is None:
-        raise SchemaValidationError("Session.tags")
+        raise SchemaValidationError("Session.tags is null")
     for data_tags_entry in data.tags:
         validate_session_tag(data_tags_entry)
     return
@@ -390,36 +390,36 @@ def validate_session(data: Session):
 
 def validate_session_access_request(data: SessionAccessRequest):
     if data.api_key is None:
-        raise SchemaValidationError("SessionAccessRequest.api_key")
+        raise SchemaValidationError("SessionAccessRequest.api_key is null")
     if len(data.api_key) < 1:
-        raise SchemaValidationError("SessionAccessRequest.api_key")
+        raise SchemaValidationError("SessionAccessRequest.api_key is too short")
     if data.auth_token is None:
-        raise SchemaValidationError("SessionAccessRequest.auth_token")
+        raise SchemaValidationError("SessionAccessRequest.auth_token is null")
     if len(data.auth_token) < 1:
-        raise SchemaValidationError("SessionAccessRequest.auth_token")
+        raise SchemaValidationError("SessionAccessRequest.auth_token is too short")
     if data.session_id is None:
-        raise SchemaValidationError("SessionAccessRequest.session_id")
+        raise SchemaValidationError("SessionAccessRequest.session_id is null")
     if len(data.session_id) < 1:
-        raise SchemaValidationError("SessionAccessRequest.session_id")
+        raise SchemaValidationError("SessionAccessRequest.session_id is too short")
     if data.username is None:
-        raise SchemaValidationError("SessionAccessRequest.username")
+        raise SchemaValidationError("SessionAccessRequest.username is null")
     if len(data.username) < 1:
-        raise SchemaValidationError("SessionAccessRequest.username")
+        raise SchemaValidationError("SessionAccessRequest.username is too short")
     return
 
 
 def validate_session_players(data: SessionPlayers):
     if data.session_id is None:
-        raise SchemaValidationError("SessionPlayers.session_id")
+        raise SchemaValidationError("SessionPlayers.session_id is null")
     if len(data.session_id) < 1:
-        raise SchemaValidationError("SessionPlayers.session_id")
+        raise SchemaValidationError("SessionPlayers.session_id is too short")
     if data.usernames is None:
-        raise SchemaValidationError("SessionPlayers.usernames")
+        raise SchemaValidationError("SessionPlayers.usernames is null")
     for data_usernames_entry in data.usernames:
         if data_usernames_entry is None:
-            raise SchemaValidationError("SessionPlayers.usernames")
+            raise SchemaValidationError("SessionPlayers.usernames is null")
         if len(data_usernames_entry) < 1:
-            raise SchemaValidationError("SessionPlayers.usernames")
+            raise SchemaValidationError("SessionPlayers.usernames is too short")
     return
 
 
@@ -431,23 +431,23 @@ def validate_session_response(data: SessionResponse):
 
 def validate_session_tag(data: SessionTag):
     if data.description is None:
-        raise SchemaValidationError("SessionTag.description")
+        raise SchemaValidationError("SessionTag.description is null")
     if len(data.description) < 1:
-        raise SchemaValidationError("SessionTag.description")
+        raise SchemaValidationError("SessionTag.description is too short")
     if data.name is None:
-        raise SchemaValidationError("SessionTag.name")
+        raise SchemaValidationError("SessionTag.name is null")
     if len(data.name) < 1:
-        raise SchemaValidationError("SessionTag.name")
+        raise SchemaValidationError("SessionTag.name is too short")
     return
 
 
 def validate_sessions_players_request(data: SessionsPlayersRequest):
     if data.api_key is None:
-        raise SchemaValidationError("SessionsPlayersRequest.api_key")
+        raise SchemaValidationError("SessionsPlayersRequest.api_key is null")
     if len(data.api_key) < 1:
-        raise SchemaValidationError("SessionsPlayersRequest.api_key")
+        raise SchemaValidationError("SessionsPlayersRequest.api_key is too short")
     if data.sessions is None:
-        raise SchemaValidationError("SessionsPlayersRequest.sessions")
+        raise SchemaValidationError("SessionsPlayersRequest.sessions is null")
     for data_sessions_entry in data.sessions:
         validate_session_players(data_sessions_entry)
     return
@@ -455,7 +455,7 @@ def validate_sessions_players_request(data: SessionsPlayersRequest):
 
 def validate_sessions_response(data: SessionsResponse):
     if data.sessions is None:
-        raise SchemaValidationError("SessionsResponse.sessions")
+        raise SchemaValidationError("SessionsResponse.sessions is null")
     for data_sessions_entry in data.sessions:
         validate_session(data_sessions_entry)
     return
@@ -463,27 +463,27 @@ def validate_sessions_response(data: SessionsResponse):
 
 def validate_success_response(data: SuccessResponse):
     if data.message is None:
-        raise SchemaValidationError("SuccessResponse.message")
+        raise SchemaValidationError("SuccessResponse.message is null")
     if data.success is None:
-        raise SchemaValidationError("SuccessResponse.success")
+        raise SchemaValidationError("SuccessResponse.success is null")
     return
 
 
 def validate_tag(data: Tag):
     if data.description is None:
-        raise SchemaValidationError("Tag.description")
+        raise SchemaValidationError("Tag.description is null")
     if data.id is None:
-        raise SchemaValidationError("Tag.id")
+        raise SchemaValidationError("Tag.id is null")
     if data.name is None:
-        raise SchemaValidationError("Tag.name")
+        raise SchemaValidationError("Tag.name is null")
     if len(data.name) < 1:
-        raise SchemaValidationError("Tag.name")
+        raise SchemaValidationError("Tag.name is too short")
     return
 
 
 def validate_tags_response(data: TagsResponse):
     if data.tags is None:
-        raise SchemaValidationError("TagsResponse.tags")
+        raise SchemaValidationError("TagsResponse.tags is null")
     for data_tags_entry in data.tags:
         validate_tag(data_tags_entry)
     return
@@ -499,9 +499,9 @@ class server_info:
         *,
         get_handler: Callable[[HttpRequest], ServerInfoResponse | tuple[int, ServerInfoResponse]],
     ):
-        def dispatch(request: HttpRequest, *args, **kwargs):
+        def dispatch(request: HttpRequest):
             if request.method == "GET":
-                return cls.do_get(request, get_handler, *args, **kwargs)
+                return cls.do_get(request, get_handler)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -530,9 +530,9 @@ class tags:
         *,
         get_handler: Callable[[HttpRequest], TagsResponse | tuple[int, TagsResponse]],
     ):
-        def dispatch(request: HttpRequest, *args, **kwargs):
+        def dispatch(request: HttpRequest):
             if request.method == "GET":
-                return cls.do_get(request, get_handler, *args, **kwargs)
+                return cls.do_get(request, get_handler)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -562,11 +562,11 @@ class sessions:
         get_handler: Callable[[HttpRequest], SessionsResponse | tuple[int, SessionsResponse]],
         post_handler: Callable[[HttpRequest, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest, *args, **kwargs):
+        def dispatch(request: HttpRequest):
             if request.method == "GET":
-                return cls.do_get(request, get_handler, *args, **kwargs)
+                return cls.do_get(request, get_handler)
             if request.method == "POST":
-                return cls.do_post(request, post_handler, *args, **kwargs)
+                return cls.do_post(request, post_handler)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -589,12 +589,10 @@ class sessions:
     def do_post(
         request: HttpRequest,
         handler: Callable[[HttpRequest, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
-        *args,
-        **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
         body: CreateSessionRequest = CreateSessionRequest.schema().loads(request.body.decode())
         body.validate()
-        response = handler(request, *args, **kwargs, body=body)
+        response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
@@ -604,7 +602,7 @@ class sessions:
 
 
 class session:
-    path = "api/v0/sessions/<str:sessionid>"
+    path = "api/v0/sessions/<str:sessionId>"
     name = "session"
 
     @classmethod
@@ -615,13 +613,13 @@ class session:
         post_handler: Callable[[HttpRequest, str, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
         delete_handler: Callable[[HttpRequest, str], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest, *args, **kwargs):
+        def dispatch(request: HttpRequest, sessionId: str):
             if request.method == "GET":
-                return cls.do_get(request, get_handler, *args, **kwargs)
+                return cls.do_get(request, get_handler, sessionId)
             if request.method == "POST":
-                return cls.do_post(request, post_handler, *args, **kwargs)
+                return cls.do_post(request, post_handler, sessionId)
             if request.method == "DELETE":
-                return cls.do_delete(request, delete_handler, *args, **kwargs)
+                return cls.do_delete(request, delete_handler, sessionId)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -631,10 +629,9 @@ class session:
     def do_get(
         request: HttpRequest,
         handler: Callable[[HttpRequest, str], SessionResponse | tuple[int, SessionResponse]],
-        *args,
-        **kwargs,
+        sessionId: str,
     ) -> SessionResponse | tuple[int, SessionResponse]:
-        response = handler(request, *args, **kwargs)
+        response = handler(request, sessionId)
         if isinstance(response, tuple):
             code, response = response
         else:
@@ -647,12 +644,11 @@ class session:
     def do_post(
         request: HttpRequest,
         handler: Callable[[HttpRequest, str, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
-        *args,
-        **kwargs,
+        sessionId: str,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
         body: CreateSessionRequest = CreateSessionRequest.schema().loads(request.body.decode())
         body.validate()
-        response = handler(request, *args, **kwargs, body=body)
+        response = handler(request, sessionId, body)
         if isinstance(response, tuple):
             code, response = response
         else:
@@ -665,10 +661,9 @@ class session:
     def do_delete(
         request: HttpRequest,
         handler: Callable[[HttpRequest, str], SuccessResponse | tuple[int, SuccessResponse]],
-        *args,
-        **kwargs,
+        sessionId: str,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
-        response = handler(request, *args, **kwargs)
+        response = handler(request, sessionId)
         if isinstance(response, tuple):
             code, response = response
         else:
@@ -687,9 +682,9 @@ class session_access:
         *,
         post_handler: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest, *args, **kwargs):
+        def dispatch(request: HttpRequest):
             if request.method == "POST":
-                return cls.do_post(request, post_handler, *args, **kwargs)
+                return cls.do_post(request, post_handler)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -699,12 +694,10 @@ class session_access:
     def do_post(
         request: HttpRequest,
         handler: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse | tuple[int, SuccessResponse]],
-        *args,
-        **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
         body: SessionAccessRequest = SessionAccessRequest.schema().loads(request.body.decode())
         body.validate()
-        response = handler(request, *args, **kwargs, body=body)
+        response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
@@ -723,9 +716,9 @@ class session_players:
         *,
         post_handler: Callable[[HttpRequest, SessionsPlayersRequest], Empty | tuple[int, Empty]],
     ):
-        def dispatch(request: HttpRequest, *args, **kwargs):
+        def dispatch(request: HttpRequest):
             if request.method == "POST":
-                return cls.do_post(request, post_handler, *args, **kwargs)
+                return cls.do_post(request, post_handler)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -733,14 +726,11 @@ class session_players:
     @json_response
     @staticmethod
     def do_post(
-        request: HttpRequest,
-        handler: Callable[[HttpRequest, SessionsPlayersRequest], Empty | tuple[int, Empty]],
-        *args,
-        **kwargs,
+        request: HttpRequest, handler: Callable[[HttpRequest, SessionsPlayersRequest], Empty | tuple[int, Empty]]
     ) -> Empty | tuple[int, Empty]:
         body: SessionsPlayersRequest = SessionsPlayersRequest.schema().loads(request.body.decode())
         body.validate()
-        response = handler(request, *args, **kwargs, body=body)
+        response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
@@ -759,9 +749,9 @@ class announcements:
         *,
         get_handler: Callable[[HttpRequest], AnnouncementsResponse | tuple[int, AnnouncementsResponse]],
     ):
-        def dispatch(request: HttpRequest, *args, **kwargs):
+        def dispatch(request: HttpRequest):
             if request.method == "GET":
-                return cls.do_get(request, get_handler, *args, **kwargs)
+                return cls.do_get(request, get_handler)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -791,9 +781,9 @@ class profile:
         *,
         get_handler: Callable[[HttpRequest], ProfileInfoResponse | tuple[int, ProfileInfoResponse]],
     ):
-        def dispatch(request: HttpRequest, *args, **kwargs):
+        def dispatch(request: HttpRequest):
             if request.method == "GET":
-                return cls.do_get(request, get_handler, *args, **kwargs)
+                return cls.do_get(request, get_handler)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -822,9 +812,9 @@ class change_username:
         *,
         post_handler: Callable[[HttpRequest, ChangeUsernameRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest, *args, **kwargs):
+        def dispatch(request: HttpRequest):
             if request.method == "POST":
-                return cls.do_post(request, post_handler, *args, **kwargs)
+                return cls.do_post(request, post_handler)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -834,12 +824,10 @@ class change_username:
     def do_post(
         request: HttpRequest,
         handler: Callable[[HttpRequest, ChangeUsernameRequest], SuccessResponse | tuple[int, SuccessResponse]],
-        *args,
-        **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
         body: ChangeUsernameRequest = ChangeUsernameRequest.schema().loads(request.body.decode())
         body.validate()
-        response = handler(request, *args, **kwargs, body=body)
+        response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
@@ -858,9 +846,9 @@ class regenerate_token:
         *,
         get_handler: Callable[[HttpRequest], Empty | tuple[int, Empty]],
     ):
-        def dispatch(request: HttpRequest, *args, **kwargs):
+        def dispatch(request: HttpRequest):
             if request.method == "GET":
-                return cls.do_get(request, get_handler, *args, **kwargs)
+                return cls.do_get(request, get_handler)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -889,9 +877,9 @@ class login:
         *,
         post_handler: Callable[[HttpRequest, LoginRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest, *args, **kwargs):
+        def dispatch(request: HttpRequest):
             if request.method == "POST":
-                return cls.do_post(request, post_handler, *args, **kwargs)
+                return cls.do_post(request, post_handler)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -901,12 +889,10 @@ class login:
     def do_post(
         request: HttpRequest,
         handler: Callable[[HttpRequest, LoginRequest], SuccessResponse | tuple[int, SuccessResponse]],
-        *args,
-        **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
         body: LoginRequest = LoginRequest.schema().loads(request.body.decode())
         body.validate()
-        response = handler(request, *args, **kwargs, body=body)
+        response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
@@ -925,9 +911,9 @@ class register:
         *,
         post_handler: Callable[[HttpRequest, RegisterRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest, *args, **kwargs):
+        def dispatch(request: HttpRequest):
             if request.method == "POST":
-                return cls.do_post(request, post_handler, *args, **kwargs)
+                return cls.do_post(request, post_handler)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -937,12 +923,10 @@ class register:
     def do_post(
         request: HttpRequest,
         handler: Callable[[HttpRequest, RegisterRequest], SuccessResponse | tuple[int, SuccessResponse]],
-        *args,
-        **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
         body: RegisterRequest = RegisterRequest.schema().loads(request.body.decode())
         body.validate()
-        response = handler(request, *args, **kwargs, body=body)
+        response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
@@ -961,9 +945,9 @@ class change_password:
         *,
         post_handler: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest, *args, **kwargs):
+        def dispatch(request: HttpRequest):
             if request.method == "POST":
-                return cls.do_post(request, post_handler, *args, **kwargs)
+                return cls.do_post(request, post_handler)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -973,12 +957,10 @@ class change_password:
     def do_post(
         request: HttpRequest,
         handler: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse | tuple[int, SuccessResponse]],
-        *args,
-        **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
         body: ChangePasswordRequest = ChangePasswordRequest.schema().loads(request.body.decode())
         body.validate()
-        response = handler(request, *args, **kwargs, body=body)
+        response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
@@ -997,9 +979,9 @@ class change_email:
         *,
         post_handler: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest, *args, **kwargs):
+        def dispatch(request: HttpRequest):
             if request.method == "POST":
-                return cls.do_post(request, post_handler, *args, **kwargs)
+                return cls.do_post(request, post_handler)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -1009,12 +991,10 @@ class change_email:
     def do_post(
         request: HttpRequest,
         handler: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse | tuple[int, SuccessResponse]],
-        *args,
-        **kwargs,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
         body: ChangeEmailRequest = ChangeEmailRequest.schema().loads(request.body.decode())
         body.validate()
-        response = handler(request, *args, **kwargs, body=body)
+        response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
@@ -1033,9 +1013,9 @@ class logout:
         *,
         get_handler: Callable[[HttpRequest], Empty | tuple[int, Empty]],
     ):
-        def dispatch(request: HttpRequest, *args, **kwargs):
+        def dispatch(request: HttpRequest):
             if request.method == "GET":
-                return cls.do_get(request, get_handler, *args, **kwargs)
+                return cls.do_get(request, get_handler)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)

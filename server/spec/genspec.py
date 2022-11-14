@@ -164,7 +164,7 @@ def main():
                 body=CreateSessionRequest(),
             ),
         },
-        ApiPath("/api/v0/sessions/<str:sessionid>", "session"): {
+        ApiPath("/api/v0/sessions/<str:sessionId>", "session"): {
             HttpMethod.GET: Endpoint(
                 operation_name="getSession",
                 response=SessionResponse(),

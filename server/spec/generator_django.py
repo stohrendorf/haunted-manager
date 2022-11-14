@@ -40,29 +40,27 @@ def _gen_check(context: str, indent: str, field: BaseField, accessor: str) -> tu
     empty = True
 
     if not field.nullable:
-        output += f'{indent}if {accessor} is None: raise SchemaValidationError("{context}")\n'
+        output += f'{indent}if {accessor} is None: raise SchemaValidationError("{context} is null")\n'
     else:
         output += f"{indent}if {accessor} is not None:\n"
         indent += base_indent
 
     if isinstance(field, StringField):
         if field.min_length is not None:
-            output += f'{indent}if len({accessor}) < {field.min_length}: raise SchemaValidationError("{context}")\n'
+            output += f'{indent}if len({accessor}) < {field.min_length}: raise SchemaValidationError("{context} is too short")\n'
             empty = False
         if field.max_length is not None:
-            output += f'{indent}if len({accessor}) > {field.max_length}: raise SchemaValidationError("{context}")\n'
+            output += f'{indent}if len({accessor}) > {field.max_length}: raise SchemaValidationError("{context} is too long")\n'
             empty = False
         if field.regex is not None:
-            output += (
-                f'{indent}if not re.fullmatch(r"{field.regex}", {accessor}): raise SchemaValidationError("{context}")\n'
-            )
+            output += f'{indent}if not re.fullmatch(r"{field.regex}", {accessor}): raise SchemaValidationError("{context} has an invalid format")\n'
             empty = False
     elif isinstance(field, (IntegerField, FloatField)):
         if field.min is not None:
-            output += f'{indent}if {accessor} < {field.min}: raise SchemaValidationError("{context}")\n'
+            output += f'{indent}if {accessor} < {field.min}: raise SchemaValidationError("{context} has a value below minimum")\n'
             empty = False
         if field.max is not None:
-            output += f'{indent}if {accessor} > {field.max}: raise SchemaValidationError("{context}")\n'
+            output += f'{indent}if {accessor} > {field.max}: raise SchemaValidationError("{context} has a value above maximum")\n'
             empty = False
     elif isinstance(field, ArrayField):
         varname = re.sub(r"[^a-zA-Z0-9]", "_", accessor) + "_entry"
@@ -140,11 +138,9 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dic
 
     for path, methods_endpoints in endpoints.items():
         url_params = get_url_params(path.path)
-        args_str = ""
-        if url_params:
-            args_str = ", " + ", ".join(
-                (p_spec.type for p_name, p_spec in url_params.items()),
-            )
+        url_arg_types = [p_spec.type for p_spec in url_params.values()]
+        url_args_in = [f"{p_name}: {p_spec.type}" for p_name, p_spec in url_params.items()]
+        url_args_out = [p_name for p_name in url_params.keys()]
 
         output += "\n"
         output += f"class {humps.decamelize(path.name)}:\n"
@@ -155,24 +151,28 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dic
         output += "        cls,\n"
         output += "        *,\n"
         for method, endpoint in methods_endpoints.items():
-            handler_signature = make_handler_signature(args_str, endpoint, method)
+            handler_signature = make_handler_signature(url_arg_types, endpoint, method)
             output += f"        {method.name.lower()}_handler: {handler_signature},\n"
         output += "    ):\n"
-        output += "        def dispatch(request: HttpRequest, *args, **kwargs):\n"
+        output += "        def dispatch(" + ", ".join(["request: HttpRequest"] + url_args_in) + "):\n"
         for method, endpoint in methods_endpoints.items():
             output += f'            if request.method == "{method.value}":\n'
-            output += f"                return cls.do_{method.value.lower()}(request, {method.value.lower()}_handler, *args, **kwargs)\n"
+            output += (
+                f"                return cls.do_{method.value.lower()}("
+                + ", ".join(["request", f"{method.value.lower()}_handler", *url_args_out])
+                + ")\n"
+            )
         output += "            raise RuntimeError\n"
         output += "        return path(cls.path, dispatch, name=cls.name)\n"
 
         for method, endpoint in methods_endpoints.items():
-            kwargs = ", *args, **kwargs" if args_str or method == HttpMethod.POST else ""
             output += "    @json_response\n"
             output += "    @staticmethod\n"
-            handler_signature = make_handler_signature(args_str, endpoint, method)
+            handler_signature = make_handler_signature(url_arg_types, endpoint, method)
             output += (
-                f"    def do_{method.value.lower()}(request: HttpRequest, handler: {handler_signature}{kwargs})"
-                f" -> {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]:\n"
+                f"    def do_{method.value.lower()}("
+                + ", ".join(["request: HttpRequest", f"handler: {handler_signature}", *url_args_in])
+                + f") -> {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]:\n"
             )
             if method == HttpMethod.POST:
                 assert endpoint.body is not None
@@ -181,9 +181,9 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dic
                     f".schema().loads(request.body.decode())\n"
                 )
                 output += "        body.validate()\n"
-                output += f"        response = handler(request{kwargs}, body=body)\n"
+                output += f"        response = handler(" + ", ".join(["request", *url_args_out, "body"]) + ")\n"
             elif method in (HttpMethod.GET, HttpMethod.DELETE):
-                output += f"        response = handler(request{kwargs})\n"
+                output += f"        response = handler(" + ", ".join(["request", *url_args_out]) + ")\n"
             else:
                 raise RuntimeError
 
@@ -197,16 +197,18 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dic
     return output
 
 
-def make_handler_signature(args_str, endpoint, method):
+def make_handler_signature(arg_types: list[str], endpoint: Endpoint, method: HttpMethod) -> str:
+    input_signature = ", ".join(["HttpRequest"] + arg_types)
+
     if method == HttpMethod.POST:
         assert endpoint.body is not None
         handler_signature = (
-            f"Callable[[HttpRequest{args_str}, {endpoint.body.typename()}],"
+            f"Callable[[{input_signature}, {endpoint.body.typename()}],"
             f" {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]]"
         )
     elif method in (HttpMethod.GET, HttpMethod.DELETE):
         handler_signature = (
-            f"Callable[[HttpRequest{args_str}],"
+            f"Callable[[{input_signature}],"
             f" {endpoint.response.typename()} | tuple[int, {endpoint.response.typename()}]]"
         )
     else:
