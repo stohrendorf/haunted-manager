@@ -43,7 +43,7 @@ def login(request: HttpRequest, body: LoginRequest) -> SuccessResponse | tuple[i
 
 
 def logout(request: HttpRequest) -> Empty | tuple[int, Empty]:
-    if not request.user.is_active or not request.user.is_authenticated:
+    if request.user.is_anonymous or not request.user.is_active or not request.user.is_authenticated:
         return HttpResponseForbidden.status_code, Empty()
 
     django.contrib.auth.logout(request)

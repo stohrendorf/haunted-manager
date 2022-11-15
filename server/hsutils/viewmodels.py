@@ -1,22 +1,18 @@
+import logging
 import re
 from dataclasses import dataclass
 from enum import Enum
 from typing import Callable, List, Optional
 
 from dataclasses_json import DataClassJsonMixin, dataclass_json
-from django.http import HttpRequest, HttpResponse
+from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, JsonResponse
 from django.urls import path
 
 from . import json_response
 
 
 class SchemaValidationError(Exception):
-    def __init__(self, message: str):
-        super().__init__(path)
-        self.message = path
-
-    def __str__(self):
-        return f"Schema validation error: {self.message}"
+    pass
 
 
 class HttpMethod(Enum):
@@ -510,13 +506,12 @@ class server_info:
     @staticmethod
     def do_get(
         request: HttpRequest, handler: Callable[[HttpRequest], ServerInfoResponse | tuple[int, ServerInfoResponse]]
-    ) -> ServerInfoResponse | tuple[int, ServerInfoResponse]:
+    ) -> ServerInfoResponse | tuple[int, ServerInfoResponse] | JsonResponse:
         response = handler(request)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
 
@@ -541,13 +536,12 @@ class tags:
     @staticmethod
     def do_get(
         request: HttpRequest, handler: Callable[[HttpRequest], TagsResponse | tuple[int, TagsResponse]]
-    ) -> TagsResponse | tuple[int, TagsResponse]:
+    ) -> TagsResponse | tuple[int, TagsResponse] | JsonResponse:
         response = handler(request)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
 
@@ -575,13 +569,12 @@ class sessions:
     @staticmethod
     def do_get(
         request: HttpRequest, handler: Callable[[HttpRequest], SessionsResponse | tuple[int, SessionsResponse]]
-    ) -> SessionsResponse | tuple[int, SessionsResponse]:
+    ) -> SessionsResponse | tuple[int, SessionsResponse] | JsonResponse:
         response = handler(request)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
     @json_response
@@ -589,15 +582,18 @@ class sessions:
     def do_post(
         request: HttpRequest,
         handler: Callable[[HttpRequest, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
-    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+    ) -> SuccessResponse | tuple[int, SuccessResponse] | JsonResponse:
         body: CreateSessionRequest = CreateSessionRequest.schema().loads(request.body.decode())
-        body.validate()
+        try:
+            body.validate()
+        except SchemaValidationError as e:
+            logging.error("request validation failed", exc_info=True)
+            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
         response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
 
@@ -630,13 +626,12 @@ class session:
         request: HttpRequest,
         handler: Callable[[HttpRequest, str], SessionResponse | tuple[int, SessionResponse]],
         session_id: str,
-    ) -> SessionResponse | tuple[int, SessionResponse]:
+    ) -> SessionResponse | tuple[int, SessionResponse] | JsonResponse:
         response = handler(request, session_id)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
     @json_response
@@ -645,15 +640,18 @@ class session:
         request: HttpRequest,
         handler: Callable[[HttpRequest, str, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
         session_id: str,
-    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+    ) -> SuccessResponse | tuple[int, SuccessResponse] | JsonResponse:
         body: CreateSessionRequest = CreateSessionRequest.schema().loads(request.body.decode())
-        body.validate()
+        try:
+            body.validate()
+        except SchemaValidationError as e:
+            logging.error("request validation failed", exc_info=True)
+            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
         response = handler(request, session_id, body)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
     @json_response
@@ -662,13 +660,12 @@ class session:
         request: HttpRequest,
         handler: Callable[[HttpRequest, str], SuccessResponse | tuple[int, SuccessResponse]],
         session_id: str,
-    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+    ) -> SuccessResponse | tuple[int, SuccessResponse] | JsonResponse:
         response = handler(request, session_id)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
 
@@ -694,15 +691,18 @@ class session_access:
     def do_post(
         request: HttpRequest,
         handler: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse | tuple[int, SuccessResponse]],
-    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+    ) -> SuccessResponse | tuple[int, SuccessResponse] | JsonResponse:
         body: SessionAccessRequest = SessionAccessRequest.schema().loads(request.body.decode())
-        body.validate()
+        try:
+            body.validate()
+        except SchemaValidationError as e:
+            logging.error("request validation failed", exc_info=True)
+            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
         response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
 
@@ -727,15 +727,18 @@ class session_players:
     @staticmethod
     def do_post(
         request: HttpRequest, handler: Callable[[HttpRequest, SessionsPlayersRequest], Empty | tuple[int, Empty]]
-    ) -> Empty | tuple[int, Empty]:
+    ) -> Empty | tuple[int, Empty] | JsonResponse:
         body: SessionsPlayersRequest = SessionsPlayersRequest.schema().loads(request.body.decode())
-        body.validate()
+        try:
+            body.validate()
+        except SchemaValidationError as e:
+            logging.error("request validation failed", exc_info=True)
+            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
         response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
 
@@ -761,13 +764,12 @@ class announcements:
     def do_get(
         request: HttpRequest,
         handler: Callable[[HttpRequest], AnnouncementsResponse | tuple[int, AnnouncementsResponse]],
-    ) -> AnnouncementsResponse | tuple[int, AnnouncementsResponse]:
+    ) -> AnnouncementsResponse | tuple[int, AnnouncementsResponse] | JsonResponse:
         response = handler(request)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
 
@@ -792,13 +794,12 @@ class profile:
     @staticmethod
     def do_get(
         request: HttpRequest, handler: Callable[[HttpRequest], ProfileInfoResponse | tuple[int, ProfileInfoResponse]]
-    ) -> ProfileInfoResponse | tuple[int, ProfileInfoResponse]:
+    ) -> ProfileInfoResponse | tuple[int, ProfileInfoResponse] | JsonResponse:
         response = handler(request)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
 
@@ -824,15 +825,18 @@ class change_username:
     def do_post(
         request: HttpRequest,
         handler: Callable[[HttpRequest, ChangeUsernameRequest], SuccessResponse | tuple[int, SuccessResponse]],
-    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+    ) -> SuccessResponse | tuple[int, SuccessResponse] | JsonResponse:
         body: ChangeUsernameRequest = ChangeUsernameRequest.schema().loads(request.body.decode())
-        body.validate()
+        try:
+            body.validate()
+        except SchemaValidationError as e:
+            logging.error("request validation failed", exc_info=True)
+            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
         response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
 
@@ -857,13 +861,12 @@ class regenerate_token:
     @staticmethod
     def do_get(
         request: HttpRequest, handler: Callable[[HttpRequest], Empty | tuple[int, Empty]]
-    ) -> Empty | tuple[int, Empty]:
+    ) -> Empty | tuple[int, Empty] | JsonResponse:
         response = handler(request)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
 
@@ -889,15 +892,18 @@ class login:
     def do_post(
         request: HttpRequest,
         handler: Callable[[HttpRequest, LoginRequest], SuccessResponse | tuple[int, SuccessResponse]],
-    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+    ) -> SuccessResponse | tuple[int, SuccessResponse] | JsonResponse:
         body: LoginRequest = LoginRequest.schema().loads(request.body.decode())
-        body.validate()
+        try:
+            body.validate()
+        except SchemaValidationError as e:
+            logging.error("request validation failed", exc_info=True)
+            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
         response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
 
@@ -923,15 +929,18 @@ class register:
     def do_post(
         request: HttpRequest,
         handler: Callable[[HttpRequest, RegisterRequest], SuccessResponse | tuple[int, SuccessResponse]],
-    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+    ) -> SuccessResponse | tuple[int, SuccessResponse] | JsonResponse:
         body: RegisterRequest = RegisterRequest.schema().loads(request.body.decode())
-        body.validate()
+        try:
+            body.validate()
+        except SchemaValidationError as e:
+            logging.error("request validation failed", exc_info=True)
+            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
         response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
 
@@ -957,15 +966,18 @@ class change_password:
     def do_post(
         request: HttpRequest,
         handler: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse | tuple[int, SuccessResponse]],
-    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+    ) -> SuccessResponse | tuple[int, SuccessResponse] | JsonResponse:
         body: ChangePasswordRequest = ChangePasswordRequest.schema().loads(request.body.decode())
-        body.validate()
+        try:
+            body.validate()
+        except SchemaValidationError as e:
+            logging.error("request validation failed", exc_info=True)
+            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
         response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
 
@@ -991,15 +1003,18 @@ class change_email:
     def do_post(
         request: HttpRequest,
         handler: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse | tuple[int, SuccessResponse]],
-    ) -> SuccessResponse | tuple[int, SuccessResponse]:
+    ) -> SuccessResponse | tuple[int, SuccessResponse] | JsonResponse:
         body: ChangeEmailRequest = ChangeEmailRequest.schema().loads(request.body.decode())
-        body.validate()
+        try:
+            body.validate()
+        except SchemaValidationError as e:
+            logging.error("request validation failed", exc_info=True)
+            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
         response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response
 
 
@@ -1024,11 +1039,10 @@ class logout:
     @staticmethod
     def do_get(
         request: HttpRequest, handler: Callable[[HttpRequest], Empty | tuple[int, Empty]]
-    ) -> Empty | tuple[int, Empty]:
+    ) -> Empty | tuple[int, Empty] | JsonResponse:
         response = handler(request)
         if isinstance(response, tuple):
             code, response = response
         else:
             code = HttpResponse.status_code
-        response.validate()
         return code, response

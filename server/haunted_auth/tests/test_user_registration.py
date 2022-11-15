@@ -63,17 +63,17 @@ def test_register_verify_happy_path(client: Client, django_user_model):
 def test_register_missing_data(client: Client, django_user_model):
     # TODO these error checks are stupid, a proper exception handling is needed
     code, response = try_register(client, email="", password=uuid.uuid4().hex, username="test-user")
-    assert code == 500
+    assert code == HttpResponseBadRequest.status_code
     assert response is None
     assert django_user_model.objects.count() == 0
 
     code, response = try_register(client, email="test@example.com", password="", username="test-user")
-    assert code == 500
+    assert code == HttpResponseBadRequest.status_code
     assert response is None
     assert django_user_model.objects.count() == 0
 
     code, response = try_register(client, email="test@example.com", password=uuid.uuid4().hex, username="")
-    assert code == 500
+    assert code == HttpResponseBadRequest.status_code
     assert response is None
     assert django_user_model.objects.count() == 0
 
