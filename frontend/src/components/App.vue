@@ -103,17 +103,28 @@ export default class App extends Vue {
           </template>
           <div style="padding: 0.6666em">
             <div>
-              The server address is
+              The Server Address is
               <clipboard-copyable :value="serverInfo.coop_url">
                 <code>{{ serverInfo.coop_url }}</code>
               </clipboard-copyable>
             </div>
             <hr />
             <div>
-              Your personal Auth token is
+              Your Username is
+              <clipboard-copyable :value="profileInfo.username">
+                <code>{{ profileInfo.username }}</code>
+              </clipboard-copyable>
+            </div>
+            <hr />
+            <div>
+              Your Personal Auth Token is
               <clipboard-copyable :value="profileInfo.auth_token">
                 <code>{{ profileInfo.auth_token }}</code>
               </clipboard-copyable>
+              <small class="text-secondary">
+                You can re-generate this token in your profile if it gets
+                compromised.
+              </small>
             </div>
           </div>
         </bs-dropdown-nav-item>
