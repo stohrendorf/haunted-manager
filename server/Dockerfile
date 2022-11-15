@@ -19,7 +19,8 @@ COPY . .
 RUN find . -type f -exec dos2unix {} \; \
     && chmod a+x manage.py \
     && poetry install --no-interaction --no-ansi \
-    && poetry run pytest
+    && poetry run coverage run -m pytest \
+    && poetry run coverage report
 
 EXPOSE 8000
 
