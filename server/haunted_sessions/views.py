@@ -61,9 +61,9 @@ def get_sessions(request: HttpRequest) -> SessionsResponse:
     )
 
 
-def get_session(request: HttpRequest, sessionid: str) -> SessionResponse | tuple[int, SessionResponse]:
+def get_session(request: HttpRequest, session_id: str) -> SessionResponse | tuple[int, SessionResponse]:
     try:
-        session = SessionModel.objects.get(key=sessionid)
+        session = SessionModel.objects.get(key=session_id)
     except SessionModel.DoesNotExist:
         return HttpResponseNotFound.status_code, SessionResponse(session=None)
 
@@ -86,11 +86,11 @@ def get_session(request: HttpRequest, sessionid: str) -> SessionResponse | tuple
 
 def edit_session(
     request: HttpRequest,
-    sessionid: str,
+    session_id: str,
     body: CreateSessionRequest,
 ) -> SuccessResponse | tuple[int, SuccessResponse]:
     try:
-        session = SessionModel.objects.get(key=sessionid)
+        session = SessionModel.objects.get(key=session_id)
     except SessionModel.DoesNotExist:
         return HttpResponseNotFound.status_code, SuccessResponse(message="invalid session id", success=False)
 
@@ -106,24 +106,24 @@ def edit_session(
     return SuccessResponse(message="", success=True)
 
 
-def delete_session(request: HttpRequest, sessionid: str) -> tuple[int, SuccessResponse] | SuccessResponse:
+def delete_session(request: HttpRequest, session_id: str) -> tuple[int, SuccessResponse] | SuccessResponse:
     if not request.user.is_active or not request.user.is_authenticated:
         return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")
 
-    session = SessionModel.objects.get(key=sessionid)
+    session = SessionModel.objects.get(key=session_id)
     if not session:
         return HttpResponseNotFound.status_code, SuccessResponse(
-            message=f"session {sessionid} not found",
+            message=f"session {session_id} not found",
             success=False,
         )
     if session.owner != request.user:
         return 401, SuccessResponse(
-            message=f"not allowed to delete session {sessionid}",
+            message=f"not allowed to delete session {session_id}",
             success=False,
         )
     session.delete()
     return SuccessResponse(
-        message=f"session {sessionid} deleted",
+        message=f"session {session_id} deleted",
         success=True,
     )
 

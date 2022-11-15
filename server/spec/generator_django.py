@@ -96,12 +96,12 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dic
     output += "from . import json_response\n"
     output += "import re\n"
     output += "class SchemaValidationError(Exception):\n"
-    output += "    def __init__(self, path: str):\n"
+    output += "    def __init__(self, message: str):\n"
     output += "        super().__init__(path)\n"
-    output += "        self.path = path\n"
+    output += "        self.message = path\n"
 
     output += "    def __str__(self):\n"
-    output += '        return f"Schema validation error at {self.path}"\n'
+    output += '        return f"Schema validation error: {self.message}"\n'
     output += "class HttpMethod(Enum):\n"
     for method in HttpMethod:
         output += f'    {method.name} = "{method.value}"\n'
@@ -139,12 +139,18 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dic
     for path, methods_endpoints in endpoints.items():
         url_params = get_url_params(path.path)
         url_arg_types = [p_spec.type for p_spec in url_params.values()]
-        url_args_in = [f"{p_name}: {p_spec.type}" for p_name, p_spec in url_params.items()]
-        url_args_out = [p_name for p_name in url_params.keys()]
+        url_args_in = [f"{humps.decamelize(p_name)}: {p_spec.type}" for p_name, p_spec in url_params.items()]
+        url_args_out = [humps.decamelize(p_name) for p_name in url_params.keys()]
+        django_path = path.path
+        for p_name, p_spec in url_params.items():
+            django_path = django_path.replace(
+                f"<{p_spec.type}:{p_name}>",
+                f"<{p_spec.type}:{humps.decamelize(p_name)}>",
+            )
 
         output += "\n"
         output += f"class {humps.decamelize(path.name)}:\n"
-        output += f'    path = "{path.path.lstrip("/")}"\n'
+        output += f'    path = "{django_path.lstrip("/")}"\n'
         output += f'    name = "{path.name}"\n'
         output += "    @classmethod\n"
         output += "    def wrap(\n"

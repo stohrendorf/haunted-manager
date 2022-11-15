@@ -11,12 +11,12 @@ from . import json_response
 
 
 class SchemaValidationError(Exception):
-    def __init__(self, path: str):
+    def __init__(self, message: str):
         super().__init__(path)
-        self.path = path
+        self.message = path
 
     def __str__(self):
-        return f"Schema validation error at {self.path}"
+        return f"Schema validation error: {self.message}"
 
 
 class HttpMethod(Enum):
@@ -602,7 +602,7 @@ class sessions:
 
 
 class session:
-    path = "api/v0/sessions/<str:sessionId>"
+    path = "api/v0/sessions/<str:session_id>"
     name = "session"
 
     @classmethod
@@ -613,13 +613,13 @@ class session:
         post_handler: Callable[[HttpRequest, str, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
         delete_handler: Callable[[HttpRequest, str], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest, sessionId: str):
+        def dispatch(request: HttpRequest, session_id: str):
             if request.method == "GET":
-                return cls.do_get(request, get_handler, sessionId)
+                return cls.do_get(request, get_handler, session_id)
             if request.method == "POST":
-                return cls.do_post(request, post_handler, sessionId)
+                return cls.do_post(request, post_handler, session_id)
             if request.method == "DELETE":
-                return cls.do_delete(request, delete_handler, sessionId)
+                return cls.do_delete(request, delete_handler, session_id)
             raise RuntimeError
 
         return path(cls.path, dispatch, name=cls.name)
@@ -629,9 +629,9 @@ class session:
     def do_get(
         request: HttpRequest,
         handler: Callable[[HttpRequest, str], SessionResponse | tuple[int, SessionResponse]],
-        sessionId: str,
+        session_id: str,
     ) -> SessionResponse | tuple[int, SessionResponse]:
-        response = handler(request, sessionId)
+        response = handler(request, session_id)
         if isinstance(response, tuple):
             code, response = response
         else:
@@ -644,11 +644,11 @@ class session:
     def do_post(
         request: HttpRequest,
         handler: Callable[[HttpRequest, str, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
-        sessionId: str,
+        session_id: str,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
         body: CreateSessionRequest = CreateSessionRequest.schema().loads(request.body.decode())
         body.validate()
-        response = handler(request, sessionId, body)
+        response = handler(request, session_id, body)
         if isinstance(response, tuple):
             code, response = response
         else:
@@ -661,9 +661,9 @@ class session:
     def do_delete(
         request: HttpRequest,
         handler: Callable[[HttpRequest, str], SuccessResponse | tuple[int, SuccessResponse]],
-        sessionId: str,
+        session_id: str,
     ) -> SuccessResponse | tuple[int, SuccessResponse]:
-        response = handler(request, sessionId)
+        response = handler(request, session_id)
         if isinstance(response, tuple):
             code, response = response
         else:
