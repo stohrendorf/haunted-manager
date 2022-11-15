@@ -27,7 +27,7 @@ from .models import Tag as TagModel
 User = get_user_model()
 
 
-def get_tags(request) -> TagsResponse:
+def get_tags(request: HttpRequest) -> TagsResponse:
     return TagsResponse(
         tags=[
             Tag(
@@ -40,7 +40,7 @@ def get_tags(request) -> TagsResponse:
     )
 
 
-def get_sessions(request) -> SessionsResponse:
+def get_sessions(request: HttpRequest) -> SessionsResponse:
     return SessionsResponse(
         sessions=[
             Session(
@@ -61,7 +61,7 @@ def get_sessions(request) -> SessionsResponse:
     )
 
 
-def get_session(request, sessionid: str) -> SessionResponse | tuple[int, SessionResponse]:
+def get_session(request: HttpRequest, sessionid: str) -> SessionResponse | tuple[int, SessionResponse]:
     try:
         session = SessionModel.objects.get(key=sessionid)
     except SessionModel.DoesNotExist:
@@ -84,7 +84,11 @@ def get_session(request, sessionid: str) -> SessionResponse | tuple[int, Session
     )
 
 
-def edit_session(request, sessionid: str, body: CreateSessionRequest) -> SuccessResponse | tuple[int, SuccessResponse]:
+def edit_session(
+    request: HttpRequest,
+    sessionid: str,
+    body: CreateSessionRequest,
+) -> SuccessResponse | tuple[int, SuccessResponse]:
     try:
         session = SessionModel.objects.get(key=sessionid)
     except SessionModel.DoesNotExist:
@@ -102,7 +106,7 @@ def edit_session(request, sessionid: str, body: CreateSessionRequest) -> Success
     return SuccessResponse(message="", success=True)
 
 
-def delete_session(request, sessionid: str) -> tuple[int, SuccessResponse] | SuccessResponse:
+def delete_session(request: HttpRequest, sessionid: str) -> tuple[int, SuccessResponse] | SuccessResponse:
     if not request.user.is_active or not request.user.is_authenticated:
         return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")
 
@@ -157,7 +161,7 @@ def check_session_access(request: HttpRequest, body: SessionAccessRequest) -> Su
 
 @csrf_exempt
 @atomic
-def update_sessions_players(request, body: SessionsPlayersRequest) -> Empty:
+def update_sessions_players(request: HttpRequest, body: SessionsPlayersRequest) -> Empty:
     if body.api_key != settings.COOP_API_KEY:
         return Empty()
 

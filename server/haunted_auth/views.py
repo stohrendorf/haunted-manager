@@ -8,12 +8,13 @@ from django.core.exceptions import ValidationError
 from django.db.transaction import atomic
 from django.http import (
     HttpRequest,
+    HttpResponse,
     HttpResponseBadRequest,
     HttpResponseForbidden,
     HttpResponseRedirect,
     HttpResponseServerError,
 )
-from django_email_verification import send_email, verify_email_view, verify_token
+from django_email_verification import send_email, verify_email, verify_email_view
 
 from haunted_auth.models import ApiKey
 from hsutils.viewmodels import (
@@ -167,6 +168,6 @@ def change_email(request: HttpRequest, body: ChangeEmailRequest) -> SuccessRespo
 
 
 @verify_email_view
-def confirm_email_token(request, token):
-    verify_token(token)
+def confirm_email_token(request: HttpRequest, token: str) -> HttpResponse:
+    verify_email(token)
     return HttpResponseRedirect("/")
