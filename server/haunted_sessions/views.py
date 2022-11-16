@@ -1,9 +1,10 @@
 import logging
+from http import HTTPStatus
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.transaction import atomic
-from django.http import HttpRequest, HttpResponseForbidden, HttpResponseNotFound
+from django.http import HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 
 from haunted_auth.models import ApiKey
@@ -65,7 +66,7 @@ def get_session(request: HttpRequest, session_id: str) -> SessionResponse | tupl
     try:
         session = SessionModel.objects.get(key=session_id)
     except SessionModel.DoesNotExist:
-        return HttpResponseNotFound.status_code, SessionResponse(session=None)
+        return HTTPStatus.NOT_FOUND, SessionResponse(session=None)
 
     return SessionResponse(
         session=Session(
@@ -92,10 +93,10 @@ def edit_session(
     try:
         session = SessionModel.objects.get(key=session_id)
     except SessionModel.DoesNotExist:
-        return HttpResponseNotFound.status_code, SuccessResponse(message="invalid session id", success=False)
+        return HTTPStatus.NOT_FOUND, SuccessResponse(message="invalid session id", success=False)
 
     if request.user != session.owner:
-        return HttpResponseForbidden.status_code, SuccessResponse(
+        return HTTPStatus.FORBIDDEN, SuccessResponse(
             message="not allowed to edit this session",
             success=False,
         )
@@ -108,16 +109,16 @@ def edit_session(
 
 def delete_session(request: HttpRequest, session_id: str) -> tuple[int, SuccessResponse] | SuccessResponse:
     if not request.user.is_active or not request.user.is_authenticated:
-        return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")
+        return HTTPStatus.UNAUTHORIZED, SuccessResponse(success=False, message="not allowed")
 
     session = SessionModel.objects.get(key=session_id)
     if not session:
-        return HttpResponseNotFound.status_code, SuccessResponse(
+        return HTTPStatus.NOT_FOUND, SuccessResponse(
             message=f"session {session_id} not found",
             success=False,
         )
     if session.owner != request.user:
-        return 401, SuccessResponse(
+        return HTTPStatus.FORBIDDEN, SuccessResponse(
             message=f"not allowed to delete session {session_id}",
             success=False,
         )
@@ -187,14 +188,14 @@ def create_session(
     body: CreateSessionRequest,
 ) -> tuple[int, SuccessResponse] | SuccessResponse:
     if not request.user.is_active or not request.user.is_authenticated:
-        return HttpResponseForbidden.status_code, SuccessResponse(success=False, message="not allowed")
+        return HTTPStatus.FORBIDDEN, SuccessResponse(success=False, message="not allowed")
 
     session = SessionModel.objects.create(
         owner=request.user,
         description=body.description,
     )
     session.tags.add(*TagModel.objects.filter(id__in=body.tags).all())
-    return SuccessResponse(
+    return HTTPStatus.CREATED, SuccessResponse(
         message="session created",
         success=True,
     )

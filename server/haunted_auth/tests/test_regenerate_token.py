@@ -1,6 +1,7 @@
+from http import HTTPStatus
+
 import pytest
 from django.contrib.auth.models import AbstractUser
-from django.http import HttpResponseBase, HttpResponseForbidden
 from django.test import Client
 
 from hsutils.test_utils import get_test_url
@@ -16,7 +17,7 @@ def test_regenerate_token(client: Client, django_user_model):
         regenerate_token.path,
         Empty,
     )
-    assert code == HttpResponseForbidden.status_code
+    assert code == HTTPStatus.UNAUTHORIZED
     assert response is not None
 
     user: AbstractUser = django_user_model.objects.create_user(
@@ -30,7 +31,7 @@ def test_regenerate_token(client: Client, django_user_model):
         regenerate_token.path,
         Empty,
     )
-    assert code == HttpResponseForbidden.status_code
+    assert code == HTTPStatus.UNAUTHORIZED
     assert response is not None
 
     user.is_active = True
@@ -41,5 +42,5 @@ def test_regenerate_token(client: Client, django_user_model):
         regenerate_token.path,
         Empty,
     )
-    assert code == HttpResponseBase.status_code
+    assert code == HTTPStatus.OK
     assert response is not None

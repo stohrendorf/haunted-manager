@@ -1,6 +1,7 @@
+from http import HTTPStatus
+
 import pytest
 from django.contrib.auth.models import AbstractUser
-from django.http import HttpResponseBase, HttpResponseForbidden
 from django.test import Client
 
 from hsutils.test_utils import post_test_url
@@ -17,7 +18,7 @@ def test_login(client: Client, django_user_model):
         LoginRequest(password="password!!!", username="username"),
         SuccessResponse,
     )
-    assert code == HttpResponseForbidden.status_code
+    assert code == HTTPStatus.FORBIDDEN
     assert response is not None
     assert response.success is False
     user: AbstractUser = django_user_model.objects.create_user(
@@ -32,7 +33,7 @@ def test_login(client: Client, django_user_model):
         LoginRequest(password="password!!!", username="username"),
         SuccessResponse,
     )
-    assert code == HttpResponseForbidden.status_code
+    assert code == HTTPStatus.FORBIDDEN
     assert response is not None
     assert response.success is False
 
@@ -44,7 +45,7 @@ def test_login(client: Client, django_user_model):
         LoginRequest(password="password!!!", username="username"),
         SuccessResponse,
     )
-    assert code == HttpResponseBase.status_code
+    assert code == HTTPStatus.OK
     assert response is not None
     assert response.success is True
 
@@ -54,7 +55,7 @@ def test_login(client: Client, django_user_model):
         LoginRequest(password="password", username="username"),
         SuccessResponse,
     )
-    assert code == HttpResponseForbidden.status_code
+    assert code == HTTPStatus.FORBIDDEN
     assert response is not None
     assert response.success is False
 
@@ -64,6 +65,6 @@ def test_login(client: Client, django_user_model):
         LoginRequest(password="password!!!", username="xxx"),
         SuccessResponse,
     )
-    assert code == HttpResponseForbidden.status_code
+    assert code == HTTPStatus.FORBIDDEN
     assert response is not None
     assert response.success is False
