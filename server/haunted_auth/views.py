@@ -1,6 +1,7 @@
 import logging
 
 import django.contrib.auth
+from django.conf import settings
 from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth import login as django_login
 from django.contrib.auth.password_validation import validate_password
@@ -92,7 +93,7 @@ def register(request: HttpRequest, body: RegisterRequest) -> tuple[int, SuccessR
         validate_password(body.password, user)
         ApiKey.objects.create(owner=user)
         user.save()
-        send_email(user)
+        send_email(user, thread=not settings.TEST_RUN)
     except ValidationError as e:
         logging.error("registration failed", exc_info=True)
         if user is not None:
@@ -163,7 +164,7 @@ def change_email(request: HttpRequest, body: ChangeEmailRequest) -> SuccessRespo
 
     request.user.email = body.email
     request.user.save()
-    send_email(request.user)
+    send_email(request.user, thread=not settings.TEST_RUN)
     return SuccessResponse(success=True, message="email changed")
 
 

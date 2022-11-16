@@ -1,3 +1,4 @@
+import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -152,3 +153,5 @@ SITE_ID = env.int("SITE_ID")
 
 COOP_API_KEY = env("COOP_API_KEY")
 COOP_SERVER_URL = env("COOP_SERVER_URL")
+
+TEST_RUN = DEBUG or "PYTEST_CURRENT_TEST" in os.environ

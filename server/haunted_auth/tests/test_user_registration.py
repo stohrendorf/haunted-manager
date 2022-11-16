@@ -1,4 +1,5 @@
 import uuid
+from email.message import EmailMessage
 from typing import Optional
 
 import pytest
@@ -25,7 +26,11 @@ def try_register(
 
 
 @pytest.mark.django_db
-def test_register_verify_happy_path(client: Client, django_user_model):
+def test_register_verify_happy_path(
+    client: Client,
+    django_user_model: type[AbstractUser],
+    mailoutbox: list[EmailMessage],
+):
     code, response = try_register(
         client,
         email="test@example.com",
@@ -35,11 +40,15 @@ def test_register_verify_happy_path(client: Client, django_user_model):
     assert code == HttpResponse.status_code
     assert response is not None
     assert response.success is True
+    assert len(mailoutbox) == 1
+
+    mailoutbox.clear()
 
     user: AbstractUser = django_user_model.objects.get()
     assert user.is_active is False
     assert user.email == "test@example.com"
     assert user.get_username() == "test-user"
+    assert len(mailoutbox) == 0
 
     # check that a duplicate user can't be registered
 
@@ -52,37 +61,47 @@ def test_register_verify_happy_path(client: Client, django_user_model):
     assert code == 409
     assert response is not None
     assert response.success is False
+    assert len(mailoutbox) == 0
 
     user = django_user_model.objects.get()
     assert user.is_active is False
     assert user.email == "test@example.com"
     assert user.get_username() == "test-user"
+    assert len(mailoutbox) == 0
 
 
 @pytest.mark.django_db
-def test_register_missing_data(client: Client, django_user_model):
+def test_register_missing_data(client: Client, django_user_model: type[AbstractUser], mailoutbox: list[EmailMessage]):
     # TODO these error checks are stupid, a proper exception handling is needed
     code, response = try_register(client, email="", password=uuid.uuid4().hex, username="test-user")
     assert code == HttpResponseBadRequest.status_code
     assert response is None
     assert django_user_model.objects.count() == 0
+    assert len(mailoutbox) == 0
 
     code, response = try_register(client, email="test@example.com", password="", username="test-user")
     assert code == HttpResponseBadRequest.status_code
     assert response is None
     assert django_user_model.objects.count() == 0
+    assert len(mailoutbox) == 0
 
     code, response = try_register(client, email="test@example.com", password=uuid.uuid4().hex, username="")
     assert code == HttpResponseBadRequest.status_code
     assert response is None
     assert django_user_model.objects.count() == 0
+    assert len(mailoutbox) == 0
 
 
 @pytest.mark.django_db
-def test_register_invalid_password(client: Client, django_user_model):
+def test_register_invalid_password(
+    client: Client,
+    django_user_model: type[AbstractUser],
+    mailoutbox: list[EmailMessage],
+):
     code, response = try_register(client, email="test@example.com", password="1234", username="test-user")
     assert code == HttpResponseBadRequest.status_code
     assert response is not None
     assert response.success is False
     assert response.message is not None
     assert django_user_model.objects.count() == 0
+    assert len(mailoutbox) == 0
