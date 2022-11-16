@@ -1,5 +1,6 @@
 import uuid
 from email.message import EmailMessage
+from http import HTTPStatus
 from typing import Optional
 
 import pytest
@@ -8,7 +9,17 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.test import Client
 
 from hsutils.test_utils import post_test_url
-from hsutils.viewmodels import RegisterRequest, SuccessResponse, register
+from hsutils.viewmodels import (
+    ChangeEmailRequest,
+    ChangePasswordRequest,
+    ChangeUsernameRequest,
+    RegisterRequest,
+    SuccessResponse,
+    change_email,
+    change_password,
+    change_username,
+    register,
+)
 
 
 def try_register(
@@ -50,7 +61,19 @@ def test_register_verify_happy_path(
     assert user.get_username() == "test-user"
     assert len(mailoutbox) == 0
 
-    # check that a duplicate user can't be registered
+
+@pytest.mark.django_db
+def test_register_duplicate(
+    client: Client,
+    mailoutbox: list[EmailMessage],
+):
+    try_register(
+        client,
+        email="test@example.com",
+        password=uuid.uuid4().hex,
+        username="test-user",
+    )
+    mailoutbox.clear()
 
     code, response = try_register(
         client,
@@ -63,10 +86,54 @@ def test_register_verify_happy_path(
     assert response.success is False
     assert len(mailoutbox) == 0
 
-    user = django_user_model.objects.get()
-    assert user.is_active is False
-    assert user.email == "test@example.com"
-    assert user.get_username() == "test-user"
+
+@pytest.mark.django_db
+def test_register_duplicate_username(
+    client: Client,
+    mailoutbox: list[EmailMessage],
+):
+    try_register(
+        client,
+        email="test@example.com",
+        password=uuid.uuid4().hex,
+        username="test-user",
+    )
+    mailoutbox.clear()
+
+    code, response = try_register(
+        client,
+        email="test-2@example.com",
+        password=uuid.uuid4().hex,
+        username="test-user",
+    )
+    assert code == 409
+    assert response is not None
+    assert response.success is False
+    assert len(mailoutbox) == 0
+
+
+@pytest.mark.django_db
+def test_register_duplicate_email(
+    client: Client,
+    mailoutbox: list[EmailMessage],
+):
+    try_register(
+        client,
+        email="test@example.com",
+        password=uuid.uuid4().hex,
+        username="test-user",
+    )
+    mailoutbox.clear()
+
+    code, response = try_register(
+        client,
+        email="test@example.com",
+        password=uuid.uuid4().hex,
+        username="test-user-2",
+    )
+    assert code == 409
+    assert response is not None
+    assert response.success is False
     assert len(mailoutbox) == 0
 
 
@@ -105,3 +172,108 @@ def test_register_invalid_password(
     assert response.message is not None
     assert django_user_model.objects.count() == 0
     assert len(mailoutbox) == 0
+
+
+@pytest.mark.django_db
+def test_change_password(client: Client, django_user_model: type[AbstractUser]):
+    try_register(
+        client,
+        email="test@example.com",
+        password=uuid.uuid4().hex,
+        username="test-user",
+    )
+    user: AbstractUser = django_user_model.objects.get()
+    user.is_active = True
+    user.save()
+
+    client.force_login(user)
+    code, response = post_test_url(
+        client,
+        change_password.path,
+        ChangePasswordRequest(password="password987"),
+        SuccessResponse,
+    )
+    assert code == HTTPStatus.OK
+    assert response is not None
+    assert response.success is True
+
+    client.force_login(user)
+    code, response = post_test_url(
+        client,
+        change_password.path,
+        ChangePasswordRequest(password="password"),
+        SuccessResponse,
+    )
+    assert code == HTTPStatus.UNAUTHORIZED
+    assert response is not None
+    assert response.success is False
+
+
+@pytest.mark.django_db
+def test_change_username(client: Client, django_user_model: type[AbstractUser]):
+    try_register(
+        client,
+        email="test@example.com",
+        password=uuid.uuid4().hex,
+        username="test-user",
+    )
+    user: AbstractUser = django_user_model.objects.get()
+    user.is_active = True
+    user.save()
+
+    client.force_login(user)
+    code, response = post_test_url(
+        client,
+        change_username.path,
+        ChangeUsernameRequest(username="test-user-2"),
+        SuccessResponse,
+    )
+    assert code == HTTPStatus.OK
+    assert response is not None
+    assert response.success is True
+
+    client.force_login(user)
+    code, response = post_test_url(
+        client,
+        change_username.path,
+        ChangeUsernameRequest(username="test-user-2"),
+        SuccessResponse,
+    )
+    assert code == HTTPStatus.CONFLICT
+    assert response is not None
+    assert response.success is False
+
+
+@pytest.mark.django_db
+def test_change_email(client: Client, django_user_model: type[AbstractUser]):
+    try_register(
+        client,
+        email="test@example.com",
+        password=uuid.uuid4().hex,
+        username="test-user",
+    )
+    user: AbstractUser = django_user_model.objects.get()
+    user.is_active = True
+    user.save()
+
+    client.force_login(user)
+    code, response = post_test_url(
+        client,
+        change_email.path,
+        ChangeEmailRequest(email="test-2@example.com"),
+        SuccessResponse,
+    )
+    assert code == HTTPStatus.OK
+    assert response is not None
+    assert response.success is True
+
+    client.force_login(user)
+    code, response = post_test_url(
+        client,
+        change_email.path,
+        ChangeEmailRequest(email="test-2@example.com"),
+        SuccessResponse,
+    )
+    assert code == HTTPStatus.CONFLICT
+    assert response is not None
+    assert response.success is False

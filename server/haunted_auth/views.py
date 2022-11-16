@@ -157,7 +157,7 @@ def change_email(request: HttpRequest, body: ChangeEmailRequest) -> SuccessRespo
         return HTTPStatus.UNAUTHORIZED, SuccessResponse(success=False, message="not allowed")
 
     if User.objects.filter(email=body.email).exists():
-        return SuccessResponse(success=False, message="Email address already in use.")
+        return HTTPStatus.CONFLICT, SuccessResponse(success=False, message="Email address already in use.")
 
     request.user.email = body.email
     request.user.save()
