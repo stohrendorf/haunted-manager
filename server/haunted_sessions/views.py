@@ -130,41 +130,50 @@ def delete_session(request: HttpRequest, session_id: str) -> tuple[int, SuccessR
 
 
 @csrf_exempt
-def check_session_access(request: HttpRequest, body: SessionAccessRequest) -> SuccessResponse:
+def check_session_access(
+    request: HttpRequest,
+    body: SessionAccessRequest,
+) -> SuccessResponse | tuple[int, SuccessResponse]:
     if body.api_key != settings.COOP_API_KEY:
-        return SuccessResponse(success=False, message="invalid api key")
+        return HTTPStatus.UNAUTHORIZED, SuccessResponse(success=False, message="invalid api key")
 
     try:
         user = User.objects.get(username=body.username)
     except User.DoesNotExist:
-        return SuccessResponse(success=False, message="user does not exist")
+        return HTTPStatus.NOT_FOUND, SuccessResponse(success=False, message="user does not exist")
     except Exception:
         logging.error("unexpected error while retrieving user", exc_info=True)
-        return SuccessResponse(success=False, message="unexpected error while retrieving user")
+        return HTTPStatus.INTERNAL_SERVER_ERROR, SuccessResponse(
+            success=False,
+            message="unexpected error while retrieving user",
+        )
 
     if not user.is_active:
-        return SuccessResponse(success=False, message="user is inactive")
+        return HTTPStatus.NOT_FOUND, SuccessResponse(success=False, message="user is inactive")
 
     try:
         auth_token = ApiKey.objects.get(owner=user)
     except ApiKey.DoesNotExist:
-        return SuccessResponse(success=False, message="auth token not found")
+        return HTTPStatus.NOT_FOUND, SuccessResponse(success=False, message="auth token not found")
     except Exception:
         logging.error("unexpected error while checking auth token", exc_info=True)
-        return SuccessResponse(success=False, message="unexpected error while checking auth token")
+        return HTTPStatus.INTERNAL_SERVER_ERROR, SuccessResponse(
+            success=False,
+            message="unexpected error while checking auth token",
+        )
 
     if auth_token.key.hex != body.auth_token:
-        return SuccessResponse(success=False, message="invalid auth token")
+        return HTTPStatus.UNAUTHORIZED, SuccessResponse(success=False, message="invalid auth token")
     if not SessionModel.objects.filter(key=body.session_id).exists():
-        return SuccessResponse(success=False, message="session does not exist")
+        return HTTPStatus.NOT_FOUND, SuccessResponse(success=False, message="session does not exist")
     return SuccessResponse(success=True, message="")
 
 
 @csrf_exempt
 @atomic
-def update_sessions_players(request: HttpRequest, body: SessionsPlayersRequest) -> Empty:
+def update_sessions_players(request: HttpRequest, body: SessionsPlayersRequest) -> Empty | tuple[int, Empty]:
     if body.api_key != settings.COOP_API_KEY:
-        return Empty()
+        return HTTPStatus.UNAUTHORIZED, Empty()
 
     for db_session in SessionModel.objects.all():
         db_session.players.clear()
