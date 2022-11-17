@@ -71,7 +71,7 @@ def profile(request: HttpRequest) -> ProfileInfoResponse:
 @atomic
 def register(request: HttpRequest, body: RegisterRequest) -> tuple[int, SuccessResponse] | SuccessResponse:
     if not request.user.is_anonymous or request.user.is_authenticated:
-        return SuccessResponse(success=False, message="already logged in")
+        return HTTPStatus.BAD_REQUEST, SuccessResponse(success=False, message="already logged in")
 
     if User.objects.filter(username=body.username).exists() or User.objects.filter(email=body.email).exists():
         return HTTPStatus.CONFLICT, SuccessResponse(
