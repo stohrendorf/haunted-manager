@@ -103,7 +103,7 @@ export default class ProfileView extends Vue {
         variant="primary"
         @click="changeEmail()"
       >
-        <span class="bi bi-check" /> Change &amp; Verify
+        <span class="bi bi-check" /> Change
       </bs-btn>
     </floating-single-line-input>
 

@@ -215,7 +215,7 @@ describe("<NotVerifiedLock />", () => {
       .should("have.value", "email@example.com");
     cy.get("button")
       .eq(2)
-      .should("contain.text", "Change & Verify")
+      .should("contain.text", "Change")
       .should("be.disabled");
     cy.get("input[aria-label='Email']").clear().type("other-email@example.com");
     cy.get("button").eq(2).should("not.be.disabled");
@@ -250,7 +250,7 @@ describe("<NotVerifiedLock />", () => {
       .should("have.value", "email@example.com");
     cy.get("button")
       .eq(2)
-      .should("contain.text", "Change & Verify")
+      .should("contain.text", "Change")
       .should("be.disabled");
     cy.get("input[aria-label='Email']").clear().type("other-email@example.com");
     cy.get("button").eq(2).should("not.be.disabled").click();
@@ -288,7 +288,7 @@ describe("<NotVerifiedLock />", () => {
       .should("have.value", "email@example.com");
     cy.get("button")
       .eq(2)
-      .should("contain.text", "Change & Verify")
+      .should("contain.text", "Change")
       .should("be.disabled");
     cy.get("input[aria-label='Email']").clear().type("other-email@example.com");
     cy.get("button").eq(2).should("not.be.disabled").click();
