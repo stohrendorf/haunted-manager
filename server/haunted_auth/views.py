@@ -161,7 +161,6 @@ def change_email(request: HttpRequest, body: ChangeEmailRequest) -> SuccessRespo
 
     request.user.email = body.email
     request.user.save()
-    send_email(request.user, thread=not settings.TEST_RUN)
     return SuccessResponse(success=True, message="email changed")
 
 

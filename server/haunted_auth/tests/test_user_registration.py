@@ -175,7 +175,11 @@ def test_register_invalid_password(
 
 
 @pytest.mark.django_db
-def test_change_password(client: Client, django_user_model: type[AbstractUser]):
+def test_change_password(
+    client: Client,
+    django_user_model: type[AbstractUser],
+    mailoutbox: list[EmailMessage],
+):
     try_register(
         client,
         email="test@example.com",
@@ -185,6 +189,7 @@ def test_change_password(client: Client, django_user_model: type[AbstractUser]):
     user: AbstractUser = django_user_model.objects.get()
     user.is_active = True
     user.save()
+    mailoutbox.clear()
 
     client.force_login(user)
     code, response = post_test_url(
@@ -196,6 +201,7 @@ def test_change_password(client: Client, django_user_model: type[AbstractUser]):
     assert code == HTTPStatus.OK
     assert response is not None
     assert response.success is True
+    assert len(mailoutbox) == 0
 
     client.force_login(user)
     code, response = post_test_url(
@@ -207,10 +213,15 @@ def test_change_password(client: Client, django_user_model: type[AbstractUser]):
     assert code == HTTPStatus.UNAUTHORIZED
     assert response is not None
     assert response.success is False
+    assert len(mailoutbox) == 0
 
 
 @pytest.mark.django_db
-def test_change_username(client: Client, django_user_model: type[AbstractUser]):
+def test_change_username(
+    client: Client,
+    django_user_model: type[AbstractUser],
+    mailoutbox: list[EmailMessage],
+):
     try_register(
         client,
         email="test@example.com",
@@ -220,6 +231,7 @@ def test_change_username(client: Client, django_user_model: type[AbstractUser]):
     user: AbstractUser = django_user_model.objects.get()
     user.is_active = True
     user.save()
+    mailoutbox.clear()
 
     client.force_login(user)
     code, response = post_test_url(
@@ -231,6 +243,7 @@ def test_change_username(client: Client, django_user_model: type[AbstractUser]):
     assert code == HTTPStatus.OK
     assert response is not None
     assert response.success is True
+    assert len(mailoutbox) == 0
 
     client.force_login(user)
     code, response = post_test_url(
@@ -242,10 +255,15 @@ def test_change_username(client: Client, django_user_model: type[AbstractUser]):
     assert code == HTTPStatus.CONFLICT
     assert response is not None
     assert response.success is False
+    assert len(mailoutbox) == 0
 
 
 @pytest.mark.django_db
-def test_change_email(client: Client, django_user_model: type[AbstractUser]):
+def test_change_email(
+    client: Client,
+    django_user_model: type[AbstractUser],
+    mailoutbox: list[EmailMessage],
+):
     try_register(
         client,
         email="test@example.com",
@@ -255,6 +273,7 @@ def test_change_email(client: Client, django_user_model: type[AbstractUser]):
     user: AbstractUser = django_user_model.objects.get()
     user.is_active = True
     user.save()
+    mailoutbox.clear()
 
     client.force_login(user)
     code, response = post_test_url(
@@ -266,6 +285,7 @@ def test_change_email(client: Client, django_user_model: type[AbstractUser]):
     assert code == HTTPStatus.OK
     assert response is not None
     assert response.success is True
+    assert len(mailoutbox) == 0
 
     client.force_login(user)
     code, response = post_test_url(
@@ -277,3 +297,4 @@ def test_change_email(client: Client, django_user_model: type[AbstractUser]):
     assert code == HTTPStatus.CONFLICT
     assert response is not None
     assert response.success is False
+    assert len(mailoutbox) == 0
