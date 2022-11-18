@@ -66,7 +66,7 @@ def _gen_check(context: str, indent: str, field: BaseField, accessor: str) -> tu
         varname = re.sub(r"[^a-zA-Z0-9]", "_", accessor) + "_entry"
         output += f"{indent}for {varname} in {accessor}:\n"
         if isinstance(field.items, Compound):
-            output += f"{indent}    validate_{humps.decamelize(field.items.typename())}({varname})\n"
+            output += f"{indent}    {varname}.validate()\n"
             empty = False
         else:
             field_output, empty = _gen_check(context, indent + base_indent, field.items, varname)
@@ -81,8 +81,8 @@ def _gen_check(context: str, indent: str, field: BaseField, accessor: str) -> tu
     return output, empty
 
 
-def _gen_django_field_checks(context: str, accessor: str, field: BaseField) -> str:
-    output, _ = _gen_check(context, base_indent, field, accessor)
+def _gen_django_field_checks(context: str, accessor: str, field: BaseField, additional_indent_level: int = 0) -> str:
+    output, _ = _gen_check(context, base_indent * (additional_indent_level + 1), field, accessor)
     return output
 
 
@@ -93,7 +93,8 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dic
     output += "from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, JsonResponse\n"
     output += "from django.urls import path\n"
     output += "from enum import Enum\n"
-    output += "from . import json_response\n"
+    output += "from http import HTTPStatus\n"
+    output += "from .json_response import json_response, Validatable\n"
     output += "import re\n"
     output += "import logging\n"
     output += "class SchemaValidationError(Exception):\n"
@@ -106,25 +107,25 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dic
         if not is_primitive_field(schema):
             output += "@dataclass_json\n"
             output += "@dataclass(kw_only=True)\n"
-            output += f"class {schema.typename()}(DataClassJsonMixin):\n"
+            output += f"class {schema.typename()}(DataClassJsonMixin, Validatable):\n"
             for field_name, field in schema.subfields():
                 output += f"    {field_name}: {_field_to_type_sig(field)}\n"
 
             output += "    def validate(self):\n"
-            output += f"        validate_{humps.decamelize(schema.typename())}(self)\n"
+            for field_name, field in schema.subfields():
+                output += _gen_django_field_checks(
+                    f"{schema.typename()}.{field_name}",
+                    f"self.{field_name}",
+                    field,
+                    additional_indent_level=1,
+                )
+            output += "        return\n"
 
             output += "\n"
 
     for schema in schemas:
         if not is_primitive_field(schema):
-            output += f"def validate_{humps.decamelize(schema.typename())}(data: {schema.typename()}):\n"
-            for field_name, field in schema.subfields():
-                output += _gen_django_field_checks(
-                    f"{schema.typename()}.{field_name}",
-                    f"data.{field_name}",
-                    field,
-                )
-            output += "    return\n"
+            pass
         elif not is_pure_primitive_field(schema):
             output += (
                 f"def validate_{humps.decamelize(schema.typename())}(data: Optional[{_field_to_type_sig(schema)}]):\n"
@@ -156,7 +157,7 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dic
             handler_signature = make_handler_signature(url_arg_types, endpoint, method)
             output += f"        {method.name.lower()}_handler: {handler_signature},\n"
         output += "    ):\n"
-        output += "        def dispatch(" + ", ".join(["request: HttpRequest"] + url_args_in) + "):\n"
+        output += "        def dispatch(" + ", ".join(["request: HttpRequest"] + url_args_in) + ") -> JsonResponse:\n"
         for method, endpoint in methods_endpoints.items():
             output += f'            if request.method == "{method.value}":\n'
             output += (
@@ -164,7 +165,7 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dic
                 + ", ".join(["request", f"{method.value.lower()}_handler", *url_args_out])
                 + ")\n"
             )
-        output += "            raise RuntimeError\n"
+        output += "            return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)\n"
         output += "        return path(cls.path, dispatch, name=cls.name)\n"
 
         for method, endpoint in methods_endpoints.items():
