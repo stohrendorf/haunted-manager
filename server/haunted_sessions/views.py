@@ -41,24 +41,25 @@ def get_tags(request: HttpRequest) -> TagsResponse:
     )
 
 
+def session_to_response(session: SessionModel) -> Session:
+    return Session(
+        id=session.key.hex,
+        tags=[
+            SessionTag(
+                name=t.name,
+                description=t.description,
+            )
+            for t in session.tags.all()
+        ],
+        owner=session.owner.username,
+        description=session.description,
+        players=[u.username for u in session.players.all()],
+    )
+
+
 def get_sessions(request: HttpRequest) -> SessionsResponse:
     return SessionsResponse(
-        sessions=[
-            Session(
-                id=session.key.hex,
-                tags=[
-                    SessionTag(
-                        name=t.name,
-                        description=t.description,
-                    )
-                    for t in session.tags.all()
-                ],
-                owner=session.owner.username,
-                description=session.description,
-                players=[u.username for u in session.players.all()],
-            )
-            for session in SessionModel.objects.order_by("-created_at").all()
-        ],
+        sessions=[session_to_response(session) for session in SessionModel.objects.order_by("-created_at").all()],
     )
 
 
@@ -68,21 +69,7 @@ def get_session(request: HttpRequest, session_id: str) -> SessionResponse | tupl
     except SessionModel.DoesNotExist:
         return HTTPStatus.NOT_FOUND, SessionResponse(session=None)
 
-    return SessionResponse(
-        session=Session(
-            id=session.key.hex,
-            tags=[
-                SessionTag(
-                    name=t.name,
-                    description=t.description,
-                )
-                for t in session.tags.all()
-            ],
-            owner=session.owner.username,
-            description=session.description,
-            players=[u.username for u in session.players.all()],
-        ),
-    )
+    return SessionResponse(session=session_to_response(session))
 
 
 def edit_session(
