@@ -102,6 +102,7 @@ class ChangeUsernameRequest(DataClassJsonMixin, Validatable):
 class CreateSessionRequest(DataClassJsonMixin, Validatable):
     description: str
     tags: List[int]
+    time: Optional["TimeSpan"]
 
     def validate(self):
         if self.description is None:
@@ -112,6 +113,8 @@ class CreateSessionRequest(DataClassJsonMixin, Validatable):
             if self_tags_entry is None:
                 raise SchemaValidationError("CreateSessionRequest.tags is null")
             pass
+        if self.time is not None:
+            self.time.validate()
         return
 
 
@@ -221,6 +224,7 @@ class Session(DataClassJsonMixin, Validatable):
     owner: str
     players: List[str]
     tags: List["SessionTag"]
+    time: Optional["TimeSpan"]
 
     def validate(self):
         if self.description is None:
@@ -244,6 +248,8 @@ class Session(DataClassJsonMixin, Validatable):
             raise SchemaValidationError("Session.tags is null")
         for self_tags_entry in self.tags:
             self_tags_entry.validate()
+        if self.time is not None:
+            self.time.validate()
         return
 
 
@@ -303,7 +309,7 @@ class SessionResponse(DataClassJsonMixin, Validatable):
 
     def validate(self):
         if self.session is not None:
-            pass
+            self.session.validate()
         return
 
 
@@ -400,6 +406,36 @@ class TagsResponse(DataClassJsonMixin, Validatable):
         for self_tags_entry in self.tags:
             self_tags_entry.validate()
         return
+
+
+@dataclass_json
+@dataclass(kw_only=True)
+class TimeSpan(DataClassJsonMixin, Validatable):
+    end: str
+    start: str
+
+    def validate(self):
+        if self.end is None:
+            raise SchemaValidationError("TimeSpan.end is null")
+        if not re.fullmatch(
+            r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+(\+[0-9]{2}:[0-9]{2}|Z)", self.end
+        ):
+            raise SchemaValidationError("TimeSpan.end has an invalid format")
+        if self.start is None:
+            raise SchemaValidationError("TimeSpan.start is null")
+        if not re.fullmatch(
+            r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+(\+[0-9]{2}:[0-9]{2}|Z)", self.start
+        ):
+            raise SchemaValidationError("TimeSpan.start has an invalid format")
+        return
+
+
+def validate_iso_date_time(data: Optional[str]):
+    if data is None:
+        raise SchemaValidationError("IsoDateTime is null")
+    if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+(\+[0-9]{2}:[0-9]{2}|Z)", data):
+        raise SchemaValidationError("IsoDateTime has an invalid format")
+    return
 
 
 class server_info:

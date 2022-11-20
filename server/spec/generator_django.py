@@ -74,6 +74,9 @@ def _gen_check(context: str, indent: str, field: BaseField, accessor: str) -> tu
         if empty:
             output += f"{indent}    pass\n"
         empty = False
+    elif isinstance(field, Compound):
+        output += f"{indent}{accessor}.validate()\n"
+        empty = False
 
     if field.nullable and empty:
         output += f"{indent}pass\n"

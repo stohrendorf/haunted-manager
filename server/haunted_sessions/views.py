@@ -8,6 +8,7 @@ from django.http import HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 
 from haunted_auth.models import ApiKey
+from hsutils.rest_helper import parse_datetime
 from hsutils.viewmodels import (
     CreateSessionRequest,
     Empty,
@@ -20,6 +21,7 @@ from hsutils.viewmodels import (
     SuccessResponse,
     Tag,
     TagsResponse,
+    TimeSpan,
 )
 
 from .models import Session as SessionModel
@@ -54,6 +56,12 @@ def session_to_response(session: SessionModel) -> Session:
         owner=session.owner.username,
         description=session.description,
         players=[u.username for u in session.players.all()],
+        time=TimeSpan(
+            start=session.start.isoformat(),
+            end=session.end.isoformat(),
+        )
+        if session.is_event
+        else None,
     )
 
 
@@ -90,6 +98,14 @@ def edit_session(
 
     session.tags.set(body.tags)
     session.description = body.description
+
+    if body.time is not None:
+        session.is_event = True
+        session.start = parse_datetime(body.time.start)
+        session.end = parse_datetime(body.time.end)
+    else:
+        session.is_event = False
+
     session.save()
     return SuccessResponse(message="", success=True)
 
@@ -190,7 +206,15 @@ def create_session(
         owner=request.user,
         description=body.description,
     )
+
+    if body.time is not None:
+        session.is_event = True
+        session.start = parse_datetime(body.time.start)
+        session.end = parse_datetime(body.time.end)
+
     session.tags.add(*TagModel.objects.filter(id__in=body.tags).all())
+    session.save()
+
     return HTTPStatus.CREATED, SuccessResponse(
         message="session created",
         success=True,

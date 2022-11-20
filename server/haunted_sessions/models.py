@@ -26,6 +26,9 @@ class Session(TimestampedModel):
     tags = models.ManyToManyField(to=Tag, related_name="sessions")
     description = models.CharField(blank=True, null=False, max_length=512)
     players = models.ManyToManyField(to=User, related_name="sessions")
+    is_event = models.BooleanField(default=False, blank=False)
+    start = models.DateTimeField(null=True, default=None)
+    end = models.DateTimeField(null=True, default=None)
 
     def __str__(self):
         return self.key
