@@ -151,7 +151,7 @@ export default class App extends Vue {
       </bs-navbar-nav>
     </bs-navbar>
 
-    <article class="container-fluid container-md">
+    <article class="container-fluid container-md pb-5 mb-5 mt-2">
       <site-announcements-list />
       <router-view />
     </article>
