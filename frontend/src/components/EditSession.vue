@@ -24,6 +24,7 @@ export default class EditSession extends Vue {
     await editSession(this.session!.id, {
       description: this.session!.description,
       tags: this.selectedTags,
+      time: this.session!.time,
     });
     this.$router.push("/");
   }

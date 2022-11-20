@@ -20,6 +20,7 @@ export interface IChangeUsernameRequest {
 export interface ICreateSessionRequest {
   description: string;
   tags: number[];
+  time: ITimeSpan | null;
 }
 export interface IEmpty {}
 export interface ILoginRequest {
@@ -49,6 +50,7 @@ export interface ISession {
   owner: string;
   players: string[];
   tags: ISessionTag[];
+  time: ITimeSpan | null;
 }
 export interface ISessionAccessRequest {
   api_key: string;
@@ -85,6 +87,10 @@ export interface ITag {
 }
 export interface ITagsResponse {
   tags: ITag[];
+}
+export interface ITimeSpan {
+  end: string;
+  start: string;
 }
 function validateAnnouncementEntry(data: IAnnouncementEntry): void {
   if (data.background_color === undefined)
@@ -178,8 +184,25 @@ function validateCreateSessionRequest(data: ICreateSessionRequest): void {
     if (fieldData === null)
       throw new SchemaValidationError("CreateSessionRequest.tags is null");
   }
+
+  if (data.time === undefined)
+    throw new SchemaValidationError("CreateSessionRequest.time is undefined");
+  if (data.time !== null) {
+    validateTimeSpan(data.time);
+  }
 }
 function validateEmpty(data: IEmpty): void {}
+function validateIsoDateTime(data?: string | null): void {
+  if (data === undefined)
+    throw new SchemaValidationError("IsoDateTime is undefined");
+  if (data === null) throw new SchemaValidationError("IsoDateTime is null");
+  if (
+    !data.match(
+      /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+(\+[0-9]{2}:[0-9]{2}|Z)$/
+    )
+  )
+    throw new SchemaValidationError("IsoDateTime has an invalid format");
+}
 function validateLoginRequest(data: ILoginRequest): void {
   if (data.password === undefined)
     throw new SchemaValidationError("LoginRequest.password is undefined");
@@ -321,6 +344,12 @@ function validateSession(data: ISession): void {
     throw new SchemaValidationError("Session.tags is null");
   for (const fieldData of data.tags) {
     validateSessionTag(fieldData);
+  }
+
+  if (data.time === undefined)
+    throw new SchemaValidationError("Session.time is undefined");
+  if (data.time !== null) {
+    validateTimeSpan(data.time);
   }
 }
 function validateSessionAccessRequest(data: ISessionAccessRequest): void {
@@ -468,6 +497,28 @@ function validateTagsResponse(data: ITagsResponse): void {
   for (const fieldData of data.tags) {
     validateTag(fieldData);
   }
+}
+function validateTimeSpan(data: ITimeSpan): void {
+  if (data.end === undefined)
+    throw new SchemaValidationError("TimeSpan.end is undefined");
+  if (data.end === null)
+    throw new SchemaValidationError("TimeSpan.end is null");
+  if (
+    !data.end.match(
+      /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+(\+[0-9]{2}:[0-9]{2}|Z)$/
+    )
+  )
+    throw new SchemaValidationError("TimeSpan.end has an invalid format");
+  if (data.start === undefined)
+    throw new SchemaValidationError("TimeSpan.start is undefined");
+  if (data.start === null)
+    throw new SchemaValidationError("TimeSpan.start is null");
+  if (
+    !data.start.match(
+      /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+(\+[0-9]{2}:[0-9]{2}|Z)$/
+    )
+  )
+    throw new SchemaValidationError("TimeSpan.start has an invalid format");
 }
 export async function getServerInfo(): Promise<IServerInfoResponse> {
   const result = (await doGet(`/api/v0/server-info`)) as IServerInfoResponse;

@@ -5,12 +5,30 @@ import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
 import BsCheckbox from "@/components/bootstrap/BsCheckbox.vue";
 import { Prop } from "vue-property-decorator";
+import DateTimePicker from "@/components/utilities/DateTimePicker.vue";
+import moment from "moment";
 
-@Options({ components: { BsCheckbox, BsBtn, FloatingSingleLineInput } })
+@Options({
+  components: { BsCheckbox, BsBtn, FloatingSingleLineInput, DateTimePicker },
+})
 export default class SessionEditor extends Vue {
   private tags: ITag[] | null = null;
+  get isEvent(): boolean {
+    return this.session.time !== null;
+  }
+  set isEvent(value: boolean) {
+    if (value === (this.session.time !== null)) return;
+    if (value) {
+      this.session.time = {
+        start: moment().toISOString(),
+        end: moment().toISOString(),
+      };
+    } else {
+      this.session.time = null;
+    }
+  }
 
-  @Prop({ required: true, default: { tags: [] } })
+  @Prop({ required: true, default: () => ({ tags: [] }) })
   public session!: ISession;
 
   @Prop({ required: true, default: () => [] })
@@ -48,6 +66,32 @@ export default class SessionEditor extends Vue {
       label="Description"
       required
     />
+
+    <div class="card">
+      <div class="card-body">
+        <div class="card-title form-check form-check-inline">
+          <input
+            :id="'event-checkbox--' + $.uid"
+            v-model="isEvent"
+            class="form-check-input"
+            type="checkbox"
+          />
+          <label :for="'event-checkbox--' + $.uid"> Scheduled Event </label>
+        </div>
+        <div v-if="session.time">
+          <date-time-picker v-model="session.time.start">
+            <strong> Start Time </strong>
+            {{ $filters.datetime(session.time.start) }}
+          </date-time-picker>
+          <date-time-picker v-model="session.time.end">
+            <strong> End Time </strong>
+            {{ $filters.datetime(session.time.end) }}
+          </date-time-picker>
+          <small>All times are in your local time zone.</small>
+        </div>
+      </div>
+    </div>
+
     <ul class="list-unstyled">
       <li v-for="tag in tags" :key="tag.id">
         <bs-checkbox :value="tag.id" :selected-values="selectedTags">

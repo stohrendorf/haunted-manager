@@ -4,9 +4,8 @@ import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import router from "@/router";
 import moment from "moment";
+import "moment-timezone";
 import { createPinia } from "pinia";
-
-// Vue.config.productionTip = false;
 
 const app = createApp(App);
 app.use(router);
@@ -16,7 +15,10 @@ app.component("App", App);
 
 app.config.globalProperties.$filters = {
   datetime(value: string): string {
-    return moment(value).format("LLLL");
+    return moment(value)
+      .tz(moment.tz.guess())
+      .locale(navigator.language)
+      .format("LLLL");
   },
   seconds(value: number): string {
     return moment

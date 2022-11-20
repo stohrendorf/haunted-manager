@@ -14,6 +14,7 @@ export default class CreateSession extends Vue {
     description: "",
     tags: [],
     players: [],
+    time: null,
   };
   private selectedTags: number[] = [];
 
@@ -21,6 +22,7 @@ export default class CreateSession extends Vue {
     await createSession({
       description: this.session.description,
       tags: this.selectedTags,
+      time: this.session.time,
     });
     this.$router.push("/");
   }

@@ -48,6 +48,14 @@ export default class SessionList extends Vue {
         :key="session.id"
         class="list-group-item"
       >
+        <div v-if="session.time !== null" class="row">
+          <div class="col mb-2 rounded border-secondary border">
+            <span class="bi bi-calendar3" /> Scheduled event, starting
+            {{ $filters.datetime(session.time.start) }}, ending
+            {{ $filters.datetime(session.time.end) }}.
+            <small>All times are in your local time zone.</small>
+          </div>
+        </div>
         <div class="row">
           <div class="col col-auto">
             <div class="row">

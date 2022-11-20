@@ -15,6 +15,7 @@ describe("<SessionList />", () => {
             ],
             owner: "owner1",
             players: ["player1"],
+            time: null,
           },
           {
             id: "id456",
@@ -22,6 +23,7 @@ describe("<SessionList />", () => {
             tags: [{ name: "tag3", description: "tag description 3" }],
             owner: "owner2",
             players: [],
+            time: null,
           },
         ],
       },
