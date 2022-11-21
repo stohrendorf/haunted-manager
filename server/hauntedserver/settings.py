@@ -96,7 +96,7 @@ TIME_ZONE = "UTC"
 USE_I18N = False
 USE_TZ = True
 
-STATICFILES_DIRS: list[str] = []
+STATICFILES_DIRS = [BASE_DIR / "hsutils" / "openapi"]
 STATIC_ROOT = BASE_DIR / "static"
 STATIC_URL = "static/"
 

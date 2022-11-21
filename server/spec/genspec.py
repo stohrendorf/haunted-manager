@@ -283,7 +283,7 @@ def main():
     )
 
     write_openapi_spec(
-        Path(__file__).parent.parent / "hsutils" / "openapi.json",
+        Path(__file__).parent.parent / "hsutils" / "openapi" / "openapi.json",
         endpoints,
     )
 
