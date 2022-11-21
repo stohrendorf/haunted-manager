@@ -16,6 +16,7 @@ describe("<LoginWidget />", () => {
         username: "username",
         verified: true,
         auth_token: "token123",
+        is_staff: false,
       },
     }).as("profileRequest");
   });
