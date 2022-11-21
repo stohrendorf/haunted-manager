@@ -53,6 +53,7 @@ def profile(request: HttpRequest) -> ProfileInfoResponse:
             verified=False,
             email=None,
             auth_token=None,
+            is_staff=False,
         )
 
     try:
@@ -65,6 +66,7 @@ def profile(request: HttpRequest) -> ProfileInfoResponse:
         verified=request.user.is_active,
         email=request.user.email,
         auth_token=key.key.hex if key else None,
+        is_staff=request.user.is_active and (request.user.is_staff or request.user.is_superuser),
     )
 
 

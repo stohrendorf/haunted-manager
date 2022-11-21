@@ -10,6 +10,7 @@ describe("<NotVerifiedLock />", () => {
         username: "anonymous",
         verified: false,
         auth_token: null,
+        is_staff: false,
       },
     });
 
@@ -32,6 +33,7 @@ describe("<NotVerifiedLock />", () => {
         username: "anonymous",
         verified: false,
         auth_token: "token123",
+        is_staff: false,
       },
     });
 
@@ -54,6 +56,7 @@ describe("<NotVerifiedLock />", () => {
         username: "anonymous",
         verified: true,
         auth_token: null,
+        is_staff: false,
       },
     });
 
@@ -76,6 +79,7 @@ describe("<NotVerifiedLock />", () => {
         username: "username123",
         verified: true,
         auth_token: "token123",
+        is_staff: false,
       },
     });
 
@@ -100,6 +104,7 @@ describe("<NotVerifiedLock />", () => {
         username: "username123",
         verified: true,
         auth_token: "token123",
+        is_staff: false,
       },
     });
 
@@ -128,6 +133,7 @@ describe("<NotVerifiedLock />", () => {
         username: "username123",
         verified: true,
         auth_token: "token123",
+        is_staff: false,
       },
     }).as("getProfile");
 
@@ -164,6 +170,7 @@ describe("<NotVerifiedLock />", () => {
         username: "username123",
         verified: true,
         auth_token: "token123",
+        is_staff: false,
       },
     });
 
@@ -201,6 +208,7 @@ describe("<NotVerifiedLock />", () => {
         username: "username123",
         verified: true,
         auth_token: "token123",
+        is_staff: false,
       },
     });
 
@@ -229,6 +237,7 @@ describe("<NotVerifiedLock />", () => {
         username: "username123",
         verified: true,
         auth_token: "token123",
+        is_staff: false,
       },
     }).as("getProfile");
 
@@ -267,6 +276,7 @@ describe("<NotVerifiedLock />", () => {
         username: "username123",
         verified: true,
         auth_token: "token123",
+        is_staff: false,
       },
     });
 
@@ -306,6 +316,7 @@ describe("<NotVerifiedLock />", () => {
         username: "username123",
         verified: true,
         auth_token: "token123",
+        is_staff: false,
       },
     });
 
@@ -334,6 +345,7 @@ describe("<NotVerifiedLock />", () => {
         username: "username123",
         verified: true,
         auth_token: "token123",
+        is_staff: false,
       },
     }).as("getProfile");
 
@@ -370,6 +382,7 @@ describe("<NotVerifiedLock />", () => {
         username: "username123",
         verified: true,
         auth_token: "token123",
+        is_staff: false,
       },
     });
 

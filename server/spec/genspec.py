@@ -36,6 +36,7 @@ class ProfileInfoResponse(Compound):
     verified = BooleanField()
     email = StringField(nullable=True, min_length=1)
     auth_token = StringField(nullable=True, min_length=1)
+    is_staff = BooleanField()
 
 
 class ChangeUsernameRequest(Compound):

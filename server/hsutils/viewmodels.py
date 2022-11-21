@@ -149,6 +149,7 @@ class ProfileInfoResponse(DataClassJsonMixin, Validatable):
     auth_token: Optional[str]
     authenticated: bool
     email: Optional[str]
+    is_staff: bool
     username: str
     verified: bool
 
@@ -161,6 +162,8 @@ class ProfileInfoResponse(DataClassJsonMixin, Validatable):
         if self.email is not None:
             if len(self.email) < 1:
                 raise SchemaValidationError("ProfileInfoResponse.email is too short")
+        if self.is_staff is None:
+            raise SchemaValidationError("ProfileInfoResponse.is_staff is null")
         if self.username is None:
             raise SchemaValidationError("ProfileInfoResponse.username is null")
         if len(self.username) < 1:

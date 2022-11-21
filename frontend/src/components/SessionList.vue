@@ -100,7 +100,12 @@ export default class SessionList extends Vue {
           </div>
         </div>
 
-        <div v-if="profile.$state.username === session.owner" class="row mt-1">
+        <div
+          v-if="
+            profile.$state.username === session.owner || profile.$state.is_staff
+          "
+          class="row mt-1"
+        >
           <div class="col col-auto">
             <bs-btn variant="danger" small @click="deleteSession(session.id)">
               <i class="bi bi-trash" /> Delete

@@ -31,6 +31,7 @@ export interface IProfileInfoResponse {
   auth_token: string | null;
   authenticated: boolean;
   email: string | null;
+  is_staff: boolean;
   username: string;
   verified: boolean;
 }
@@ -242,6 +243,12 @@ function validateProfileInfoResponse(data: IProfileInfoResponse): void {
     if (data.email.length < 1)
       throw new SchemaValidationError("ProfileInfoResponse.email is too short");
   }
+  if (data.is_staff === undefined)
+    throw new SchemaValidationError(
+      "ProfileInfoResponse.is_staff is undefined"
+    );
+  if (data.is_staff === null)
+    throw new SchemaValidationError("ProfileInfoResponse.is_staff is null");
   if (data.username === undefined)
     throw new SchemaValidationError(
       "ProfileInfoResponse.username is undefined"
