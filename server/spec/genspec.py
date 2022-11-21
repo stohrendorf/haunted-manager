@@ -5,6 +5,8 @@ from generator_django import gen_django
 from generator_vue import gen_vue
 from structural import ArrayField, BooleanField, Compound, IntegerField, StringField
 
+from spec.openapi import gen_openapi
+
 
 class TagName(StringField):
     def __init__(self):
@@ -147,6 +149,13 @@ def write_django_spec(output: Path, endpoints: dict[ApiPath, dict[HttpMethod, En
     output.write_text(django_spec)
 
 
+def write_openapi_spec(output: Path, endpoints: dict[ApiPath, dict[HttpMethod, Endpoint]]):
+    all_compounds = gather_compounds(endpoints)
+
+    openapi_spec = gen_openapi([x() for x in all_compounds], endpoints)
+    output.write_text(openapi_spec)
+
+
 def main():
     endpoints = {
         ApiPath("/api/v0/server-info", "serverInfo"): {
@@ -269,6 +278,11 @@ def main():
 
     write_django_spec(
         Path(__file__).parent.parent / "hsutils" / "viewmodels.py",
+        endpoints,
+    )
+
+    write_openapi_spec(
+        Path(__file__).parent.parent / "hsutils" / "openapi.json",
         endpoints,
     )
 
