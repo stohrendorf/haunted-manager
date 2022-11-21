@@ -85,12 +85,17 @@ def edit_session(
     session_id: str,
     body: CreateSessionRequest,
 ) -> SuccessResponse | tuple[int, SuccessResponse]:
+    if not request.user.is_active or not request.user.is_authenticated:
+        return HTTPStatus.UNAUTHORIZED, SuccessResponse(success=False, message="not allowed")
+
     try:
         session = SessionModel.objects.get(key=session_id)
     except SessionModel.DoesNotExist:
         return HTTPStatus.NOT_FOUND, SuccessResponse(message="invalid session id", success=False)
 
-    if request.user != session.owner:
+    if request.user.is_staff or request.user.is_superuser:
+        pass
+    elif request.user != session.owner:
         return HTTPStatus.FORBIDDEN, SuccessResponse(
             message="not allowed to edit this session",
             success=False,
@@ -114,13 +119,17 @@ def delete_session(request: HttpRequest, session_id: str) -> tuple[int, SuccessR
     if not request.user.is_active or not request.user.is_authenticated:
         return HTTPStatus.UNAUTHORIZED, SuccessResponse(success=False, message="not allowed")
 
-    session = SessionModel.objects.get(key=session_id)
-    if not session:
+    try:
+        session = SessionModel.objects.get(key=session_id)
+    except SessionModel.DoesNotExist:
         return HTTPStatus.NOT_FOUND, SuccessResponse(
             message=f"session {session_id} not found",
             success=False,
         )
-    if session.owner != request.user:
+
+    if request.user.is_staff or request.user.is_superuser:
+        pass
+    elif session.owner != request.user:
         return HTTPStatus.FORBIDDEN, SuccessResponse(
             message=f"not allowed to delete session {session_id}",
             success=False,
