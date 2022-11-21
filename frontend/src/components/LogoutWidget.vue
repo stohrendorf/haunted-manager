@@ -16,6 +16,7 @@ export default class LogoutWidget extends Vue {
       authenticated: false,
       verified: false,
       auth_token: null,
+      is_staff: false,
     };
   }
 }

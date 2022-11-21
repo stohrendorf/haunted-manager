@@ -9,6 +9,7 @@ export const profileStore = defineStore("profile", {
       authenticated: false,
       verified: false,
       auth_token: null,
+      is_staff: false,
     };
   },
 });
