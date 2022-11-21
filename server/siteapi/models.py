@@ -1,3 +1,4 @@
+from ckeditor.fields import RichTextField
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -23,7 +24,7 @@ class BootstrapTextColor(models.TextChoices):
 
 
 class Announcement(TimestampedModel):
-    message = models.TextField(blank=False)
+    message = RichTextField(blank=False)
     background_color = models.CharField(
         max_length=16,
         blank=False,

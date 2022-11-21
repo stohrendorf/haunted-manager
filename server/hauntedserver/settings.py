@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "haunted_sessions",
     "django_email_verification",
     "environ",
+    "ckeditor",
 ]
 
 MIDDLEWARE = [
@@ -155,3 +156,5 @@ COOP_API_KEY = env("COOP_API_KEY")
 COOP_SERVER_URL = env("COOP_SERVER_URL")
 
 TEST_RUN = DEBUG or "PYTEST_CURRENT_TEST" in os.environ
+
+CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"

@@ -18,6 +18,7 @@ psycopg2 = "*"
 mysqlclient = "*"
 django-environ = "*"
 gunicorn = "*"
+django-ckeditor = "^6.5.1"
 
 [tool.poetry.dev-dependencies]
 black = "*"
