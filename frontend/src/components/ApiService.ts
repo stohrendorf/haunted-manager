@@ -175,6 +175,10 @@ function validateCreateSessionRequest(data: ICreateSessionRequest): void {
     );
   if (data.description === null)
     throw new SchemaValidationError("CreateSessionRequest.description is null");
+  if (data.description.length > 512)
+    throw new SchemaValidationError(
+      "CreateSessionRequest.description is too long"
+    );
   if (data.tags === undefined)
     throw new SchemaValidationError("CreateSessionRequest.tags is undefined");
   if (data.tags === null)

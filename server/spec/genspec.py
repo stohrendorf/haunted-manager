@@ -92,7 +92,7 @@ class Session(Compound):
 
 
 class CreateSessionRequest(Compound):
-    description = StringField()
+    description = StringField(max_length=512)
     tags = ArrayField(items=IntegerField())
     time = TimeSpan(nullable=True)
 
