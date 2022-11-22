@@ -9,15 +9,14 @@ ENV PATH="$POETRY_HOME/bin:$PATH"
 ARG TEAMCITY_VERSION=""
 
 RUN apt-get update -y \
-    && apt-get install -y libmariadb-dev python-is-python3 dos2unix \
+    && apt-get install -y libmariadb-dev python-is-python3 \
     && rm -rf /var/lib/apt/lists/* \
     && curl -sSL https://install.python-poetry.org | python3 - \
     && mkdir -p /usr/local/haunted-manager
 
 WORKDIR /usr/local/haunted-manager
 COPY . .
-RUN find . -type f -exec dos2unix {} \; \
-    && chmod a+x manage.py \
+RUN chmod a+x manage.py \
     && poetry install --no-interaction --no-ansi \
     && poetry run coverage run -m pytest \
     && poetry run coverage report
