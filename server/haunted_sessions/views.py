@@ -81,17 +81,11 @@ def get_session(request: HttpRequest, session_id: str) -> SessionResponse | tupl
     return SessionResponse(session=session_to_response(session))
 
 
-@require_authenticated(response=SuccessResponse(success=False, message="not allowed"))
-def edit_session(
+def _apply_session_properties(
     request: HttpRequest,
-    session_id: str,
+    session: SessionModel,
     body: CreateSessionRequest,
 ) -> SuccessResponse | tuple[int, SuccessResponse]:
-    try:
-        session = SessionModel.objects.get(key=session_id)
-    except SessionModel.DoesNotExist:
-        return HTTPStatus.NOT_FOUND, SuccessResponse(message="invalid session id", success=False)
-
     if request.user.is_staff or request.user.is_superuser:
         pass
     elif request.user != session.owner:
@@ -112,6 +106,20 @@ def edit_session(
 
     session.save()
     return SuccessResponse(message="", success=True)
+
+
+@require_authenticated(response=SuccessResponse(success=False, message="not allowed"))
+def edit_session(
+    request: HttpRequest,
+    session_id: str,
+    body: CreateSessionRequest,
+) -> SuccessResponse | tuple[int, SuccessResponse]:
+    try:
+        session = SessionModel.objects.get(key=session_id)
+    except SessionModel.DoesNotExist:
+        return HTTPStatus.NOT_FOUND, SuccessResponse(message="invalid session id", success=False)
+
+    return _apply_session_properties(request, session, body)
 
 
 @require_authenticated(response=SuccessResponse(success=False, message="not allowed"))
@@ -211,15 +219,4 @@ def create_session(
         description=body.description,
     )
 
-    if body.time is not None:
-        session.is_event = True
-        session.start = parse_datetime(body.time.start)
-        session.end = parse_datetime(body.time.end)
-
-    session.tags.add(*TagModel.objects.filter(id__in=body.tags).all())
-    session.save()
-
-    return HTTPStatus.CREATED, SuccessResponse(
-        message="session created",
-        success=True,
-    )
+    return _apply_session_properties(request, session, body)
