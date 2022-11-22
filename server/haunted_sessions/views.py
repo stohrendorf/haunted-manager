@@ -8,6 +8,7 @@ from django.http import HttpRequest
 from django.views.decorators.csrf import csrf_exempt
 
 from haunted_auth.models import ApiKey
+from hsutils.auth import require_authenticated
 from hsutils.rest_helper import parse_datetime
 from hsutils.viewmodels import (
     CreateSessionRequest,
@@ -80,14 +81,12 @@ def get_session(request: HttpRequest, session_id: str) -> SessionResponse | tupl
     return SessionResponse(session=session_to_response(session))
 
 
+@require_authenticated(response=SuccessResponse(success=False, message="not allowed"))
 def edit_session(
     request: HttpRequest,
     session_id: str,
     body: CreateSessionRequest,
 ) -> SuccessResponse | tuple[int, SuccessResponse]:
-    if not request.user.is_active or not request.user.is_authenticated:
-        return HTTPStatus.UNAUTHORIZED, SuccessResponse(success=False, message="not allowed")
-
     try:
         session = SessionModel.objects.get(key=session_id)
     except SessionModel.DoesNotExist:
@@ -115,10 +114,8 @@ def edit_session(
     return SuccessResponse(message="", success=True)
 
 
+@require_authenticated(response=SuccessResponse(success=False, message="not allowed"))
 def delete_session(request: HttpRequest, session_id: str) -> tuple[int, SuccessResponse] | SuccessResponse:
-    if not request.user.is_active or not request.user.is_authenticated:
-        return HTTPStatus.UNAUTHORIZED, SuccessResponse(success=False, message="not allowed")
-
     try:
         session = SessionModel.objects.get(key=session_id)
     except SessionModel.DoesNotExist:
@@ -204,13 +201,11 @@ def update_sessions_players(request: HttpRequest, body: SessionsPlayersRequest) 
 
 
 @atomic
+@require_authenticated(response=SuccessResponse(success=False, message="not allowed"))
 def create_session(
     request: HttpRequest,
     body: CreateSessionRequest,
 ) -> tuple[int, SuccessResponse] | SuccessResponse:
-    if not request.user.is_active or not request.user.is_authenticated:
-        return HTTPStatus.FORBIDDEN, SuccessResponse(success=False, message="not allowed")
-
     session = SessionModel.objects.create(
         owner=request.user,
         description=body.description,

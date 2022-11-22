@@ -12,6 +12,7 @@ from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django_email_verification import send_email, verify_email, verify_email_view
 
 from haunted_auth.models import ApiKey
+from hsutils.auth import require_authenticated
 from hsutils.viewmodels import (
     ChangeEmailRequest,
     ChangePasswordRequest,
@@ -37,10 +38,8 @@ def login(request: HttpRequest, body: LoginRequest) -> SuccessResponse | tuple[i
     return SuccessResponse(success=True, message="")
 
 
+@require_authenticated(response=Empty())
 def logout(request: HttpRequest) -> Empty | tuple[int, Empty]:
-    if request.user.is_anonymous or not request.user.is_active or not request.user.is_authenticated:
-        return HTTPStatus.UNAUTHORIZED, Empty()
-
     django.contrib.auth.logout(request)
     return Empty()
 
@@ -107,9 +106,8 @@ def register(request: HttpRequest, body: RegisterRequest) -> tuple[int, SuccessR
     return SuccessResponse(success=True, message="registered")
 
 
+@require_authenticated(response=Empty())
 def regenerate_token(request: HttpRequest) -> tuple[int, Empty] | Empty:
-    if not request.user.is_active or not request.user.is_authenticated:
-        return HTTPStatus.UNAUTHORIZED, Empty()
     try:
         ApiKey.objects.get(owner=request.user).delete()
     except ApiKey.DoesNotExist:
@@ -118,10 +116,8 @@ def regenerate_token(request: HttpRequest) -> tuple[int, Empty] | Empty:
     return Empty()
 
 
+@require_authenticated(response=SuccessResponse(success=False, message="not allowed"))
 def change_password(request: HttpRequest, body: ChangePasswordRequest) -> SuccessResponse | tuple[int, SuccessResponse]:
-    if not request.user.is_active or not request.user.is_authenticated:
-        return HTTPStatus.UNAUTHORIZED, SuccessResponse(success=False, message="not allowed")
-
     try:
         validate_password(body.password, request.user)
     except ValidationError as e:
@@ -136,10 +132,8 @@ def change_password(request: HttpRequest, body: ChangePasswordRequest) -> Succes
 
 
 @atomic
+@require_authenticated(response=SuccessResponse(success=False, message="not allowed"))
 def change_username(request: HttpRequest, body: ChangeUsernameRequest) -> SuccessResponse | tuple[int, SuccessResponse]:
-    if not request.user.is_active or not request.user.is_authenticated:
-        return HTTPStatus.UNAUTHORIZED, SuccessResponse(success=False, message="not allowed")
-
     if User.objects.filter(username=body.username).exists():
         return HTTPStatus.CONFLICT, SuccessResponse(success=False, message="Username already in use")
 
@@ -154,10 +148,8 @@ def change_username(request: HttpRequest, body: ChangeUsernameRequest) -> Succes
     return SuccessResponse(success=True, message="username changed")
 
 
+@require_authenticated(response=SuccessResponse(success=False, message="not allowed"))
 def change_email(request: HttpRequest, body: ChangeEmailRequest) -> SuccessResponse | tuple[int, SuccessResponse]:
-    if not request.user.is_active or not request.user.is_authenticated:
-        return HTTPStatus.UNAUTHORIZED, SuccessResponse(success=False, message="not allowed")
-
     if User.objects.filter(email=body.email).exists():
         return HTTPStatus.CONFLICT, SuccessResponse(success=False, message="Email address already in use.")
 
