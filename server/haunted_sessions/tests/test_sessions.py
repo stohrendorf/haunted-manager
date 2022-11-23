@@ -1,8 +1,10 @@
 import uuid
+from datetime import timedelta
 from http import HTTPStatus
 
 import pytest
 from django.test import Client
+from django.utils import timezone
 
 from haunted_sessions.models import Session, Tag
 from haunted_sessions.views import session_to_response
@@ -32,6 +34,24 @@ def test_session_response_conversion(django_user_model):
     assert len(converted.players) == 1
     assert converted.players[0] == "username"
     assert converted.id == db_session.key.hex
+    assert converted.time is None
+
+    time_start = timezone.now()
+    time_end = timezone.now() + timedelta(hours=2)
+    db_session.start = time_start
+    db_session.end = time_end
+    db_session.save()
+    converted = session_to_response(db_session)
+    assert len(converted.tags) == 1
+    assert converted.tags[0].name == "tag"
+    assert converted.tags[0].description == "tag-description"
+    assert converted.owner == "username"
+    assert len(converted.players) == 1
+    assert converted.players[0] == "username"
+    assert converted.id == db_session.key.hex
+    assert converted.time is not None
+    assert converted.time.start == time_start.isoformat()
+    assert converted.time.end == time_end.isoformat()
 
 
 @pytest.mark.django_db
@@ -178,3 +198,36 @@ def test_session(client: Client, django_user_model):
     assert len(s.tags) == 1
     assert s.tags[0].name == "tag"
     assert s.tags[0].description == "tag-description"
+
+
+@pytest.mark.django_db
+def test_session_time_sanitization(django_user_model):
+    user = django_user_model.objects.create_user(
+        is_active=True,
+        username="username",
+        email="test@example.com",
+        password="password!!!",
+    )
+
+    db_session = Session.objects.create(owner=user, description="description")
+    assert db_session.start is None
+    assert db_session.end is None
+
+    time_start = timezone.now()
+    time_end = timezone.now() + timedelta(hours=2)
+
+    db_session.start = time_start
+    db_session.save()
+    assert db_session.start is None
+    assert db_session.end is None
+
+    db_session.end = time_end
+    db_session.save()
+    assert db_session.start is None
+    assert db_session.end is None
+
+    db_session.start = time_start
+    db_session.end = time_end
+    db_session.save()
+    assert db_session.start == time_start
+    assert db_session.end == time_end
