@@ -98,11 +98,11 @@ def _apply_session_properties(
     session.description = body.description
 
     if body.time is not None:
-        session.is_event = True
         session.start = parse_datetime(body.time.start)
         session.end = parse_datetime(body.time.end)
     else:
-        session.is_event = False
+        session.start = None
+        session.end = None
 
     session.save()
     return SuccessResponse(message="", success=True)
