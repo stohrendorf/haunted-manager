@@ -11,6 +11,7 @@ class TimestampedModel(models.Model):
     class Meta:
         abstract = True
         get_latest_by = "created_at"
+        ordering = ("created_at",)
 
 
 @receiver(pre_save, sender=TimestampedModel)
