@@ -8,8 +8,15 @@ from django.utils import timezone
 
 from haunted_sessions.models import Session, Tag
 from haunted_sessions.views import session_to_response
-from hsutils.test_utils import get_test_url
-from hsutils.viewmodels import SessionResponse, SessionsResponse, sessions
+from hsutils.test_utils import get_test_url, post_test_url
+from hsutils.viewmodels import (
+    CreateSessionRequest,
+    SessionResponse,
+    SessionsResponse,
+    SuccessResponse,
+    TimeSpan,
+    sessions,
+)
 
 
 @pytest.mark.django_db
@@ -231,3 +238,59 @@ def test_session_time_sanitization(django_user_model):
     db_session.save()
     assert db_session.start == time_start
     assert db_session.end == time_end
+
+
+@pytest.mark.django_db
+def test_create_session(client: Client, django_user_model):
+    code, response = post_test_url(
+        client,
+        sessions.path,
+        CreateSessionRequest(
+            description="session description",
+            tags=[],
+            time=None,
+        ),
+        SuccessResponse,
+    )
+    assert code == HTTPStatus.UNAUTHORIZED
+    assert response is not None
+    assert response.success is False
+    assert Session.objects.count() == 0
+
+    user = django_user_model.objects.create_user(
+        is_active=True,
+        username="username",
+        email="test@example.com",
+        password="password!!!",
+    )
+    Tag.objects.create(name="tag1", description="foo1")
+    tag2 = Tag.objects.create(name="tag2", description="foo2")
+
+    start_ts = timezone.now() + timedelta(hours=3)
+    end_ts = timezone.now() + timedelta(hours=4)
+
+    client.force_login(user)
+    code, response = post_test_url(
+        client,
+        sessions.path,
+        CreateSessionRequest(
+            description="session description",
+            tags=[tag2.id],
+            time=TimeSpan(
+                start=start_ts.isoformat(),
+                end=end_ts.isoformat(),
+            ),
+        ),
+        SuccessResponse,
+    )
+    assert code == HTTPStatus.CREATED
+    assert response is not None
+    assert response.success is True
+
+    (session,) = Session.objects.all()
+    assert session.owner == user
+    assert session.description == "session description"
+    assert list(session.tags.all()) == [tag2]
+    assert session.start == start_ts
+    assert session.end == end_ts
+    assert session.players.count() == 0

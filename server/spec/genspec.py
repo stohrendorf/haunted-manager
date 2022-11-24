@@ -143,11 +143,15 @@ def write_vue_spec(output: Path, endpoints: dict[ApiPath, dict[HttpMethod, Endpo
     output.write_text(vue_spec)
 
 
-def write_django_spec(output: Path, endpoints: dict[ApiPath, dict[HttpMethod, Endpoint]]):
+def write_django_spec(output_path: Path, endpoints: dict[ApiPath, dict[HttpMethod, Endpoint]]):
     all_compounds = gather_compounds(endpoints)
 
-    django_spec = gen_django([x() for x in all_compounds], endpoints)
-    output.write_text(django_spec)
+    (output_path / "schemas").mkdir(parents=True, exist_ok=True)
+    (output_path / "schemas" / "__init__.py").touch()
+    django_spec, schemas = gen_django([x() for x in all_compounds], endpoints)
+    for schema_name, schema_output in schemas.items():
+        (output_path / "schemas" / f"{schema_name}.py").write_text(schema_output)
+    (output_path / "viewmodels.py").write_text(django_spec)
 
 
 def write_openapi_spec(output: Path, endpoints: dict[ApiPath, dict[HttpMethod, Endpoint]]):
@@ -278,7 +282,7 @@ def main():
     )
 
     write_django_spec(
-        Path(__file__).parent.parent / "hsutils" / "viewmodels.py",
+        Path(__file__).parent.parent / "hsutils",
         endpoints,
     )
 

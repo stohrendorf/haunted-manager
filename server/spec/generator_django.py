@@ -27,7 +27,7 @@ def _field_to_type_sig(field: BaseField) -> str:
     elif isinstance(field, ArrayField):
         t = f"List[{_field_to_type_sig(field.items)}]"
     else:
-        t = f'"{field.typename()}"'
+        t = field.typename()
 
     return f"Optional[{t}]" if field.nullable else t
 
@@ -47,20 +47,25 @@ def _gen_check(context: str, indent: str, field: BaseField, accessor: str) -> tu
 
     if isinstance(field, StringField):
         if field.min_length is not None:
-            output += f'{indent}if len({accessor}) < {field.min_length}: raise SchemaValidationError("{context} is too short")\n'
+            output += f"{indent}if len({accessor}) < {field.min_length}:\n"
+            output += f'{indent + base_indent}raise SchemaValidationError("{context} is too short")\n'
             empty = False
         if field.max_length is not None:
-            output += f'{indent}if len({accessor}) > {field.max_length}: raise SchemaValidationError("{context} is too long")\n'
+            output += f"{indent}if len({accessor}) > {field.max_length}:\n"
+            output += f'{indent + base_indent}raise SchemaValidationError("{context} is too long")\n'
             empty = False
         if field.regex is not None:
-            output += f'{indent}if not re.fullmatch(r"{field.regex}", {accessor}): raise SchemaValidationError("{context} has an invalid format")\n'
+            output += f'{indent}if not re.fullmatch(r"{field.regex}", {accessor}):\n'
+            output += f'{indent + base_indent}raise SchemaValidationError("{context} has an invalid format")\n'
             empty = False
     elif isinstance(field, (IntegerField, FloatField)):
         if field.min is not None:
-            output += f'{indent}if {accessor} < {field.min}: raise SchemaValidationError("{context} has a value below minimum")\n'
+            output += f"{indent}if {accessor} < {field.min}:\n"
+            output += f'{indent + base_indent}raise SchemaValidationError("{context} has a value below minimum")\n'
             empty = False
         if field.max is not None:
-            output += f'{indent}if {accessor} > {field.max}: raise SchemaValidationError("{context} has a value above maximum")\n'
+            output += f"{indent}if {accessor} > {field.max}:\n"
+            output += f'{indent+base_indent}raise SchemaValidationError("{context} has a value above maximum")\n'
             empty = False
     elif isinstance(field, ArrayField):
         varname = re.sub(r"[^a-zA-Z0-9]", "_", accessor) + "_entry"
@@ -89,7 +94,50 @@ def _gen_django_field_checks(context: str, accessor: str, field: BaseField, addi
     return output
 
 
-def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dict[HttpMethod, Endpoint]]) -> str:
+def gen_django(
+    schemas: list[BaseField | Compound],
+    endpoints: dict[ApiPath, dict[HttpMethod, Endpoint]],
+) -> tuple[str, dict[str, str]]:
+    schema_outputs = {}
+    for schema in schemas:
+        if is_primitive_field(schema):
+            continue
+
+        dependencies = set(field.typename() for _, field in schema.subfields() if isinstance(field, Compound)) | set(
+            field.items.typename()
+            for _, field in schema.subfields()
+            if isinstance(field, ArrayField) and isinstance(field.items, Compound)
+        )
+
+        schema_output = "import re\n"
+        schema_output += "from dataclasses_json import DataClassJsonMixin, dataclass_json\n"
+        schema_output += "from dataclasses import dataclass\n"
+        schema_output += "from typing import List, Optional\n"
+        for dependency in dependencies:
+            schema_output += f"from .{dependency} import {dependency}\n"
+        schema_output += "from ..json_response import Validatable\n"
+        schema_output += "from ..error import SchemaValidationError\n"
+
+        schema_output += "\n"
+
+        schema_output += "@dataclass_json\n"
+        schema_output += "@dataclass(kw_only=True)\n"
+        schema_output += f"class {schema.typename()}(DataClassJsonMixin, Validatable):\n"
+        for field_name, field in schema.subfields():
+            schema_output += f"    {field_name}: {_field_to_type_sig(field)}\n"
+
+        schema_output += "    def validate(self):\n"
+        for field_name, field in schema.subfields():
+            schema_output += _gen_django_field_checks(
+                f"{schema.typename()}.{field_name}",
+                f"self.{field_name}",
+                field,
+                additional_indent_level=1,
+            )
+        schema_output += "        return\n"
+
+        schema_outputs[schema.typename()] = schema_output
+
     output = "from typing import Callable, Optional, List\n"
     output += "from dataclasses import dataclass\n"
     output += "from dataclasses_json import DataClassJsonMixin, dataclass_json\n"
@@ -98,33 +146,16 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dic
     output += "from enum import Enum\n"
     output += "from http import HTTPStatus\n"
     output += "from .json_response import json_response, Validatable\n"
+    output += "from .error import SchemaValidationError\n"
+
+    for schema_name in schema_outputs.keys():
+        output += f"from .schemas.{schema_name} import {schema_name}\n"
+
     output += "import re\n"
     output += "import logging\n"
-    output += "class SchemaValidationError(Exception):\n"
-    output += "    pass\n"
     output += "class HttpMethod(Enum):\n"
     for method in HttpMethod:
         output += f'    {method.name} = "{method.value}"\n'
-
-    for schema in schemas:
-        if not is_primitive_field(schema):
-            output += "@dataclass_json\n"
-            output += "@dataclass(kw_only=True)\n"
-            output += f"class {schema.typename()}(DataClassJsonMixin, Validatable):\n"
-            for field_name, field in schema.subfields():
-                output += f"    {field_name}: {_field_to_type_sig(field)}\n"
-
-            output += "    def validate(self):\n"
-            for field_name, field in schema.subfields():
-                output += _gen_django_field_checks(
-                    f"{schema.typename()}.{field_name}",
-                    f"self.{field_name}",
-                    field,
-                    additional_indent_level=1,
-                )
-            output += "        return\n"
-
-            output += "\n"
 
     for schema in schemas:
         if not is_primitive_field(schema):
@@ -148,7 +179,6 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dic
                 f"<{p_spec.type}:{humps.decamelize(p_name)}>",
             )
 
-        output += "\n"
         output += f"class {humps.decamelize(path.name)}:\n"
         output += f'    path = "{django_path.lstrip("/")}"\n'
         output += f'    name = "{path.name}"\n'
@@ -203,7 +233,7 @@ def gen_django(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dic
             output += "            code = HttpResponse.status_code\n"
             output += "        return code, response\n"
 
-    return output
+    return output, schema_outputs
 
 
 def make_handler_signature(arg_types: list[str], endpoint: Endpoint, method: HttpMethod) -> str:
