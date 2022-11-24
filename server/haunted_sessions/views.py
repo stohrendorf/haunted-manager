@@ -219,4 +219,4 @@ def create_session(
         description=body.description,
     )
 
-    return _apply_session_properties(request, session, body)
+    return HTTPStatus.CREATED, _apply_session_properties(request, session, body)
