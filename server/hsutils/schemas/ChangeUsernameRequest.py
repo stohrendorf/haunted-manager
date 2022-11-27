@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from dataclasses_json import DataClassJsonMixin, dataclass_json
+from django.core.files.uploadedfile import UploadedFile
 
 from ..error import SchemaValidationError
 from ..json_response import Validatable
@@ -18,4 +19,3 @@ class ChangeUsernameRequest(DataClassJsonMixin, Validatable):
             raise SchemaValidationError("ChangeUsernameRequest.username is null")
         if len(self.username) < 1:
             raise SchemaValidationError("ChangeUsernameRequest.username is too short")
-        return

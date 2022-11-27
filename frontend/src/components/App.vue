@@ -94,9 +94,32 @@ export default class App extends Vue {
           <span class="bi bi-plus-square-fill" />
           Create Session
         </bs-router-nav-item>
+        <bs-router-nav-item to="/ghosts">
+          <span class="bi bi-list-ul" />
+          Ghosts
+        </bs-router-nav-item>
+        <bs-router-nav-item
+          v-show="profileInfo.authenticated"
+          to="/upload-ghosts"
+          :disabled="!profileInfo.verified"
+        >
+          <not-verified-lock />
+          <span class="bi bi-upload" />
+          Upload Ghosts
+        </bs-router-nav-item>
+      </bs-navbar-nav>
+      <bs-navbar-nav ms="auto">
+        <li class="navbar-text text-info">
+          <span class="bi bi-info-circle" />
+          Happily providing {{ serverInfo.total_sessions }} sessions for
+          {{ serverInfo.total_users }} users.
+        </li>
+      </bs-navbar-nav>
+      <bs-navbar-nav ms="auto">
         <bs-dropdown-nav-item
           v-show="profileInfo.authenticated"
           min-width="20em"
+          end="true"
         >
           <template #toggle>
             <span class="bi bi-key-fill" /> Session Credentials
@@ -128,15 +151,6 @@ export default class App extends Vue {
             </div>
           </div>
         </bs-dropdown-nav-item>
-      </bs-navbar-nav>
-      <bs-navbar-nav ms="auto">
-        <li class="navbar-text text-info">
-          <span class="bi bi-info-circle" />
-          Happily providing {{ serverInfo.total_sessions }} sessions for
-          {{ serverInfo.total_users }} users.
-        </li>
-      </bs-navbar-nav>
-      <bs-navbar-nav ms="auto">
         <bs-dropdown-nav-item v-show="profileInfo.authenticated" end="true">
           <template #toggle>
             <not-verified-lock />

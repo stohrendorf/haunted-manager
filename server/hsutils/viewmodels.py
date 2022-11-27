@@ -1,16 +1,16 @@
 import logging
 import re
-from dataclasses import dataclass
 from enum import Enum
 from http import HTTPStatus
 from typing import Callable, List, Optional
 
-from dataclasses_json import DataClassJsonMixin, dataclass_json
-from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest, JsonResponse
+from django.core.files.uploadedfile import UploadedFile
+from django.http import FileResponse as DjangoFileResponse
+from django.http import HttpRequest, HttpResponseBase, JsonResponse
 from django.urls import path
 
 from .error import SchemaValidationError
-from .json_response import Validatable, json_response
+from .json_response import json_response
 from .schemas.AnnouncementEntry import AnnouncementEntry
 from .schemas.AnnouncementsResponse import AnnouncementsResponse
 from .schemas.ChangeEmailRequest import ChangeEmailRequest
@@ -18,8 +18,13 @@ from .schemas.ChangePasswordRequest import ChangePasswordRequest
 from .schemas.ChangeUsernameRequest import ChangeUsernameRequest
 from .schemas.CreateSessionRequest import CreateSessionRequest
 from .schemas.Empty import Empty
+from .schemas.GhostFileResponse import GhostFileResponse
+from .schemas.GhostFileResponseEntry import GhostFileResponseEntry
+from .schemas.GhostFilesResponse import GhostFilesResponse
+from .schemas.GhostInfoRequest import GhostInfoRequest
 from .schemas.LoginRequest import LoginRequest
 from .schemas.ProfileInfoResponse import ProfileInfoResponse
+from .schemas.QuotaResponse import QuotaResponse
 from .schemas.RegisterRequest import RegisterRequest
 from .schemas.ServerInfoResponse import ServerInfoResponse
 from .schemas.Session import Session
@@ -46,7 +51,6 @@ def validate_iso_date_time(data: Optional[str]):
         raise SchemaValidationError("IsoDateTime is null")
     if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+(\+[0-9]{2}:[0-9]{2}|Z)", data):
         raise SchemaValidationError("IsoDateTime has an invalid format")
-    return
 
 
 class server_info:
@@ -59,7 +63,7 @@ class server_info:
         *,
         get_handler: Callable[[HttpRequest], ServerInfoResponse | tuple[int, ServerInfoResponse]],
     ):
-        def dispatch(request: HttpRequest) -> JsonResponse:
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -75,7 +79,7 @@ class server_info:
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
 
@@ -89,7 +93,7 @@ class tags:
         *,
         get_handler: Callable[[HttpRequest], TagsResponse | tuple[int, TagsResponse]],
     ):
-        def dispatch(request: HttpRequest) -> JsonResponse:
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -105,7 +109,7 @@ class tags:
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
 
@@ -120,7 +124,7 @@ class sessions:
         get_handler: Callable[[HttpRequest], SessionsResponse | tuple[int, SessionsResponse]],
         post_handler: Callable[[HttpRequest, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest) -> JsonResponse:
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             if request.method == "POST":
@@ -138,7 +142,7 @@ class sessions:
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
     @json_response
@@ -152,12 +156,12 @@ class sessions:
             body.validate()
         except SchemaValidationError as e:
             logging.error("request validation failed", exc_info=True)
-            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
+            return JsonResponse(status=HTTPStatus.BAD_REQUEST, data={"message": str(e)})
         response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
 
@@ -173,7 +177,7 @@ class session:
         post_handler: Callable[[HttpRequest, str, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
         delete_handler: Callable[[HttpRequest, str], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest, session_id: str) -> JsonResponse:
+        def dispatch(request: HttpRequest, session_id: str) -> HttpResponseBase:
             if request.method == "GET":
                 return cls.do_get(request, get_handler, session_id)
             if request.method == "POST":
@@ -195,7 +199,7 @@ class session:
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
     @json_response
@@ -210,12 +214,12 @@ class session:
             body.validate()
         except SchemaValidationError as e:
             logging.error("request validation failed", exc_info=True)
-            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
+            return JsonResponse(status=HTTPStatus.BAD_REQUEST, data={"message": str(e)})
         response = handler(request, session_id, body)
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
     @json_response
@@ -229,7 +233,7 @@ class session:
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
 
@@ -243,7 +247,7 @@ class session_access:
         *,
         post_handler: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest) -> JsonResponse:
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
             if request.method == "POST":
                 return cls.do_post(request, post_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -261,12 +265,12 @@ class session_access:
             body.validate()
         except SchemaValidationError as e:
             logging.error("request validation failed", exc_info=True)
-            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
+            return JsonResponse(status=HTTPStatus.BAD_REQUEST, data={"message": str(e)})
         response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
 
@@ -280,7 +284,7 @@ class session_players:
         *,
         post_handler: Callable[[HttpRequest, SessionsPlayersRequest], Empty | tuple[int, Empty]],
     ):
-        def dispatch(request: HttpRequest) -> JsonResponse:
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
             if request.method == "POST":
                 return cls.do_post(request, post_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -297,12 +301,12 @@ class session_players:
             body.validate()
         except SchemaValidationError as e:
             logging.error("request validation failed", exc_info=True)
-            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
+            return JsonResponse(status=HTTPStatus.BAD_REQUEST, data={"message": str(e)})
         response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
 
@@ -316,7 +320,7 @@ class announcements:
         *,
         get_handler: Callable[[HttpRequest], AnnouncementsResponse | tuple[int, AnnouncementsResponse]],
     ):
-        def dispatch(request: HttpRequest) -> JsonResponse:
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -333,7 +337,7 @@ class announcements:
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
 
@@ -347,7 +351,7 @@ class profile:
         *,
         get_handler: Callable[[HttpRequest], ProfileInfoResponse | tuple[int, ProfileInfoResponse]],
     ):
-        def dispatch(request: HttpRequest) -> JsonResponse:
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -363,7 +367,7 @@ class profile:
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
 
@@ -377,7 +381,7 @@ class change_username:
         *,
         post_handler: Callable[[HttpRequest, ChangeUsernameRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest) -> JsonResponse:
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
             if request.method == "POST":
                 return cls.do_post(request, post_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -395,12 +399,12 @@ class change_username:
             body.validate()
         except SchemaValidationError as e:
             logging.error("request validation failed", exc_info=True)
-            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
+            return JsonResponse(status=HTTPStatus.BAD_REQUEST, data={"message": str(e)})
         response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
 
@@ -414,7 +418,7 @@ class regenerate_token:
         *,
         get_handler: Callable[[HttpRequest], Empty | tuple[int, Empty]],
     ):
-        def dispatch(request: HttpRequest) -> JsonResponse:
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -430,7 +434,7 @@ class regenerate_token:
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
 
@@ -444,7 +448,7 @@ class login:
         *,
         post_handler: Callable[[HttpRequest, LoginRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest) -> JsonResponse:
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
             if request.method == "POST":
                 return cls.do_post(request, post_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -462,12 +466,12 @@ class login:
             body.validate()
         except SchemaValidationError as e:
             logging.error("request validation failed", exc_info=True)
-            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
+            return JsonResponse(status=HTTPStatus.BAD_REQUEST, data={"message": str(e)})
         response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
 
@@ -481,7 +485,7 @@ class register:
         *,
         post_handler: Callable[[HttpRequest, RegisterRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest) -> JsonResponse:
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
             if request.method == "POST":
                 return cls.do_post(request, post_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -499,12 +503,12 @@ class register:
             body.validate()
         except SchemaValidationError as e:
             logging.error("request validation failed", exc_info=True)
-            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
+            return JsonResponse(status=HTTPStatus.BAD_REQUEST, data={"message": str(e)})
         response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
 
@@ -518,7 +522,7 @@ class change_password:
         *,
         post_handler: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest) -> JsonResponse:
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
             if request.method == "POST":
                 return cls.do_post(request, post_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -536,12 +540,12 @@ class change_password:
             body.validate()
         except SchemaValidationError as e:
             logging.error("request validation failed", exc_info=True)
-            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
+            return JsonResponse(status=HTTPStatus.BAD_REQUEST, data={"message": str(e)})
         response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
 
@@ -555,7 +559,7 @@ class change_email:
         *,
         post_handler: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest) -> JsonResponse:
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
             if request.method == "POST":
                 return cls.do_post(request, post_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -573,12 +577,12 @@ class change_email:
             body.validate()
         except SchemaValidationError as e:
             logging.error("request validation failed", exc_info=True)
-            return JsonResponse(status=HttpResponseBadRequest.status_code, data={"message": str(e)})
+            return JsonResponse(status=HTTPStatus.BAD_REQUEST, data={"message": str(e)})
         response = handler(request, body)
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
         return code, response
 
 
@@ -592,7 +596,7 @@ class logout:
         *,
         get_handler: Callable[[HttpRequest], Empty | tuple[int, Empty]],
     ):
-        def dispatch(request: HttpRequest) -> JsonResponse:
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -608,5 +612,209 @@ class logout:
         if isinstance(response, tuple):
             code, response = response
         else:
-            code = HttpResponse.status_code
+            code = HTTPStatus.OK
+        return code, response
+
+
+class ghosts:
+    path = "api/v0/ghosts"
+    name = "ghosts"
+
+    @classmethod
+    def wrap(
+        cls,
+        *,
+        get_handler: Callable[[HttpRequest], GhostFilesResponse | tuple[int, GhostFilesResponse]],
+        post_handler: Callable[[HttpRequest, dict[str, UploadedFile]], SuccessResponse | tuple[int, SuccessResponse]],
+    ):
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
+            if request.method == "GET":
+                return cls.do_get(request, get_handler)
+            if request.method == "POST":
+                return cls.do_post(request, post_handler)
+            return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
+
+        return path(cls.path, dispatch, name=cls.name)
+
+    @json_response
+    @staticmethod
+    def do_get(
+        request: HttpRequest, handler: Callable[[HttpRequest], GhostFilesResponse | tuple[int, GhostFilesResponse]]
+    ) -> GhostFilesResponse | tuple[int, GhostFilesResponse] | JsonResponse:
+        response = handler(request)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HTTPStatus.OK
+        return code, response
+
+    @json_response
+    @staticmethod
+    def do_post(
+        request: HttpRequest,
+        handler: Callable[[HttpRequest, dict[str, UploadedFile]], SuccessResponse | tuple[int, SuccessResponse]],
+    ) -> SuccessResponse | tuple[int, SuccessResponse] | JsonResponse:
+        files: dict[str, UploadedFile] = request.FILES
+        response = handler(request, files)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HTTPStatus.OK
+        return code, response
+
+
+class download_ghost:
+    path = "api/v0/ghosts/<int:id>/download"
+    name = "download_ghost"
+
+    @classmethod
+    def wrap(
+        cls,
+        *,
+        get_handler: Callable[[HttpRequest, int], DjangoFileResponse],
+    ):
+        def dispatch(request: HttpRequest, id: int) -> HttpResponseBase:
+            if request.method == "GET":
+                return cls.do_get(request, get_handler, id)
+            return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
+
+        return path(cls.path, dispatch, name=cls.name)
+
+    @staticmethod
+    def do_get(
+        request: HttpRequest, handler: Callable[[HttpRequest, int], DjangoFileResponse], id: int
+    ) -> DjangoFileResponse:
+        response = handler(request, id)
+        return response
+
+
+class single_ghost:
+    path = "api/v0/ghosts/<int:id>"
+    name = "single_ghost"
+
+    @classmethod
+    def wrap(
+        cls,
+        *,
+        get_handler: Callable[[HttpRequest, int], GhostFileResponse | tuple[int, GhostFileResponse]],
+        post_handler: Callable[[HttpRequest, int, GhostInfoRequest], SuccessResponse | tuple[int, SuccessResponse]],
+        delete_handler: Callable[[HttpRequest, int], SuccessResponse | tuple[int, SuccessResponse]],
+    ):
+        def dispatch(request: HttpRequest, id: int) -> HttpResponseBase:
+            if request.method == "GET":
+                return cls.do_get(request, get_handler, id)
+            if request.method == "POST":
+                return cls.do_post(request, post_handler, id)
+            if request.method == "DELETE":
+                return cls.do_delete(request, delete_handler, id)
+            return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
+
+        return path(cls.path, dispatch, name=cls.name)
+
+    @json_response
+    @staticmethod
+    def do_get(
+        request: HttpRequest,
+        handler: Callable[[HttpRequest, int], GhostFileResponse | tuple[int, GhostFileResponse]],
+        id: int,
+    ) -> GhostFileResponse | tuple[int, GhostFileResponse] | JsonResponse:
+        response = handler(request, id)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HTTPStatus.OK
+        return code, response
+
+    @json_response
+    @staticmethod
+    def do_post(
+        request: HttpRequest,
+        handler: Callable[[HttpRequest, int, GhostInfoRequest], SuccessResponse | tuple[int, SuccessResponse]],
+        id: int,
+    ) -> SuccessResponse | tuple[int, SuccessResponse] | JsonResponse:
+        body: GhostInfoRequest = GhostInfoRequest.schema().loads(request.body.decode())
+        try:
+            body.validate()
+        except SchemaValidationError as e:
+            logging.error("request validation failed", exc_info=True)
+            return JsonResponse(status=HTTPStatus.BAD_REQUEST, data={"message": str(e)})
+        response = handler(request, id, body)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HTTPStatus.OK
+        return code, response
+
+    @json_response
+    @staticmethod
+    def do_delete(
+        request: HttpRequest,
+        handler: Callable[[HttpRequest, int], SuccessResponse | tuple[int, SuccessResponse]],
+        id: int,
+    ) -> SuccessResponse | tuple[int, SuccessResponse] | JsonResponse:
+        response = handler(request, id)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HTTPStatus.OK
+        return code, response
+
+
+class staging_ghosts:
+    path = "api/v0/ghosts/staging"
+    name = "staging_ghosts"
+
+    @classmethod
+    def wrap(
+        cls,
+        *,
+        get_handler: Callable[[HttpRequest], GhostFilesResponse | tuple[int, GhostFilesResponse]],
+    ):
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
+            if request.method == "GET":
+                return cls.do_get(request, get_handler)
+            return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
+
+        return path(cls.path, dispatch, name=cls.name)
+
+    @json_response
+    @staticmethod
+    def do_get(
+        request: HttpRequest, handler: Callable[[HttpRequest], GhostFilesResponse | tuple[int, GhostFilesResponse]]
+    ) -> GhostFilesResponse | tuple[int, GhostFilesResponse] | JsonResponse:
+        response = handler(request)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HTTPStatus.OK
+        return code, response
+
+
+class quota:
+    path = "api/v0/ghosts/quota"
+    name = "quota"
+
+    @classmethod
+    def wrap(
+        cls,
+        *,
+        get_handler: Callable[[HttpRequest], QuotaResponse | tuple[int, QuotaResponse]],
+    ):
+        def dispatch(request: HttpRequest) -> HttpResponseBase:
+            if request.method == "GET":
+                return cls.do_get(request, get_handler)
+            return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
+
+        return path(cls.path, dispatch, name=cls.name)
+
+    @json_response
+    @staticmethod
+    def do_get(
+        request: HttpRequest, handler: Callable[[HttpRequest], QuotaResponse | tuple[int, QuotaResponse]]
+    ) -> QuotaResponse | tuple[int, QuotaResponse] | JsonResponse:
+        response = handler(request)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HTTPStatus.OK
         return code, response

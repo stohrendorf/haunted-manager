@@ -14,6 +14,22 @@ class BaseField:
     def subfields(cls) -> list[tuple[str, "BaseField"]]:
         return []
 
+    @property
+    def has_constraints(self) -> bool:
+        return False
+
+
+@dataclass(kw_only=True)
+class FilesBody(BaseField):
+    def __init__(self):
+        super().__init__(nullable=False)
+
+
+@dataclass(kw_only=True)
+class FileResponse(BaseField):
+    def __init__(self):
+        super().__init__(nullable=False)
+
 
 @dataclass(kw_only=True)
 class StringField(BaseField):
@@ -33,6 +49,10 @@ class StringField(BaseField):
     def has_regex(self):
         return self.regex is not None
 
+    @property
+    def has_constraints(self) -> bool:
+        return self.min_length is not None or self.max_length is not None or self.regex is not None
+
 
 @dataclass(kw_only=True)
 class IntegerField(BaseField):
@@ -47,6 +67,10 @@ class IntegerField(BaseField):
     def has_max(self):
         return self.max is not None
 
+    @property
+    def has_constraints(self) -> bool:
+        return self.min is not None or self.max is not None
+
 
 @dataclass(kw_only=True)
 class FloatField(BaseField):
@@ -60,6 +84,10 @@ class FloatField(BaseField):
     @property
     def has_max(self):
         return self.max is not None
+
+    @property
+    def has_constraints(self) -> bool:
+        return self.min is not None or self.max is not None
 
 
 @dataclass(kw_only=True)
@@ -80,6 +108,10 @@ class Compound(BaseField):
             for attr_name, attr in ((attr_name, getattr(cls, attr_name)) for attr_name in dir(cls))
             if isinstance(attr, BaseField)
         ]
+
+    @property
+    def has_constraints(self) -> bool:
+        return True
 
 
 PRIMITIVES = (ArrayField, StringField, IntegerField, FloatField, BooleanField)

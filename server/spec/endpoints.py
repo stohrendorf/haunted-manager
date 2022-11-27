@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from enum import Enum, unique
 from typing import Optional
 
-from structural import BaseField, Compound, gather_dependencies
+from structural import BaseField, Compound, FileResponse, FilesBody, gather_dependencies
 
 
 @unique
@@ -16,8 +16,8 @@ class HttpMethod(Enum):
 @dataclass
 class Endpoint:
     operation_name: str
-    response: Compound
-    body: Optional[Compound] = None
+    response: Compound | FileResponse
+    body: Optional[Compound | FilesBody] = None
 
 
 @dataclass(frozen=True, unsafe_hash=True, order=True)
@@ -43,8 +43,9 @@ def gather_compounds(endpoints: dict[ApiPath, dict[HttpMethod, Endpoint]]) -> li
     all_compounds: set[type[BaseField | Compound]] = set()
     for endpoints_methods in endpoints.values():
         for endpoint in endpoints_methods.values():
-            all_compounds |= gather_dependencies(type(endpoint.response))
-            if endpoint.body is not None:
+            if not isinstance(endpoint.response, FileResponse):
+                all_compounds |= gather_dependencies(type(endpoint.response))
+            if endpoint.body is not None and not isinstance(endpoint.body, FilesBody):
                 all_compounds |= gather_dependencies(type(endpoint.body))
     return sorted(all_compounds, key=lambda x: x.typename())
 

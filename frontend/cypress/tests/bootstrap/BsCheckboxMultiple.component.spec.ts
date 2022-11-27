@@ -1,11 +1,11 @@
-import BsCheckbox from "@/components/bootstrap/BsCheckbox.vue";
+import BsCheckboxMultiple from "@/components/bootstrap/BsCheckboxMultiple.vue";
 
-describe("<BsCheckbox />", () => {
+describe("<BsCheckboxMultiple />", () => {
   const msg = "test checkbox message";
 
   it("contains the message", () => {
     // see: https://test-utils.vuejs.org/guide/
-    cy.mount(BsCheckbox, {
+    cy.mount(BsCheckboxMultiple, {
       props: {
         value: 123,
       },

@@ -23,6 +23,29 @@ export interface ICreateSessionRequest {
   time: ITimeSpan | null;
 }
 export interface IEmpty {}
+export interface IGhostFileResponse {
+  ghost: IGhostFileResponseEntry | null;
+}
+export interface IGhostFileResponseEntry {
+  description: string;
+  downloads: number;
+  duration: number;
+  finish_type: string;
+  id: number;
+  level: string;
+  published: boolean;
+  size: number;
+  tags: ITag[];
+  username: string;
+}
+export interface IGhostFilesResponse {
+  files: IGhostFileResponseEntry[];
+}
+export interface IGhostInfoRequest {
+  description: string;
+  published: boolean;
+  tags: number[];
+}
 export interface ILoginRequest {
   password: string;
   username: string;
@@ -34,6 +57,10 @@ export interface IProfileInfoResponse {
   is_staff: boolean;
   username: string;
   verified: boolean;
+}
+export interface IQuotaResponse {
+  current: number;
+  max: number;
 }
 export interface IRegisterRequest {
   email: string;
@@ -197,6 +224,124 @@ function validateCreateSessionRequest(data: ICreateSessionRequest): void {
   }
 }
 function validateEmpty(data: IEmpty): void {}
+function validateGhostFileResponse(data: IGhostFileResponse): void {
+  if (data.ghost === undefined)
+    throw new SchemaValidationError("GhostFileResponse.ghost is undefined");
+  if (data.ghost !== null) {
+    validateGhostFileResponseEntry(data.ghost);
+  }
+}
+function validateGhostFileResponseEntry(data: IGhostFileResponseEntry): void {
+  if (data.description === undefined)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.description is undefined"
+    );
+  if (data.description === null)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.description is null"
+    );
+  if (data.downloads === undefined)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.downloads is undefined"
+    );
+  if (data.downloads === null)
+    throw new SchemaValidationError("GhostFileResponseEntry.downloads is null");
+  if (data.downloads < 0)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.downloads has a value below minimum"
+    );
+  if (data.duration === undefined)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.duration is undefined"
+    );
+  if (data.duration === null)
+    throw new SchemaValidationError("GhostFileResponseEntry.duration is null");
+  if (data.duration < 0)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.duration has a value below minimum"
+    );
+  if (data.finish_type === undefined)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.finish_type is undefined"
+    );
+  if (data.finish_type === null)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.finish_type is null"
+    );
+  if (data.id === undefined)
+    throw new SchemaValidationError("GhostFileResponseEntry.id is undefined");
+  if (data.id === null)
+    throw new SchemaValidationError("GhostFileResponseEntry.id is null");
+  if (data.level === undefined)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.level is undefined"
+    );
+  if (data.level === null)
+    throw new SchemaValidationError("GhostFileResponseEntry.level is null");
+  if (data.published === undefined)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.published is undefined"
+    );
+  if (data.published === null)
+    throw new SchemaValidationError("GhostFileResponseEntry.published is null");
+  if (data.size === undefined)
+    throw new SchemaValidationError("GhostFileResponseEntry.size is undefined");
+  if (data.size === null)
+    throw new SchemaValidationError("GhostFileResponseEntry.size is null");
+  if (data.size < 0)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.size has a value below minimum"
+    );
+  if (data.tags === undefined)
+    throw new SchemaValidationError("GhostFileResponseEntry.tags is undefined");
+  if (data.tags === null)
+    throw new SchemaValidationError("GhostFileResponseEntry.tags is null");
+  for (const fieldData of data.tags) {
+    validateTag(fieldData);
+  }
+
+  if (data.username === undefined)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.username is undefined"
+    );
+  if (data.username === null)
+    throw new SchemaValidationError("GhostFileResponseEntry.username is null");
+  if (data.username.length < 1)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.username is too short"
+    );
+}
+function validateGhostFilesResponse(data: IGhostFilesResponse): void {
+  if (data.files === undefined)
+    throw new SchemaValidationError("GhostFilesResponse.files is undefined");
+  if (data.files === null)
+    throw new SchemaValidationError("GhostFilesResponse.files is null");
+  for (const fieldData of data.files) {
+    validateGhostFileResponseEntry(fieldData);
+  }
+}
+function validateGhostInfoRequest(data: IGhostInfoRequest): void {
+  if (data.description === undefined)
+    throw new SchemaValidationError(
+      "GhostInfoRequest.description is undefined"
+    );
+  if (data.description === null)
+    throw new SchemaValidationError("GhostInfoRequest.description is null");
+  if (data.published === undefined)
+    throw new SchemaValidationError("GhostInfoRequest.published is undefined");
+  if (data.published === null)
+    throw new SchemaValidationError("GhostInfoRequest.published is null");
+  if (data.tags === undefined)
+    throw new SchemaValidationError("GhostInfoRequest.tags is undefined");
+  if (data.tags === null)
+    throw new SchemaValidationError("GhostInfoRequest.tags is null");
+  for (const fieldData of data.tags) {
+    if (fieldData === undefined)
+      throw new SchemaValidationError("GhostInfoRequest.tags is undefined");
+    if (fieldData === null)
+      throw new SchemaValidationError("GhostInfoRequest.tags is null");
+  }
+}
 function validateIsoDateTime(data?: string | null): void {
   if (data === undefined)
     throw new SchemaValidationError("IsoDateTime is undefined");
@@ -269,6 +414,24 @@ function validateProfileInfoResponse(data: IProfileInfoResponse): void {
     );
   if (data.verified === null)
     throw new SchemaValidationError("ProfileInfoResponse.verified is null");
+}
+function validateQuotaResponse(data: IQuotaResponse): void {
+  if (data.current === undefined)
+    throw new SchemaValidationError("QuotaResponse.current is undefined");
+  if (data.current === null)
+    throw new SchemaValidationError("QuotaResponse.current is null");
+  if (data.current < 0)
+    throw new SchemaValidationError(
+      "QuotaResponse.current has a value below minimum"
+    );
+  if (data.max === undefined)
+    throw new SchemaValidationError("QuotaResponse.max is undefined");
+  if (data.max === null)
+    throw new SchemaValidationError("QuotaResponse.max is null");
+  if (data.max < 0)
+    throw new SchemaValidationError(
+      "QuotaResponse.max has a value below minimum"
+    );
 }
 function validateRegisterRequest(data: IRegisterRequest): void {
   if (data.email === undefined)
@@ -676,6 +839,63 @@ export async function logout(): Promise<IEmpty> {
   validateEmpty(result);
   return result;
 }
+export async function getGhosts(): Promise<IGhostFilesResponse> {
+  const result = (await doGet(`/api/v0/ghosts`)) as IGhostFilesResponse;
+  validateGhostFilesResponse(result);
+  return result;
+}
+export async function uploadGhost(files: File[]): Promise<ISuccessResponse> {
+  const result = (await doPostFiles(
+    `/api/v0/ghosts`,
+    files
+  )) as ISuccessResponse;
+  validateSuccessResponse(result);
+  return result;
+}
+export async function downloadGhost(
+  id: number
+): Promise<ReadableStream<Uint8Array> | null> {
+  const result = (await doGetFile(
+    `/api/v0/ghosts/${encodeURIComponent(id)}/download`
+  )) as ReadableStream<Uint8Array> | null;
+  return result;
+}
+export async function getGhost(id: number): Promise<IGhostFileResponse> {
+  const result = (await doGet(
+    `/api/v0/ghosts/${encodeURIComponent(id)}`
+  )) as IGhostFileResponse;
+  validateGhostFileResponse(result);
+  return result;
+}
+export async function updateGhost(
+  id: number,
+  body: IGhostInfoRequest
+): Promise<ISuccessResponse> {
+  validateGhostInfoRequest(body);
+  const result = (await doPost(
+    `/api/v0/ghosts/${encodeURIComponent(id)}`,
+    body
+  )) as ISuccessResponse;
+  validateSuccessResponse(result);
+  return result;
+}
+export async function deleteGhost(id: number): Promise<ISuccessResponse> {
+  const result = (await doDelete(
+    `/api/v0/ghosts/${encodeURIComponent(id)}`
+  )) as ISuccessResponse;
+  validateSuccessResponse(result);
+  return result;
+}
+export async function getStagingGhosts(): Promise<IGhostFilesResponse> {
+  const result = (await doGet(`/api/v0/ghosts/staging`)) as IGhostFilesResponse;
+  validateGhostFilesResponse(result);
+  return result;
+}
+export async function getGhostsQuota(): Promise<IQuotaResponse> {
+  const result = (await doGet(`/api/v0/ghosts/quota`)) as IQuotaResponse;
+  validateQuotaResponse(result);
+  return result;
+}
 function getCookie(name: string): string | null {
   if (document.cookie && document.cookie !== "") {
     const cookies = document.cookie.split(";");
@@ -703,6 +923,15 @@ export async function doGet(url: string): Promise<object> {
   }).then((r) => r.json());
 }
 
+export async function doGetFile(
+  url: string
+): Promise<ReadableStream<Uint8Array> | null> {
+  return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
+    credentials: "include",
+    headers: getCsrfHeader(),
+  }).then((r) => r.body);
+}
+
 export async function doDelete(url: string): Promise<object> {
   return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
     method: "DELETE",
@@ -717,6 +946,19 @@ export async function doPost(url: string, body: object): Promise<object> {
     credentials: "include",
     headers: getCsrfHeader(),
     body: JSON.stringify(body),
+  }).then((r) => r.json());
+}
+
+export async function doPostFiles(url: string, files: File[]): Promise<object> {
+  const formData = new FormData();
+  for (const file of files) {
+    formData.append(file.name, file);
+  }
+  return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
+    method: "POST",
+    credentials: "include",
+    headers: getCsrfHeader(),
+    body: formData,
   }).then((r) => r.json());
 }
 

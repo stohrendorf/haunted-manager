@@ -25,6 +25,15 @@ export async function doGet(url: string): Promise<object> {
   }).then((r) => r.json());
 }
 
+export async function doGetFile(
+  url: string
+): Promise<ReadableStream<Uint8Array> | null> {
+  return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
+    credentials: "include",
+    headers: getCsrfHeader(),
+  }).then((r) => r.body);
+}
+
 export async function doDelete(url: string): Promise<object> {
   return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
     method: "DELETE",
@@ -39,6 +48,19 @@ export async function doPost(url: string, body: object): Promise<object> {
     credentials: "include",
     headers: getCsrfHeader(),
     body: JSON.stringify(body),
+  }).then((r) => r.json());
+}
+
+export async function doPostFiles(url: string, files: File[]): Promise<object> {
+  const formData = new FormData();
+  for(const file of files) {
+    formData.append(file.name, file);
+  }
+  return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
+    method: "POST",
+    credentials: "include",
+    headers: getCsrfHeader(),
+    body: formData,
   }).then((r) => r.json());
 }
 

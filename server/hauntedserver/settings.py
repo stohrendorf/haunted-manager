@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     "siteapi",
     "haunted_auth",
     "haunted_sessions",
+    "ghost_sharing",
     "django_email_verification",
     "environ",
     "ckeditor",
@@ -158,3 +159,13 @@ COOP_SERVER_URL = env("COOP_SERVER_URL")
 TEST_RUN = DEBUG or "PYTEST_CURRENT_TEST" in os.environ
 
 CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
+
+MINIO_URL = env("MINIO_URL")
+MINIO_SECURE = env.bool("MINIO_SECURE")
+MINIO_ACCESS_KEY = env("MINIO_ACCESS_KEY")
+MINIO_SECRET_KEY = env("MINIO_SECRET_KEY")
+MINIO_GHOST_BUCKET = env("MINIO_GHOST_BUCKET")
+MINIO_GHOST_BUCKET_STAGING = env("MINIO_GHOST_BUCKET_STAGING")
+
+MAX_GHOST_SIZE = 5 * 2**20  # 5 MiB
+GHOST_QUOTA = 100 * 2**20  # 100 MiB

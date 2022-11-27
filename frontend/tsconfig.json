@@ -14,13 +14,14 @@
     "sourceMap": true,
     "baseUrl": ".",
     "types": [
-      "webpack-env",
+      "webpack-env"
     ],
     "paths": {
       "@/*": [
         "src/*"
       ]
     },
+    "typeRoots": ["./node_modules/@types", "src/typings"],
     "lib": [
       "esnext",
       "dom",

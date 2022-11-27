@@ -25,7 +25,8 @@
     "vue": "^3",
     "vue-class-component": "^8.0.0-rc.1",
     "vue-router": "*",
-    "vue-upload-component": "*"
+    "vue-upload-component": "*",
+    "xzwasm": "*"
   },
   "devDependencies": {
     "@babel/core": "*",

@@ -3,7 +3,15 @@ from pathlib import Path
 from endpoints import ApiPath, Endpoint, HttpMethod, gather_compounds
 from generator_django import gen_django
 from generator_vue import gen_vue
-from structural import ArrayField, BooleanField, Compound, IntegerField, StringField
+from structural import (
+    ArrayField,
+    BooleanField,
+    Compound,
+    FileResponse,
+    FilesBody,
+    IntegerField,
+    StringField,
+)
 
 from spec.openapi import gen_openapi
 
@@ -134,6 +142,38 @@ class AnnouncementEntry(Compound):
 
 class AnnouncementsResponse(Compound):
     announcements = ArrayField(items=AnnouncementEntry())
+
+
+class GhostFileResponseEntry(Compound):
+    username = StringField(min_length=1)
+    id = IntegerField()
+    description = StringField()
+    tags = ArrayField(items=Tag())
+    level = StringField()
+    duration = IntegerField(min=0)
+    size = IntegerField(min=0)
+    finish_type = StringField()
+    downloads = IntegerField(min=0)
+    published = BooleanField()
+
+
+class GhostFilesResponse(Compound):
+    files = ArrayField(items=GhostFileResponseEntry())
+
+
+class GhostFileResponse(Compound):
+    ghost = GhostFileResponseEntry(nullable=True)
+
+
+class GhostInfoRequest(Compound):
+    description = StringField()
+    tags = ArrayField(items=IntegerField())
+    published = BooleanField()
+
+
+class QuotaResponse(Compound):
+    current = IntegerField(min=0)
+    max = IntegerField(min=0)
 
 
 def write_vue_spec(output: Path, endpoints: dict[ApiPath, dict[HttpMethod, Endpoint]]):
@@ -272,6 +312,50 @@ def main():
             HttpMethod.GET: Endpoint(
                 operation_name="logout",
                 response=Empty(),
+            ),
+        },
+        ApiPath("/api/v0/ghosts", "ghosts"): {
+            HttpMethod.GET: Endpoint(
+                operation_name="getGhosts",
+                response=GhostFilesResponse(),
+            ),
+            HttpMethod.POST: Endpoint(
+                operation_name="uploadGhost",
+                response=SuccessResponse(),
+                body=FilesBody(),
+            ),
+        },
+        ApiPath("/api/v0/ghosts/<int:id>/download", "download_ghost"): {
+            HttpMethod.GET: Endpoint(
+                operation_name="downloadGhost",
+                response=FileResponse(),
+            ),
+        },
+        ApiPath("/api/v0/ghosts/<int:id>", "single_ghost"): {
+            HttpMethod.GET: Endpoint(
+                operation_name="getGhost",
+                response=GhostFileResponse(),
+            ),
+            HttpMethod.POST: Endpoint(
+                operation_name="updateGhost",
+                response=SuccessResponse(),
+                body=GhostInfoRequest(),
+            ),
+            HttpMethod.DELETE: Endpoint(
+                operation_name="deleteGhost",
+                response=SuccessResponse(),
+            ),
+        },
+        ApiPath("/api/v0/ghosts/staging", "staging_ghosts"): {
+            HttpMethod.GET: Endpoint(
+                operation_name="getStagingGhosts",
+                response=GhostFilesResponse(),
+            ),
+        },
+        ApiPath("/api/v0/ghosts/quota", "quota"): {
+            HttpMethod.GET: Endpoint(
+                operation_name="getGhostsQuota",
+                response=QuotaResponse(),
             ),
         },
     }

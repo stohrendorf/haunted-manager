@@ -8,6 +8,8 @@ from structural import (
     BaseField,
     BooleanField,
     Compound,
+    FileResponse,
+    FilesBody,
     FloatField,
     IntegerField,
     StringField,
@@ -121,15 +123,31 @@ def gen_vue(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dict[H
             if endpoint.body is not None:
                 if args_str:
                     output += ", "
-                output += f"body: I{endpoint.body.typename()}"
-            output += f"): Promise<I{endpoint.response.typename()}> {{\n"
-            if endpoint.body is not None:
+                if isinstance(endpoint.body, FilesBody):
+                    output += f"files: File[]"
+                else:
+                    output += f"body: I{endpoint.body.typename()}"
+            result_type = (
+                "ReadableStream<Uint8Array> | null"
+                if isinstance(endpoint.response, FileResponse)
+                else f"I{endpoint.response.typename()}"
+            )
+            output += f"): Promise<{result_type}> {{\n"
+            if endpoint.body is not None and not isinstance(endpoint.body, FilesBody):
                 output += f"  validate{endpoint.body.typename()}(body);\n"
-            output += f"  const result = (await do{method.value.capitalize()}(`{ts_url}`"
+            if isinstance(endpoint.body, FilesBody):
+                output += f"  const result = (await do{method.value.capitalize()}Files(`{ts_url}`"
+            else:
+                file_suffix = "File" if isinstance(endpoint.response, FileResponse) else ""
+                output += f"  const result = (await do{method.value.capitalize()}{file_suffix}(`{ts_url}`"
             if endpoint.body is not None:
-                output += ", body"
-            output += f")) as I{endpoint.response.typename()};\n"
-            output += f"  validate{ endpoint.response.typename() }(result);\n"
+                if isinstance(endpoint.body, FilesBody):
+                    output += ", files"
+                else:
+                    output += ", body"
+            output += f")) as {result_type};\n"
+            if not isinstance(endpoint.response, FileResponse):
+                output += f"  validate{ endpoint.response.typename() }(result);\n"
             output += "  return result;\n"
             output += "}\n"
 

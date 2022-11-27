@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from dataclasses_json import DataClassJsonMixin, dataclass_json
+from django.core.files.uploadedfile import UploadedFile
 
 from ..error import SchemaValidationError
 from ..json_response import Validatable
@@ -23,4 +24,3 @@ class SessionTag(DataClassJsonMixin, Validatable):
             raise SchemaValidationError("SessionTag.name is null")
         if len(self.name) < 1:
             raise SchemaValidationError("SessionTag.name is too short")
-        return

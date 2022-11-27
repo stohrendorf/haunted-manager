@@ -3,13 +3,18 @@ import { Options, Vue } from "vue-class-component";
 import { getTags, ISession, ITag } from "@/components/ApiService";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
-import BsCheckbox from "@/components/bootstrap/BsCheckbox.vue";
+import BsCheckboxMultiple from "@/components/bootstrap/BsCheckboxMultiple.vue";
 import { Prop } from "vue-property-decorator";
 import DateTimePicker from "@/components/utilities/DateTimePicker.vue";
 import moment from "moment";
 
 @Options({
-  components: { BsCheckbox, BsBtn, FloatingSingleLineInput, DateTimePicker },
+  components: {
+    BsCheckboxMultiple,
+    BsBtn,
+    FloatingSingleLineInput,
+    DateTimePicker,
+  },
 })
 export default class SessionEditor extends Vue {
   private tags: ITag[] | null = null;
@@ -94,10 +99,10 @@ export default class SessionEditor extends Vue {
 
     <ul class="list-unstyled">
       <li v-for="tag in tags" :key="tag.id">
-        <bs-checkbox :value="tag.id" :selected-values="selectedTags">
+        <bs-checkbox-multiple :value="tag.id" :selected-values="selectedTags">
           <span class="badge bg-secondary">{{ tag.name }}</span>
           {{ tag.description }}
-        </bs-checkbox>
+        </bs-checkbox-multiple>
       </li>
     </ul>
     <slot />

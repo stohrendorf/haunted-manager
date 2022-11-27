@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from dataclasses_json import DataClassJsonMixin, dataclass_json
+from django.core.files.uploadedfile import UploadedFile
 
 from ..error import SchemaValidationError
 from ..json_response import Validatable
@@ -24,4 +25,3 @@ class SessionsPlayersRequest(DataClassJsonMixin, Validatable):
             raise SchemaValidationError("SessionsPlayersRequest.sessions is null")
         for self_sessions_entry in self.sessions:
             self_sessions_entry.validate()
-        return

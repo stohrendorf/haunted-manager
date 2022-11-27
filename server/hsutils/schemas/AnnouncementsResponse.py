@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from dataclasses_json import DataClassJsonMixin, dataclass_json
+from django.core.files.uploadedfile import UploadedFile
 
 from ..error import SchemaValidationError
 from ..json_response import Validatable
@@ -19,4 +20,3 @@ class AnnouncementsResponse(DataClassJsonMixin, Validatable):
             raise SchemaValidationError("AnnouncementsResponse.announcements is null")
         for self_announcements_entry in self.announcements:
             self_announcements_entry.validate()
-        return

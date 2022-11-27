@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from dataclasses_json import DataClassJsonMixin, dataclass_json
+from django.core.files.uploadedfile import UploadedFile
 
 from ..error import SchemaValidationError
 from ..json_response import Validatable
@@ -28,4 +29,3 @@ class ServerInfoResponse(DataClassJsonMixin, Validatable):
             raise SchemaValidationError("ServerInfoResponse.total_users is null")
         if self.total_users < 0:
             raise SchemaValidationError("ServerInfoResponse.total_users has a value below minimum")
-        return

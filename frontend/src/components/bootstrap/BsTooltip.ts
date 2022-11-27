@@ -2,7 +2,7 @@ import { Directive } from "vue";
 import { Tooltip } from "bootstrap";
 
 const BsTooltip: Directive<HTMLElement> = {
-  beforeMount(el, binding) {
+  beforeMount(el) {
     new Tooltip(el);
   },
 };

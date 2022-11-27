@@ -17,7 +17,6 @@ export default class EditSession extends Vue {
       throw new Error("invalid session id");
     }
     this.session = session;
-    this.$emit("update:session");
   }
 
   async updateSession(): Promise<void> {
@@ -26,7 +25,7 @@ export default class EditSession extends Vue {
       tags: this.selectedTags,
       time: this.session!.time,
     });
-    this.$router.push("/");
+    this.$router.back();
   }
 }
 </script>
@@ -40,7 +39,7 @@ export default class EditSession extends Vue {
     <bs-btn variant="success" @click="updateSession()">
       <span class="bi bi-save" /> Save
     </bs-btn>
-    <bs-btn variant="danger" @click="$router.push('/')">
+    <bs-btn variant="danger" @click="$router.back()">
       <span class="bi bi-x-square" /> Abort
     </bs-btn>
   </session-editor>

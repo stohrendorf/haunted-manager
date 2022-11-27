@@ -24,10 +24,6 @@ export default class SessionList extends Vue {
     await deleteSessionRequest(id);
     this.sessions = (await getSessions()).sessions;
   }
-
-  editSession(id: String): void {
-    this.$router.push("/edit-session/" + id);
-  }
 }
 </script>
 
@@ -112,7 +108,11 @@ export default class SessionList extends Vue {
             </bs-btn>
           </div>
           <div class="col col-auto">
-            <bs-btn variant="primary" small @click="editSession(session.id)">
+            <bs-btn
+              variant="primary"
+              small
+              @click="$router.push('/edit-session/' + session.id)"
+            >
               <i class="bi bi-pencil" /> Edit
             </bs-btn>
           </div>

@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from typing import List, Optional
 
 from dataclasses_json import DataClassJsonMixin, dataclass_json
+from django.core.files.uploadedfile import UploadedFile
 
 from ..error import SchemaValidationError
 from ..json_response import Validatable
@@ -35,4 +36,3 @@ class ProfileInfoResponse(DataClassJsonMixin, Validatable):
             raise SchemaValidationError("ProfileInfoResponse.username is too short")
         if self.verified is None:
             raise SchemaValidationError("ProfileInfoResponse.verified is null")
-        return

@@ -7,6 +7,7 @@ from structural import (
     BaseField,
     BooleanField,
     Compound,
+    FilesBody,
     FloatField,
     IntegerField,
     StringField,
@@ -139,7 +140,7 @@ def gen_openapi(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, di
                         {
                             "requestBody": {
                                 "content": {
-                                    "application/json": {
+                                    ("multipart/form-data" if isinstance(ep.body, FilesBody) else "application/json"): {
                                         "schema": {
                                             "$ref": f"#/components/schemas/{humps.camelize(ep.body.typename())}",
                                         },

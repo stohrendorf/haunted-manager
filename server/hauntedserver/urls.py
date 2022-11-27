@@ -8,4 +8,5 @@ urlpatterns = [
     path("", include("siteapi.urls")),
     path("", include("haunted_sessions.urls")),
     path("", include("haunted_auth.urls")),
+    path("", include("ghost_sharing.urls")),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
