@@ -32,7 +32,7 @@ class Session(TimestampedModel):
     end = models.DateTimeField(null=True, default=None)
 
     def __str__(self):
-        return self.key
+        return str(self.key)
 
     @property
     def is_event(self) -> bool:
