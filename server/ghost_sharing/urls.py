@@ -17,7 +17,9 @@ urlpatterns = [
     quota.wrap(get_handler=get_quota),
     staging_ghosts.wrap(get_handler=get_staging_ghosts),
     single_ghost.wrap(
-        get_handler=get_single_ghost, post_handler=update_single_ghost, delete_handler=delete_single_ghost
+        get_handler=get_single_ghost,
+        post_handler=update_single_ghost,
+        delete_handler=delete_single_ghost,
     ),
     download_ghost_endpoint.wrap(get_handler=download_ghost),
 ]

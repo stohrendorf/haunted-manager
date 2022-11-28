@@ -124,7 +124,7 @@ def gen_vue(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dict[H
                 if args_str:
                     output += ", "
                 if isinstance(endpoint.body, FilesBody):
-                    output += f"files: File[]"
+                    output += "files: File[]"
                 else:
                     output += f"body: I{endpoint.body.typename()}"
             result_type = (

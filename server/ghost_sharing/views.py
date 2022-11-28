@@ -97,7 +97,7 @@ def upload(request: HttpRequest, files: dict[str, UploadedFile]) -> SuccessRespo
                 staging_ghost.hash = file_hash.hexdigest()
                 staging_ghost.save()
             except Exception:
-                logging.fatal(f"File save failed", exc_info=True)
+                logging.fatal("File save failed", exc_info=True)
                 staging_ghost.delete()
                 raise
 
@@ -125,7 +125,7 @@ def upload(request: HttpRequest, files: dict[str, UploadedFile]) -> SuccessRespo
                             staging_ghost.save()
                 put_staging_ghost(staging_ghost, tmp_file)
             except Exception:
-                logging.fatal(f"File save failed", exc_info=True)
+                logging.fatal("File save failed", exc_info=True)
                 staging_ghost.delete()
                 raise
 
@@ -156,7 +156,7 @@ def _ghost_to_response(ghost: Ghost) -> GhostFileResponseEntry:
 
 def _get_ghosts(published: bool) -> GhostFilesResponse:
     return GhostFilesResponse(
-        files=[_ghost_to_response(ghost) for ghost in Ghost.objects.filter(published=published).all()]
+        files=[_ghost_to_response(ghost) for ghost in Ghost.objects.filter(published=published).all()],
     )
 
 

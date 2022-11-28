@@ -88,7 +88,10 @@ def _gen_check(context: str, indent: str, field: BaseField, accessor: str) -> tu
 
 
 def _gen_django_field_checks(
-    context: str, accessor: str, field: BaseField, additional_indent_level: int = 0
+    context: str,
+    accessor: str,
+    field: BaseField,
+    additional_indent_level: int = 0,
 ) -> tuple[str, bool]:
     return _gen_check(context, base_indent * (additional_indent_level + 1), field, accessor)
 
@@ -219,7 +222,7 @@ def gen_django(
                 output += (
                     f"    def do_{method.value.lower()}("
                     + ", ".join(["request: HttpRequest", f"handler: {handler_signature}", *url_args_in])
-                    + f") -> DjangoFileResponse:\n"
+                    + ") -> DjangoFileResponse:\n"
                 )
             else:
                 output += (
@@ -230,7 +233,7 @@ def gen_django(
             if method == HttpMethod.POST:
                 assert endpoint.body is not None
                 if isinstance(endpoint.body, FilesBody):
-                    output += f"        files: dict[str, UploadedFile] = request.FILES\n"
+                    output += "        files: dict[str, UploadedFile] = request.FILES\n"
                     output += "        response = handler(" + ", ".join(["request", *url_args_out, "files"]) + ")\n"
                 else:
                     output += (
