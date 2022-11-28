@@ -30,9 +30,7 @@ app.config.globalProperties.$filters = {
     const base = kib ? 1024 : 1000;
     const sizes = kib ? ["Bytes", "KiB", "MiB"] : ["Bytes", "KB", "MB"];
     const exp = Math.floor(Math.log(bytes) / Math.log(base));
-    return (
-      Math.round(bytes / Math.pow(base, exp)).toFixed(1) + " " + sizes[exp]
-    );
+    return (bytes / Math.pow(base, exp)).toFixed(1) + " " + sizes[exp];
   },
 };
 app.mount("#app");
