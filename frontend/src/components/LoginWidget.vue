@@ -12,7 +12,7 @@ export default class LoginWidget extends Vue {
 
   async formSubmit() {
     const loginResult = await login({
-      username: this.username,
+      username: this.username.trim(),
       password: this.password,
     });
     if (!loginResult.success) {
@@ -45,7 +45,7 @@ export default class LoginWidget extends Vue {
           v-model="username"
           type="text"
           required
-          label="Username or Email"
+          label="Username"
         />
       </div>
     </div>
@@ -70,13 +70,18 @@ export default class LoginWidget extends Vue {
         variant="success"
         type="submit"
         :disabled="!username || !password"
-        >Login</bs-btn
       >
+        Login
+      </bs-btn>
     </div>
     <div class="form-group">
-      <bs-btn class="w-100" variant="primary" @click="$router.push('/register')"
-        >Register</bs-btn
+      <bs-btn
+        class="w-100"
+        variant="primary"
+        @click="$router.push('/register')"
       >
+        Register
+      </bs-btn>
     </div>
   </form>
 </template>
