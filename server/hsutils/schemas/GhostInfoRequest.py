@@ -13,12 +13,15 @@ from ..json_response import Validatable
 @dataclass(kw_only=True)
 class GhostInfoRequest(DataClassJsonMixin, Validatable):
     description: str
+    level_id: int
     published: bool
     tags: List[int]
 
     def validate(self):
         if self.description is None:
             raise SchemaValidationError("GhostInfoRequest.description is null")
+        if self.level_id is None:
+            raise SchemaValidationError("GhostInfoRequest.level_id is null")
         if self.published is None:
             raise SchemaValidationError("GhostInfoRequest.published is null")
         if self.tags is None:

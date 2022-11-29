@@ -22,6 +22,8 @@ from .schemas.GhostFileResponse import GhostFileResponse
 from .schemas.GhostFileResponseEntry import GhostFileResponseEntry
 from .schemas.GhostFilesResponse import GhostFilesResponse
 from .schemas.GhostInfoRequest import GhostInfoRequest
+from .schemas.LevelInfo import LevelInfo
+from .schemas.LevelsResponse import LevelsResponse
 from .schemas.LoginRequest import LoginRequest
 from .schemas.ProfileInfoResponse import ProfileInfoResponse
 from .schemas.QuotaResponse import QuotaResponse
@@ -813,6 +815,38 @@ class quota:
         request: HttpRequest, handler: Callable[[HttpRequest], QuotaResponse | tuple[int, QuotaResponse]]
     ) -> QuotaResponse | tuple[int, QuotaResponse] | JsonResponse:
         response = handler(request)
+        if isinstance(response, tuple):
+            code, response = response
+        else:
+            code = HTTPStatus.OK
+        return code, response
+
+
+class levels:
+    path = "api/v0/levels/<str:identifier>"
+    name = "levels"
+
+    @classmethod
+    def wrap(
+        cls,
+        *,
+        get_handler: Callable[[HttpRequest, str], LevelsResponse | tuple[int, LevelsResponse]],
+    ):
+        def dispatch(request: HttpRequest, identifier: str) -> HttpResponseBase:
+            if request.method == "GET":
+                return cls.do_get(request, get_handler, identifier)
+            return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
+
+        return path(cls.path, dispatch, name=cls.name)
+
+    @json_response
+    @staticmethod
+    def do_get(
+        request: HttpRequest,
+        handler: Callable[[HttpRequest, str], LevelsResponse | tuple[int, LevelsResponse]],
+        identifier: str,
+    ) -> LevelsResponse | tuple[int, LevelsResponse] | JsonResponse:
+        response = handler(request, identifier)
         if isinstance(response, tuple):
             code, response = response
         else:

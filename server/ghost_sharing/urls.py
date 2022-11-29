@@ -1,9 +1,10 @@
 from hsutils.viewmodels import download_ghost as download_ghost_endpoint
-from hsutils.viewmodels import ghosts, quota, single_ghost, staging_ghosts
+from hsutils.viewmodels import ghosts, levels, quota, single_ghost, staging_ghosts
 
 from .views import (
     delete_single_ghost,
     download_ghost,
+    get_alternative_levels,
     get_published_ghosts,
     get_quota,
     get_single_ghost,
@@ -22,4 +23,5 @@ urlpatterns = [
         delete_handler=delete_single_ghost,
     ),
     download_ghost_endpoint.wrap(get_handler=download_ghost),
+    levels.wrap(get_handler=get_alternative_levels),
 ]

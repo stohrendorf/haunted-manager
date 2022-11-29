@@ -18,7 +18,9 @@ class GhostFileResponseEntry(DataClassJsonMixin, Validatable):
     duration: int
     finish_type: str
     id: int
-    level: str
+    level_display: str
+    level_id: int
+    level_identifier: str
     published: bool
     size: int
     tags: List[Tag]
@@ -39,8 +41,16 @@ class GhostFileResponseEntry(DataClassJsonMixin, Validatable):
             raise SchemaValidationError("GhostFileResponseEntry.finish_type is null")
         if self.id is None:
             raise SchemaValidationError("GhostFileResponseEntry.id is null")
-        if self.level is None:
-            raise SchemaValidationError("GhostFileResponseEntry.level is null")
+        if self.level_display is None:
+            raise SchemaValidationError("GhostFileResponseEntry.level_display is null")
+        if len(self.level_display) < 1:
+            raise SchemaValidationError("GhostFileResponseEntry.level_display is too short")
+        if self.level_id is None:
+            raise SchemaValidationError("GhostFileResponseEntry.level_id is null")
+        if self.level_identifier is None:
+            raise SchemaValidationError("GhostFileResponseEntry.level_identifier is null")
+        if len(self.level_identifier) < 1:
+            raise SchemaValidationError("GhostFileResponseEntry.level_identifier is too short")
         if self.published is None:
             raise SchemaValidationError("GhostFileResponseEntry.published is null")
         if self.size is None:

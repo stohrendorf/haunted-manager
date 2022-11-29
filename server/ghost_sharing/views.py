@@ -27,6 +27,8 @@ from hsutils.viewmodels import (
     GhostFileResponseEntry,
     GhostFilesResponse,
     GhostInfoRequest,
+    LevelInfo,
+    LevelsResponse,
     QuotaResponse,
     SuccessResponse,
     Tag,
@@ -153,7 +155,9 @@ def _ghost_to_response(ghost: Ghost) -> GhostFileResponseEntry:
             )
             for tag in ghost.tags.all()
         ],
-        level=f"{ghost.level.gameflow.title} - {ghost.level.title}",
+        level_display=f"{ghost.level.gameflow.title} - {ghost.level.title}",
+        level_identifier=ghost.level.identifier,
+        level_id=ghost.level.id,
         duration=int(ghost.duration.total_seconds()),
         size=ghost.data_size,
         finish_type=GhostFinishType(ghost.finish_type).value,
@@ -223,6 +227,7 @@ def update_single_ghost(
             unpublish_ghost(ghost)
     ghost.description = body.description
     ghost.tags.set(TagModel.objects.filter(id__in=body.tags).all())
+    ghost.level = Level.objects.get(id=body.level_id)
     ghost.save()
     return SuccessResponse(success=True, message="")
 
@@ -255,3 +260,16 @@ def get_single_ghost(request: HttpRequest, id: int) -> GhostFileResponse | tuple
     except Ghost.DoesNotExist:
         return HTTPStatus.NOT_FOUND, GhostFileResponse(ghost=None)
     return GhostFileResponse(ghost=_ghost_to_response(ghost))
+
+
+def get_alternative_levels(request: HttpRequest, identifier: str) -> LevelsResponse:
+    return LevelsResponse(
+        levels=[
+            LevelInfo(
+                id=level.id,
+                identifier=level.identifier,
+                title=f"{level.gameflow.title} - {level.title}",
+            )
+            for level in Level.objects.filter(identifier=identifier).all()
+        ]
+    )

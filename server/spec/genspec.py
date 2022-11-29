@@ -149,7 +149,9 @@ class GhostFileResponseEntry(Compound):
     id = IntegerField()
     description = StringField()
     tags = ArrayField(items=Tag())
-    level = StringField()
+    level_display = StringField(min_length=1)
+    level_identifier = StringField(min_length=1)
+    level_id = IntegerField()
     duration = IntegerField(min=0)
     size = IntegerField(min=0)
     finish_type = StringField()
@@ -169,11 +171,22 @@ class GhostInfoRequest(Compound):
     description = StringField()
     tags = ArrayField(items=IntegerField())
     published = BooleanField()
+    level_id = IntegerField()
 
 
 class QuotaResponse(Compound):
     current = IntegerField(min=0)
     max = IntegerField(min=0)
+
+
+class LevelInfo(Compound):
+    id = IntegerField()
+    identifier = StringField(min_length=1)
+    title = StringField(min_length=1)
+
+
+class LevelsResponse(Compound):
+    levels = ArrayField(items=LevelInfo())
 
 
 def write_vue_spec(output: Path, endpoints: dict[ApiPath, dict[HttpMethod, Endpoint]]):
@@ -356,6 +369,12 @@ def main():
             HttpMethod.GET: Endpoint(
                 operation_name="getGhostsQuota",
                 response=QuotaResponse(),
+            ),
+        },
+        ApiPath("/api/v0/levels/<str:identifier>", "levels"): {
+            HttpMethod.GET: Endpoint(
+                operation_name="getAlternativeLevels",
+                response=LevelsResponse(),
             ),
         },
     }

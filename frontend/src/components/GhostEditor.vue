@@ -5,6 +5,7 @@ import {
   IGhostFileResponseEntry,
   ITag,
   updateGhost,
+  getAlternativeLevels,
 } from "@/components/ApiService";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
@@ -12,9 +13,12 @@ import BsCheckboxMultiple from "@/components/bootstrap/BsCheckboxMultiple.vue";
 import { Emit, Prop } from "vue-property-decorator";
 import DateTimePicker from "@/components/utilities/DateTimePicker.vue";
 import BsCheckboxSingle from "@/components/bootstrap/BsCheckboxSingle.vue";
+import BsSelect from "@/components/bootstrap/BsSelect.vue";
+import { ISelectEntry } from "@/components/bootstrap/ISelectEntry";
 
 @Options({
   components: {
+    BsSelect,
     BsCheckboxMultiple,
     BsBtn,
     FloatingSingleLineInput,
@@ -24,12 +28,16 @@ import BsCheckboxSingle from "@/components/bootstrap/BsCheckboxSingle.vue";
 })
 export default class GhostEditor extends Vue {
   private tags: ITag[] | null = null;
+  private alternativeLevels: ISelectEntry[] = [];
 
   @Prop({ required: true, default: () => ({ tags: [] }) })
   public ghost!: IGhostFileResponseEntry;
 
   async created(): Promise<void> {
     this.tags = (await getTags()).tags;
+    this.alternativeLevels = (
+      await getAlternativeLevels(this.ghost.level_identifier)
+    ).levels.map((x) => ({ value: x.id, title: x.title }));
   }
 
   async saveGhost(): Promise<void> {
@@ -37,6 +45,7 @@ export default class GhostEditor extends Vue {
       published: this.ghost.published,
       tags: this.ghost.tags.map((tag) => tag.id),
       description: this.ghost.description,
+      level_id: this.ghost.level_id,
     });
     this.saved();
   }
@@ -54,8 +63,11 @@ export default class GhostEditor extends Vue {
   <div>
     <div class="row">
       <div class="col">
-        <strong> {{ ghost.level }} </strong>
-        &bull;
+        <bs-select
+          v-model="ghost.level_id"
+          :items="alternativeLevels"
+          label="Level"
+        />
         <span class="bi bi-stopwatch"></span>
         {{ $filters.seconds(ghost.duration) }}
         &bull;

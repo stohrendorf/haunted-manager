@@ -68,7 +68,7 @@ export default class GhostList extends Vue {
       <div v-for="ghost in ghosts" :key="ghost.id" class="list-group-item">
         <div>
           <a href="" @click.prevent="downloadGhost(ghost.id)">
-            <strong>{{ ghost.level }}</strong>
+            <strong>{{ ghost.level_display }}</strong>
           </a>
           &bull;
           <span class="bi bi-download"></span> {{ ghost.downloads }}

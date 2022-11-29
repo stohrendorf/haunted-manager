@@ -2,6 +2,7 @@
 
 import django.db.models.deletion
 import django.utils.timezone
+from django.core.management import call_command
 from django.db import migrations, models
 
 
@@ -9,10 +10,12 @@ def migrate_levels(apps, schema_editor):
     Gameflow = apps.get_model("ghost_sharing", "Gameflow")
     Level = apps.get_model("ghost_sharing", "Level")
     Ghost = apps.get_model("ghost_sharing", "Ghost")
+
+    call_command("loaddata", "ghost_sharing/fixtures/gameflows.json")
+    call_command("loaddata", "ghost_sharing/fixtures/levels.json")
     db_alias = schema_editor.connection.alias
-    unknown_gameflow = Gameflow.objects.create(
+    unknown_gameflow = Gameflow.objects.get(
         identifier="unknown",
-        title="unknown",
     )
     for ghost in Ghost.objects.using(db_alias).all():
         ghost.level_new, _ = Level.objects.get_or_create(

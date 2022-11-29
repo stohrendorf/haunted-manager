@@ -32,7 +32,9 @@ export interface IGhostFileResponseEntry {
   duration: number;
   finish_type: string;
   id: number;
-  level: string;
+  level_display: string;
+  level_id: number;
+  level_identifier: string;
   published: boolean;
   size: number;
   tags: ITag[];
@@ -43,8 +45,17 @@ export interface IGhostFilesResponse {
 }
 export interface IGhostInfoRequest {
   description: string;
+  level_id: number;
   published: boolean;
   tags: number[];
+}
+export interface ILevelInfo {
+  id: number;
+  identifier: string;
+  title: string;
+}
+export interface ILevelsResponse {
+  levels: ILevelInfo[];
 }
 export interface ILoginRequest {
   password: string;
@@ -272,12 +283,36 @@ function validateGhostFileResponseEntry(data: IGhostFileResponseEntry): void {
     throw new SchemaValidationError("GhostFileResponseEntry.id is undefined");
   if (data.id === null)
     throw new SchemaValidationError("GhostFileResponseEntry.id is null");
-  if (data.level === undefined)
+  if (data.level_display === undefined)
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.level is undefined"
+      "GhostFileResponseEntry.level_display is undefined"
     );
-  if (data.level === null)
-    throw new SchemaValidationError("GhostFileResponseEntry.level is null");
+  if (data.level_display === null)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.level_display is null"
+    );
+  if (data.level_display.length < 1)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.level_display is too short"
+    );
+  if (data.level_id === undefined)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.level_id is undefined"
+    );
+  if (data.level_id === null)
+    throw new SchemaValidationError("GhostFileResponseEntry.level_id is null");
+  if (data.level_identifier === undefined)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.level_identifier is undefined"
+    );
+  if (data.level_identifier === null)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.level_identifier is null"
+    );
+  if (data.level_identifier.length < 1)
+    throw new SchemaValidationError(
+      "GhostFileResponseEntry.level_identifier is too short"
+    );
   if (data.published === undefined)
     throw new SchemaValidationError(
       "GhostFileResponseEntry.published is undefined"
@@ -327,6 +362,10 @@ function validateGhostInfoRequest(data: IGhostInfoRequest): void {
     );
   if (data.description === null)
     throw new SchemaValidationError("GhostInfoRequest.description is null");
+  if (data.level_id === undefined)
+    throw new SchemaValidationError("GhostInfoRequest.level_id is undefined");
+  if (data.level_id === null)
+    throw new SchemaValidationError("GhostInfoRequest.level_id is null");
   if (data.published === undefined)
     throw new SchemaValidationError("GhostInfoRequest.published is undefined");
   if (data.published === null)
@@ -352,6 +391,32 @@ function validateIsoDateTime(data?: string | null): void {
     )
   )
     throw new SchemaValidationError("IsoDateTime has an invalid format");
+}
+function validateLevelInfo(data: ILevelInfo): void {
+  if (data.id === undefined)
+    throw new SchemaValidationError("LevelInfo.id is undefined");
+  if (data.id === null) throw new SchemaValidationError("LevelInfo.id is null");
+  if (data.identifier === undefined)
+    throw new SchemaValidationError("LevelInfo.identifier is undefined");
+  if (data.identifier === null)
+    throw new SchemaValidationError("LevelInfo.identifier is null");
+  if (data.identifier.length < 1)
+    throw new SchemaValidationError("LevelInfo.identifier is too short");
+  if (data.title === undefined)
+    throw new SchemaValidationError("LevelInfo.title is undefined");
+  if (data.title === null)
+    throw new SchemaValidationError("LevelInfo.title is null");
+  if (data.title.length < 1)
+    throw new SchemaValidationError("LevelInfo.title is too short");
+}
+function validateLevelsResponse(data: ILevelsResponse): void {
+  if (data.levels === undefined)
+    throw new SchemaValidationError("LevelsResponse.levels is undefined");
+  if (data.levels === null)
+    throw new SchemaValidationError("LevelsResponse.levels is null");
+  for (const fieldData of data.levels) {
+    validateLevelInfo(fieldData);
+  }
 }
 function validateLoginRequest(data: ILoginRequest): void {
   if (data.password === undefined)
@@ -894,6 +959,15 @@ export async function getStagingGhosts(): Promise<IGhostFilesResponse> {
 export async function getGhostsQuota(): Promise<IQuotaResponse> {
   const result = (await doGet(`/api/v0/ghosts/quota`)) as IQuotaResponse;
   validateQuotaResponse(result);
+  return result;
+}
+export async function getAlternativeLevels(
+  identifier: string
+): Promise<ILevelsResponse> {
+  const result = (await doGet(
+    `/api/v0/levels/${encodeURIComponent(identifier)}`
+  )) as ILevelsResponse;
+  validateLevelsResponse(result);
   return result;
 }
 function getCookie(name: string): string | null {
