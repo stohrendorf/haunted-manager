@@ -16,6 +16,7 @@ from django.http import FileResponse, HttpRequest
 
 from hsutils.auth import require_authenticated
 from hsutils.minio import (
+    delete_ghost,
     get_ghost_data,
     ghost_data_exists,
     publish_ghost,
@@ -197,6 +198,7 @@ def delete_single_ghost(request: HttpRequest, id: int) -> SuccessResponse | tupl
             success=False,
         )
 
+    delete_ghost(ghost)
     ghost.delete()
     return SuccessResponse(success=True, message="")
 

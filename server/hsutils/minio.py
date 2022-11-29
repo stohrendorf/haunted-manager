@@ -129,3 +129,13 @@ def publish_ghost(ghost: Ghost):
 def unpublish_ghost(ghost: Ghost):
     _move_ghost(ghost, settings.MINIO_GHOST_BUCKET, settings.MINIO_GHOST_BUCKET_STAGING)
     ghost.published = False
+
+
+def delete_ghost(ghost: Ghost):
+    client = _create_client()
+    object_name = f"{ghost.owner.id}/{ghost.file_id.hex}/{ghost.original_filename}"
+    bucket_name = settings.MINIO_GHOST_BUCKET if ghost.published else settings.MINIO_GHOST_BUCKET_STAGING
+    client.remove_object(
+        bucket_name=bucket_name,
+        object_name=object_name,
+    )
