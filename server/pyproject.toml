@@ -20,6 +20,7 @@ django-environ = "*"
 gunicorn = "*"
 django-ckeditor = "*"
 minio = "*"
+django-ckeditor-skins = "*"
 
 [tool.poetry.dev-dependencies]
 black = "*"

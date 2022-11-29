@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     "django_email_verification",
     "environ",
     "ckeditor",
+    "ckeditor_skins",
 ]
 
 MIDDLEWARE = [
@@ -159,6 +160,127 @@ COOP_SERVER_URL = env("COOP_SERVER_URL")
 TEST_RUN = DEBUG or "PYTEST_CURRENT_TEST" in os.environ
 
 CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
+
+CKEDITOR_CONFIGS = {
+    "default": {
+        "skin": "moono-dark",
+        "toolbar": [
+            {
+                "name": "document",
+                "items": [
+                    "Source",
+                ],
+            },
+            {
+                "name": "clipboard",
+                "items": [
+                    "Cut",
+                    "Copy",
+                    "Paste",
+                    "PasteText",
+                    "PasteFromWord",
+                    "-",
+                    "Undo",
+                    "Redo",
+                ],
+            },
+            {
+                "name": "editing",
+                "items": [
+                    "Find",
+                    "Replace",
+                    "-",
+                    "SelectAll",
+                    "-",
+                    "Scayt",
+                ],
+            },
+            "/",
+            {
+                "name": "basicstyles",
+                "items": [
+                    "Bold",
+                    "Italic",
+                    "Underline",
+                    "Strike",
+                    "Subscript",
+                    "Superscript",
+                    "-",
+                    "CopyFormatting",
+                    "RemoveFormat",
+                ],
+            },
+            {
+                "name": "paragraph",
+                "items": [
+                    "NumberedList",
+                    "BulletedList",
+                    "-",
+                    "Outdent",
+                    "Indent",
+                    "-",
+                    "Blockquote",
+                    "-",
+                    "JustifyLeft",
+                    "JustifyCenter",
+                    "JustifyRight",
+                    "JustifyBlock",
+                    "-",
+                    "BidiLtr",
+                    "BidiRtl",
+                    "Language",
+                ],
+            },
+            {
+                "name": "links",
+                "items": [
+                    "Link",
+                    "Unlink",
+                ],
+            },
+            {
+                "name": "insert",
+                "items": [
+                    "Image",
+                    "Table",
+                    "HorizontalRule",
+                    "Smiley",
+                    "SpecialChar",
+                ],
+            },
+            "/",
+            {
+                "name": "styles",
+                "items": [
+                    "Styles",
+                    "Format",
+                    "Font",
+                    "FontSize",
+                ],
+            },
+            {
+                "name": "colors",
+                "items": [
+                    "TextColor",
+                    "BGColor",
+                ],
+            },
+            {
+                "name": "tools",
+                "items": [
+                    "Maximize",
+                    "ShowBlocks",
+                ],
+            },
+            {
+                "name": "about",
+                "items": [
+                    "About",
+                ],
+            },
+        ],
+    },
+}
 
 MINIO_URL = env("MINIO_URL")
 MINIO_SECURE = env.bool("MINIO_SECURE")
