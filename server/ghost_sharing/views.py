@@ -32,7 +32,7 @@ from hsutils.viewmodels import (
     Tag,
 )
 
-from .models import Ghost, GhostFinishType
+from .models import Gameflow, Ghost, GhostFinishType, Level
 from .models import Tag as TagModel
 
 
@@ -75,30 +75,15 @@ def upload(request: HttpRequest, files: dict[str, UploadedFile]) -> SuccessRespo
         ):
             return HTTPStatus.BAD_REQUEST, SuccessResponse(success=False, message="Quota exceeded")
 
-        staging_ghost = Ghost.objects.create(
-            owner=request.user,
-            file_id=uuid.uuid4(),
-            level="",
-            duration=timedelta(seconds=0),
-            hash="",
-            original_filename=filename,
-            published=False,
-            finish_type=None,
-            data_size=data.size,
-        )
-        staging_ghost.save()
-
         with BytesIO() as tmp_file:
             try:
                 file_hash = hashlib.md5()
                 for chunk in data.chunks():
                     file_hash.update(chunk)
                     tmp_file.write(chunk)
-                staging_ghost.hash = file_hash.hexdigest()
-                staging_ghost.save()
+                data_hash = file_hash.hexdigest()
             except Exception:
                 logging.fatal("File save failed", exc_info=True)
-                staging_ghost.delete()
                 raise
 
             tmp_file.seek(0)
@@ -119,14 +104,37 @@ def upload(request: HttpRequest, files: dict[str, UploadedFile]) -> SuccessRespo
                         if Path(archive_member.name).suffix == ".yml":
                             with archive.extractfile(archive_member) as extracted:
                                 yml_data = yaml.load(extracted, Loader=SafeLoaderIgnoreUnknown)
-                            staging_ghost.level = yml_data["ghost"]["level"]
-                            staging_ghost.duration = timedelta(seconds=int(yml_data["ghost"]["duration"]) / 30)
-                            staging_ghost.finish_type = yml_data["ghost"]["finishState"]
+                            unknown_gameflow, _ = Gameflow.objects.get_or_create(
+                                identifier="unknown",
+                                title="unknown",
+                            )
+                            try:
+                                level = Level.objects.get(
+                                    gameflow=unknown_gameflow,
+                                    identifier=yml_data["ghost"]["level"],
+                                )
+                            except Level.DoesNotExist:
+                                level = Level.objects.create(
+                                    gameflow=unknown_gameflow,
+                                    identifier=yml_data["ghost"]["level"],
+                                    title=yml_data["ghost"]["level"],
+                                )
+
+                            staging_ghost = Ghost.objects.create(
+                                owner=request.user,
+                                file_id=uuid.uuid4(),
+                                level=level,
+                                duration=timedelta(seconds=int(yml_data["ghost"]["duration"]) / 30),
+                                hash=data_hash,
+                                original_filename=filename,
+                                published=False,
+                                finish_type=yml_data["ghost"]["finishState"],
+                                data_size=data.size,
+                            )
                             staging_ghost.save()
                 put_staging_ghost(staging_ghost, tmp_file)
             except Exception:
                 logging.fatal("File save failed", exc_info=True)
-                staging_ghost.delete()
                 raise
 
     return SuccessResponse(success=True, message="")
@@ -145,7 +153,7 @@ def _ghost_to_response(ghost: Ghost) -> GhostFileResponseEntry:
             )
             for tag in ghost.tags.all()
         ],
-        level=ghost.level,
+        level=f"{ghost.level.gameflow.title} - {ghost.level.title}",
         duration=int(ghost.duration.total_seconds()),
         size=ghost.data_size,
         finish_type=GhostFinishType(ghost.finish_type).value,

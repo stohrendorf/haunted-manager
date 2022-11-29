@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Ghost
+from .models import Gameflow, Ghost, Level
 
 
 class GhostAdmin(admin.ModelAdmin):
@@ -9,4 +9,14 @@ class GhostAdmin(admin.ModelAdmin):
     list_filter = ("published", "level")
 
 
+class LevelAdmin(admin.ModelAdmin):
+    pass
+
+
+class GameflowAdmin(admin.ModelAdmin):
+    pass
+
+
 admin.site.register(Ghost, GhostAdmin)
+admin.site.register(Level, LevelAdmin)
+admin.site.register(Gameflow, GameflowAdmin)
