@@ -1,19 +1,33 @@
 <script lang="ts">
-import { Vue } from "vue-class-component";
-import { Prop } from "vue-property-decorator";
+import { defineComponent } from "vue";
 
-export default class SingleLineInput extends Vue {
-  @Prop({ default: false })
-  public disabled!: boolean;
-  @Prop({ default: false })
-  public required!: boolean;
-  @Prop({ required: true })
-  public label!: string;
-  @Prop({ required: true })
-  public modelValue!: string;
-  @Prop({ required: false, default: "text" })
-  public type!: string;
-}
+export default defineComponent({
+  props: {
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    required: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    label: {
+      type: String,
+      required: true,
+    },
+    modelValue: {
+      type: String,
+      required: true,
+    },
+    type: {
+      type: String,
+      required: false,
+      default: "text",
+    },
+  },
+});
 </script>
 
 <template>

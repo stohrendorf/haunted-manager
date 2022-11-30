@@ -1,19 +1,21 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { Prop } from "vue-property-decorator";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
+import { defineComponent } from "vue";
 
-@Options({
+export default defineComponent({
   components: { BsBtn },
-})
-export default class ClipboardCopyable extends Vue {
-  @Prop({ required: true })
-  public value!: string;
-
-  async copyToClipboard(): Promise<void> {
-    await navigator.clipboard.writeText(this.value);
-  }
-}
+  props: {
+    value: {
+      type: String,
+      required: true,
+    },
+  },
+  methods: {
+    async copyToClipboard(): Promise<void> {
+      await navigator.clipboard.writeText(this.value);
+    },
+  },
+});
 </script>
 
 <template>

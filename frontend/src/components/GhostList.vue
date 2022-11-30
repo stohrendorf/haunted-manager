@@ -1,5 +1,4 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import {
   getGhosts,
   IGhostFileResponseEntry,
@@ -12,53 +11,52 @@ import { profileStore } from "@/components/ProfileStore";
 import { XzReadableStream } from "xzwasm";
 
 import { getData, getFiles } from "@/components/utilities/untar";
+import { defineComponent } from "vue";
 
-@Options({
+export default defineComponent({
   components: { BsBtn },
   directives: { BsTooltip },
-})
-export default class GhostList extends Vue {
-  private ghosts: IGhostFileResponseEntry[] = [];
-  private profile = profileStore();
-
+  data() {
+    return {
+      ghosts: [] as IGhostFileResponseEntry[],
+      profile: profileStore(),
+    };
+  },
   async created(): Promise<void> {
     this.ghosts = (await getGhosts()).files;
-  }
+  },
+  methods: {
+    async deleteGhost(id: number): Promise<void> {
+      await deleteGhost(id);
+      this.ghosts = (await getGhosts()).files;
+    },
+    async downloadGhost(id: number): Promise<void> {
+      const archive = await downloadGhost(id);
+      if (archive === null) return;
 
-  async deleteGhost(id: number): Promise<void> {
-    await deleteGhost(id);
-    this.ghosts = (await getGhosts()).files;
-  }
-  async downloadGhost(id: number): Promise<void> {
-    const archive = await downloadGhost(id);
-    if (archive === null) return;
-
-    const tarDataArray = [];
-    for (const reader = new XzReadableStream(archive).getReader(); ; ) {
-      const chunk = await reader.read();
-      if (chunk.done) {
-        break;
+      const tarDataArray = [];
+      for (const reader = new XzReadableStream(archive).getReader(); ; ) {
+        const chunk = await reader.read();
+        if (chunk.done) {
+          break;
+        }
+        tarDataArray.push(...chunk.value);
       }
-      tarDataArray.push(...chunk.value);
-    }
-    const tarData = new Uint8Array(tarDataArray);
-    const entries = getFiles(tarData).filter((e) =>
-      e.name.toLowerCase().endsWith(".bin")
-    );
-    if (entries.length === 1) {
-      const binData = getData(entries[0], tarData);
-      const a = this.$refs.downloadAnchor as HTMLAnchorElement;
-      const blob = new Blob([binData], { type: "application/octet-stream" });
-      a.href = URL.createObjectURL(blob);
-      a.download = entries[0].name;
-      a.click();
-    }
-  }
-
-  getGhostDownloadUrl(id: number): string {
-    return `${process.env.VUE_APP_SERVER_URL}/api/v0/ghosts/${id}`;
-  }
-}
+      const tarData = new Uint8Array(tarDataArray);
+      const entries = getFiles(tarData).filter((e) =>
+        e.name.toLowerCase().endsWith(".bin")
+      );
+      if (entries.length === 1) {
+        const binData = getData(entries[0], tarData);
+        const a = this.$refs.downloadAnchor as HTMLAnchorElement;
+        const blob = new Blob([binData], { type: "application/octet-stream" });
+        a.href = URL.createObjectURL(blob);
+        a.download = entries[0].name;
+        a.click();
+      }
+    },
+  },
+});
 </script>
 
 <template>

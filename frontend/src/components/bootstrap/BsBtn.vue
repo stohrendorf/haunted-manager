@@ -1,22 +1,30 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { Prop } from "vue-property-decorator";
 import { Variant } from "./BsTypes";
+import { defineComponent } from "vue";
 
-@Options({})
-export default class BsBtn extends Vue {
-  @Prop({ required: true })
-  public variant!: Variant;
-
-  @Prop({ required: false, default: false, type: Boolean })
-  public disabled: boolean = undefined!;
-
-  @Prop({ required: false, default: false, type: Boolean })
-  public small: boolean = undefined!;
-
-  @Prop({ required: false, default: false, type: Boolean })
-  public outline: boolean = undefined!;
-}
+export default defineComponent({
+  props: {
+    variant: {
+      type: Variant,
+      required: true,
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
+    small: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
+    outline: {
+      type: Boolean,
+      default: false,
+      required: false,
+    },
+  },
+});
 </script>
 
 <template>

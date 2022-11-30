@@ -1,15 +1,20 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { Prop } from "vue-property-decorator";
+import { defineComponent } from "vue";
 
-@Options({})
-export default class BsDropdownNavItem extends Vue {
-  @Prop({ required: false, default: null })
-  public minWidth!: string | null;
-
-  @Prop({ required: false, default: false })
-  public end!: boolean;
-}
+export default defineComponent({
+  props: {
+    minWidth: {
+      type: String,
+      required: false,
+      default: null,
+    },
+    end: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
+});
 </script>
 
 <template>

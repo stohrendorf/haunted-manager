@@ -1,75 +1,99 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import { getTags, ISession, ITag } from "@/components/ApiService";
-import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
 import BsCheckboxMultiple from "@/components/bootstrap/BsCheckboxMultiple.vue";
-import { Prop } from "vue-property-decorator";
 import DateTimePicker from "@/components/utilities/DateTimePicker.vue";
 import moment from "moment";
+import { defineComponent, PropType } from "vue";
 
-@Options({
+export default defineComponent({
   components: {
     BsCheckboxMultiple,
-    BsBtn,
     FloatingSingleLineInput,
     DateTimePicker,
   },
-})
-export default class SessionEditor extends Vue {
-  private tags: ITag[] | null = null;
-  get isEvent(): boolean {
-    return this.session.time !== null;
-  }
-  set isEvent(value: boolean) {
-    if (value === (this.session.time !== null)) return;
-    if (value) {
-      this.session.time = {
-        start: moment().toISOString(),
-        end: moment().toISOString(),
-      };
-    } else {
-      this.session.time = null;
-    }
-  }
-
-  @Prop({ required: true, default: () => ({ tags: [] }) })
-  public session!: ISession;
-
-  @Prop({ required: true, default: () => [] })
-  private selectedTags!: number[];
-
-  private updateSelectedTagsFromSession(): void {
-    this.selectedTags.splice(0, this.selectedTags.length);
-    this.selectedTags.push(
-      ...this.session.tags.map(
-        (sessionTag) =>
-          this.tags!.filter((tag) => tag.name === sessionTag.name)[0].id
-      )
-    );
-    this.$emit("update:selectedTags", this.selectedTags);
-  }
-
+  props: {
+    modelValue: {
+      type: Object as PropType<ISession>,
+      required: true,
+    },
+    selectedTags: {
+      type: Object as PropType<number[]>,
+      required: true,
+    },
+  },
+  events: ["update:session"],
+  data() {
+    return {
+      tags: null as ITag[] | null,
+      localSession: null as ISession | null,
+      localSelectedTags: [] as number[],
+    };
+  },
+  computed: {
+    isEvent: {
+      get(): boolean {
+        return this.localSession!.time !== null;
+      },
+      set(value: boolean) {
+        if (value === (this.localSession!.time !== null)) return;
+        if (value) {
+          this.localSession!.time = {
+            start: moment().toISOString(),
+            end: moment().toISOString(),
+          };
+        } else {
+          this.localSession!.time = null;
+        }
+        this.sessionUpdated();
+      },
+    },
+  },
   async created(): Promise<void> {
     this.tags = (await getTags()).tags;
-    this.updateSelectedTagsFromSession();
+    this.localSession = { ...this.modelValue };
     this.$watch(
-      () => this.session,
+      () => this.modelValue,
       () => {
+        this.localSession = { ...this.modelValue };
         this.updateSelectedTagsFromSession();
-      },
-      { deep: false }
+      }
     );
-  }
-}
+    this.localSelectedTags = [...this.selectedTags];
+    this.$watch(
+      () => this.selectedTags,
+      () => {
+        this.localSelectedTags = [...this.selectedTags];
+        this.updateSelectedTagsFromSession();
+      }
+    );
+    this.updateSelectedTagsFromSession();
+  },
+  methods: {
+    updateSelectedTagsFromSession(): void {
+      this.localSelectedTags.splice(0, this.localSelectedTags.length);
+      this.localSelectedTags.push(
+        ...this.localSession!.tags.map(
+          (sessionTag) =>
+            this.tags!.filter((tag) => tag.name === sessionTag.name)[0].id
+        )
+      );
+      this.$emit("update:selectedTags", this.localSelectedTags);
+    },
+    sessionUpdated() {
+      this.$emit("update:modelValue", this.localSession);
+    },
+  },
+});
 </script>
 
 <template>
   <form v-if="tags != null">
     <floating-single-line-input
-      v-model="session.description"
+      v-model="localSession.description"
       label="Description"
       required
+      @change="sessionUpdated()"
     />
 
     <div class="card">
@@ -83,14 +107,20 @@ export default class SessionEditor extends Vue {
           />
           <label :for="'event-checkbox--' + $.uid"> Scheduled Event </label>
         </div>
-        <div v-if="session.time">
-          <date-time-picker v-model="session.time.start">
+        <div v-if="localSession.time">
+          <date-time-picker
+            v-model="localSession.time.start"
+            @change="sessionUpdated()"
+          >
             <strong> Start Time </strong>
-            {{ $filters.datetime(session.time.start) }}
+            {{ $filters.datetime(localSession.time.start) }}
           </date-time-picker>
-          <date-time-picker v-model="session.time.end">
+          <date-time-picker
+            v-model="localSession.time.end"
+            @change="sessionUpdated()"
+          >
             <strong> End Time </strong>
-            {{ $filters.datetime(session.time.end) }}
+            {{ $filters.datetime(localSession.time.end) }}
           </date-time-picker>
           <small>All times are in your local time zone.</small>
         </div>
@@ -99,7 +129,11 @@ export default class SessionEditor extends Vue {
 
     <ul class="list-unstyled">
       <li v-for="tag in tags" :key="tag.id">
-        <bs-checkbox-multiple :value="tag.id" :selected-values="selectedTags">
+        <bs-checkbox-multiple
+          v-model="localSelectedTags"
+          :value="tag.id"
+          @change="$emit('update:selectedTags', localSelectedTags)"
+        >
           <span class="badge bg-secondary">{{ tag.name }}</span>
           {{ tag.description }}
         </bs-checkbox-multiple>

@@ -1,5 +1,4 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import {
   getTags,
   IGhostFileResponseEntry,
@@ -10,53 +9,64 @@ import {
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
 import BsCheckboxMultiple from "@/components/bootstrap/BsCheckboxMultiple.vue";
-import { Emit, Prop } from "vue-property-decorator";
-import DateTimePicker from "@/components/utilities/DateTimePicker.vue";
 import BsCheckboxSingle from "@/components/bootstrap/BsCheckboxSingle.vue";
 import BsSelect from "@/components/bootstrap/BsSelect.vue";
 import { ISelectEntry } from "@/components/bootstrap/ISelectEntry";
+import { defineComponent, PropType } from "vue";
 
-@Options({
+export default defineComponent({
   components: {
     BsSelect,
     BsCheckboxMultiple,
     BsBtn,
     FloatingSingleLineInput,
-    DateTimePicker,
     BsCheckboxSingle,
   },
-})
-export default class GhostEditor extends Vue {
-  private tags: ITag[] | null = null;
-  private alternativeLevels: ISelectEntry[] = [];
-
-  @Prop({ required: true, default: () => ({ tags: [] }) })
-  public ghost!: IGhostFileResponseEntry;
-
+  props: {
+    modelValue: {
+      type: Object as PropType<IGhostFileResponseEntry>,
+      required: true,
+    },
+  },
+  emits: ["saved", "update:modelValue"],
+  data() {
+    return {
+      tags: null as ITag[] | null,
+      alternativeLevels: null as ISelectEntry[] | null,
+      localGhost: null as IGhostFileResponseEntry | null,
+    };
+  },
   async created(): Promise<void> {
+    this.localGhost = { ...this.modelValue };
+    this.$watch(
+      () => this.modelValue,
+      () => {
+        this.localGhost = { ...this.modelValue };
+      }
+    );
+
     this.tags = (await getTags()).tags;
     this.alternativeLevels = (
-      await getAlternativeLevels(this.ghost.level_identifier)
+      await getAlternativeLevels(this.modelValue.level_identifier)
     ).levels.map((x) => ({ value: x.id, title: x.title }));
-  }
+  },
+  methods: {
+    async saveGhost(): Promise<void> {
+      await updateGhost(this.localGhost!.id, {
+        published: this.localGhost!.published,
+        tags: this.localGhost!.tags.map((tag) => tag.id),
+        description: this.localGhost!.description,
+        level_id: this.localGhost!.level_id,
+      });
+      this.updated();
+      this.$emit("saved");
+    },
 
-  async saveGhost(): Promise<void> {
-    await updateGhost(this.ghost.id, {
-      published: this.ghost.published,
-      tags: this.ghost.tags.map((tag) => tag.id),
-      description: this.ghost.description,
-      level_id: this.ghost.level_id,
-    });
-    this.saved();
-  }
-
-  onPublishedChecked(value: boolean): void {
-    this.ghost.published = value;
-  }
-
-  @Emit()
-  saved(): void {}
-}
+    updated() {
+      this.$emit("update:modelValue", this.localGhost);
+    },
+  },
+});
 </script>
 
 <template>
@@ -64,30 +74,33 @@ export default class GhostEditor extends Vue {
     <div class="row">
       <div class="col">
         <bs-select
-          v-model="ghost.level_id"
+          v-model="localGhost.level_id"
           :items="alternativeLevels"
           label="Level"
+          @change="updated()"
         />
         <span class="bi bi-stopwatch"></span>
-        {{ $filters.seconds(ghost.duration) }}
+        {{ $filters.seconds(localGhost.duration) }}
         &bull;
-        <bs-checkbox-single v-model="ghost.published">
+        <bs-checkbox-single v-model="localGhost.published" @change="updated()">
           <span class="bi bi-cloud" /> Published
         </bs-checkbox-single>
       </div>
     </div>
     <div class="row">
       <floating-single-line-input
-        v-model="ghost.description"
+        v-model="localGhost.description"
         label="Description"
+        @change="updated()"
       ></floating-single-line-input>
     </div>
     <div class="row">
       <bs-checkbox-multiple
         v-for="tag in tags"
         :key="tag.id"
+        v-model="localGhost.tags"
         :value="tag"
-        :selected-values="ghost.tags"
+        @change="updated()"
       >
         <span class="badge bg-secondary">{{ tag.name }}</span>
         {{ tag.description }}

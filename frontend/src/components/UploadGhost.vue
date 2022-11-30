@@ -1,5 +1,4 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import {
   getGhostsQuota,
   IQuotaResponse,
@@ -12,85 +11,85 @@ import {
 } from "@/components/ApiService";
 import ProgressBarSlice from "@/components/bootstrap/ProgressBarSlice.vue";
 import BsAlert from "@/components/bootstrap/BsAlert.vue";
-import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
-import BsCheckboxMultiple from "@/components/bootstrap/BsCheckboxMultiple.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import GhostEditor from "@/components/GhostEditor.vue";
+import { defineComponent } from "vue";
 
-@Options({
+export default defineComponent({
   components: {
     GhostEditor,
-    BsCheckboxMultiple,
-    FloatingSingleLineInput,
     ProgressBarSlice,
     BsAlert,
     BsBtn,
   },
-})
-export default class UploadGhost extends Vue {
-  private errors: string[] = [];
-  private quota: IQuotaResponse = { max: 0, current: 0 };
-  private quotaPercent: number = 0;
-  private stagingGhosts: IGhostFileResponseEntry[] = [];
-  private tags: ITag[] = [];
-
+  data() {
+    return {
+      errors: [] as string[],
+      quota: { max: 0, current: 0 } as IQuotaResponse,
+      quotaPercent: 0.0,
+      stagingGhosts: [] as IGhostFileResponseEntry[],
+      tags: [] as ITag[],
+      file: null as File | null,
+    };
+  },
   async mounted(): Promise<void> {
     await this.updateQuota();
     this.tags = (await getTags()).tags;
-  }
+  },
+  methods: {
+    async updateQuota(): Promise<void> {
+      this.quota = await getGhostsQuota();
+      this.quotaPercent = Math.round(
+        (this.quota.current / this.quota.max) * 100
+      );
+      await this.updateGhostList();
+    },
 
-  private async updateQuota(): Promise<void> {
-    this.quota = await getGhostsQuota();
-    this.quotaPercent = Math.round((this.quota.current / this.quota.max) * 100);
-    await this.updateGhostList();
-  }
-
-  private async onFileSelected(event: InputEvent): Promise<void> {
-    const files = (event.target as HTMLInputElement).files;
-    if (!files || files.length != 1) {
-      this.file = null;
-      return;
-    }
-    this.file = files[0];
-  }
-
-  private async doUpload(): Promise<void> {
-    if (this.file != null) {
-      const result = await uploadGhost([this.file]);
-      if (!result.success) {
-        this.errors.push(result.message);
+    async onFileSelected(event: InputEvent): Promise<void> {
+      const files = (event.target as HTMLInputElement).files;
+      if (!files || files.length != 1) {
+        this.file = null;
+        return;
       }
-    }
-    this.file = null;
-    await this.updateQuota();
-  }
+      this.file = files[0];
+    },
 
-  private selectFile(): void {
-    (this.$refs.fileInput as HTMLInputElement).click();
-  }
+    async doUpload(): Promise<void> {
+      if (this.file != null) {
+        const result = await uploadGhost([this.file]);
+        if (!result.success) {
+          this.errors.push(result.message);
+        }
+      }
+      this.file = null;
+      await this.updateQuota();
+    },
 
-  private dropFile(e: DragEvent): void {
-    if (!e.dataTransfer) {
-      return;
-    }
-    let droppedFiles = e.dataTransfer.files;
-    if (!droppedFiles || droppedFiles.length != 1) {
-      return;
-    }
-    this.file = droppedFiles[0];
-  }
+    selectFile(): void {
+      (this.$refs.fileInput as HTMLInputElement).click();
+    },
 
-  async deleteGhost(id: number): Promise<void> {
-    await deleteGhost(id);
-    await this.updateGhostList();
-  }
+    dropFile(e: DragEvent): void {
+      if (!e.dataTransfer) {
+        return;
+      }
+      const droppedFiles = e.dataTransfer.files;
+      if (!droppedFiles || droppedFiles.length != 1) {
+        return;
+      }
+      this.file = droppedFiles[0];
+    },
 
-  async updateGhostList(): Promise<void> {
-    this.stagingGhosts = (await getStagingGhosts()).files;
-  }
+    async deleteGhost(id: number): Promise<void> {
+      await deleteGhost(id);
+      await this.updateGhostList();
+    },
 
-  private file: File | null = null;
-}
+    async updateGhostList(): Promise<void> {
+      this.stagingGhosts = (await getStagingGhosts()).files;
+    },
+  },
+});
 </script>
 
 <template>
@@ -143,18 +142,19 @@ export default class UploadGhost extends Vue {
       class="btn w-100"
       :class="{ disabled: !file, 'btn-primary': file }"
       @click="doUpload()"
-      ><i class="bi bi-upload" /> Upload</a
     >
+      <i class="bi bi-upload" /> Upload
+    </a>
 
     <h3 v-if="stagingGhosts">Unpublished Ghosts</h3>
 
     <div class="list-group">
       <div
-        v-for="ghost in stagingGhosts"
+        v-for="(ghost, index) in stagingGhosts"
         :key="ghost.id"
         class="list-group-item"
       >
-        <ghost-editor :ghost="ghost" @saved="updateGhostList">
+        <ghost-editor v-model="stagingGhosts[index]" @saved="updateGhostList">
           <bs-btn variant="danger" small @click="deleteGhost(ghost.id)">
             <span class="bi bi-trash" /> Delete
           </bs-btn>

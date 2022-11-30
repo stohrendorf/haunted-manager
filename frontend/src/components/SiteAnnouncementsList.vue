@@ -1,15 +1,17 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import { getAnnouncements, IAnnouncementEntry } from "@/components/ApiService";
+import { defineComponent } from "vue";
 
-@Options({})
-export default class SiteAnnouncementsList extends Vue {
-  public announcements: IAnnouncementEntry[] = [];
-
-  async created(): Promise<void> {
+export default defineComponent({
+  data() {
+    return {
+      announcements: [] as IAnnouncementEntry[],
+    };
+  },
+  async created() {
     this.announcements = (await getAnnouncements()).announcements;
-  }
-}
+  },
+});
 </script>
 
 <template>

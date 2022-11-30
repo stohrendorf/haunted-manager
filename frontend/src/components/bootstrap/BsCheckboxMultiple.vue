@@ -1,57 +1,62 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { Prop, Emit } from "vue-property-decorator";
+import { defineComponent } from "vue";
 
-@Options({})
-export default class BsCheckboxMultiple extends Vue {
-  @Prop({ default: true, required: false })
-  public value!: any;
-
-  @Prop({ default: () => [] })
-  public selectedValues!: any[];
-
-  private checked: boolean = false;
-
+export default defineComponent({
+  props: {
+    value: {
+      type: [Object, Boolean, String, Number, Date, Array],
+      required: false,
+      default: true,
+    },
+    modelValue: {
+      type: Array,
+      required: false,
+      default() {
+        return [];
+      },
+    },
+  },
+  emits: ["onChecked", "update:modelValue"],
+  data() {
+    return {
+      checked: false,
+    };
+  },
   created(): void {
     const updateChecked = () => {
       const value = JSON.stringify(this.value);
-      this.checked = this.selectedValues.some(
-        (x) => JSON.stringify(x) == value
-      );
-      this.onChecked();
+      this.checked = this.modelValue.some((x) => JSON.stringify(x) == value);
+      this.$emit("onChecked", this.checked);
     };
 
-    this.$watch(() => this.selectedValues, updateChecked);
+    this.$watch(() => this.modelValue, updateChecked);
     this.$watch(() => this.value, updateChecked);
     updateChecked();
-  }
-
-  changed(): void {
-    const checked = (
-      document.getElementById(String(this.$.uid)) as HTMLInputElement
-    ).checked;
-    const value = JSON.stringify(this.value);
-    if (checked && !this.selectedValues.some((x) => JSON.stringify(x) == value))
-      this.selectedValues.push(this.value);
-    else if (
-      !checked &&
-      this.selectedValues.some((x) => JSON.stringify(x) == value)
-    )
-      this.selectedValues.splice(
-        this.selectedValues.findIndex((x) => JSON.stringify(x) == value),
-        1
-      );
-    else return;
-    this.$emit("update:selectedValues", this.selectedValues);
-    this.checked = checked;
-    this.onChecked();
-  }
-
-  @Emit()
-  onChecked(): boolean {
-    return this.checked;
-  }
-}
+  },
+  methods: {
+    changed(): void {
+      const checked = (
+        document.getElementById(String(this.$.uid)) as HTMLInputElement
+      ).checked;
+      const value = JSON.stringify(this.value);
+      if (checked && !this.modelValue.some((x) => JSON.stringify(x) == value))
+        this.$emit("update:modelValue", this.modelValue?.concat(this.value));
+      else if (
+        !checked &&
+        this.modelValue.some((x) => JSON.stringify(x) == value)
+      ) {
+        this.$emit(
+          "update:modelValue",
+          this.modelValue?.filter((x) => JSON.stringify(x) !== value)
+        );
+      } else return;
+      this.$emit("update:modelValue", this.modelValue);
+      this.checked = checked;
+      this.$emit("onChecked", this.checked);
+    },
+  },
+  emit: ["onChecked"],
+});
 </script>
 
 <template>

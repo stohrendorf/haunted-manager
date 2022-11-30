@@ -1,12 +1,16 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { Prop } from "vue-property-decorator";
+import { defineComponent } from "vue";
+import { Ms } from "@/components/bootstrap/BsTypes";
 
-@Options({})
-export default class BsNavbarNav extends Vue {
-  @Prop({ required: false, default: "" })
-  public ms!: "auto" | "5" | "4" | "3" | "2" | "1";
-}
+export default defineComponent({
+  props: {
+    ms: {
+      type: Ms,
+      required: false,
+      default: null,
+    },
+  },
+});
 </script>
 
 <template>

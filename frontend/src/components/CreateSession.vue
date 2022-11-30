@@ -1,36 +1,39 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import { createSession, ISession } from "@/components/ApiService";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import SessionEditor from "@/components/SessionEditor.vue";
+import { defineComponent } from "vue";
 
-@Options({
+export default defineComponent({
   components: { BsBtn, SessionEditor },
-})
-export default class CreateSession extends Vue {
-  private session: ISession = {
-    id: "",
-    owner: "",
-    description: "",
-    tags: [],
-    players: [],
-    time: null,
-  };
-  private selectedTags: number[] = [];
-
-  async createSession(): Promise<void> {
-    await createSession({
-      description: this.session.description,
-      tags: this.selectedTags,
-      time: this.session.time,
-    });
-    this.$router.push("/");
-  }
-}
+  data() {
+    return {
+      session: {
+        id: "",
+        owner: "",
+        description: "",
+        tags: [],
+        players: [],
+        time: null,
+      } as ISession,
+      selectedTags: [] as number[],
+    };
+  },
+  methods: {
+    async createSession(): Promise<void> {
+      await createSession({
+        description: this.session.description,
+        tags: this.selectedTags,
+        time: this.session.time,
+      });
+      this.$router.push("/");
+    },
+  },
+});
 </script>
 
 <template>
-  <session-editor :session="session" :selected-tags="selectedTags">
+  <session-editor v-model="session" :selected-tags="selectedTags">
     <bs-btn variant="success" @click="createSession()">Create</bs-btn>
   </session-editor>
 </template>

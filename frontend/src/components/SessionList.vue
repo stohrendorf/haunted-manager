@@ -1,5 +1,4 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import { getSessions, ISession } from "@/components/ApiService";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import BsTooltip from "@/components/bootstrap/BsTooltip";
@@ -7,24 +6,27 @@ import { deleteSession as deleteSessionRequest } from "@/components/ApiService";
 import { profileStore } from "@/components/ProfileStore";
 import BsAlert from "@/components/bootstrap/BsAlert.vue";
 import ClipboardCopyable from "@/components/utilities/ClipboardCopyable.vue";
+import { defineComponent } from "vue";
 
-@Options({
+export default defineComponent({
   components: { ClipboardCopyable, BsAlert, BsBtn },
   directives: { BsTooltip },
-})
-export default class SessionList extends Vue {
-  private sessions: ISession[] = [];
-  private profile = profileStore();
-
-  async created(): Promise<void> {
+  data() {
+    return {
+      sessions: [] as ISession[],
+      profile: profileStore(),
+    };
+  },
+  async created() {
     this.sessions = (await getSessions()).sessions;
-  }
-
-  async deleteSession(id: string): Promise<void> {
-    await deleteSessionRequest(id);
-    this.sessions = (await getSessions()).sessions;
-  }
-}
+  },
+  methods: {
+    async deleteSession(id: string): Promise<void> {
+      await deleteSessionRequest(id);
+      this.sessions = (await getSessions()).sessions;
+    },
+  },
+});
 </script>
 
 <template>

@@ -23,7 +23,6 @@
     "moment-timezone": "*",
     "pinia": "*",
     "vue": "^3",
-    "vue-class-component": "^8.0.0-rc.1",
     "vue-router": "*",
     "vue-upload-component": "*",
     "xzwasm": "*"
@@ -53,8 +52,7 @@
     "sass": "*",
     "sass-loader": "*",
     "typescript": "*",
-    "vitest": "*",
-    "vue-property-decorator": "*"
+    "vitest": "*"
   },
   "eslintConfig": {
     "root": true,

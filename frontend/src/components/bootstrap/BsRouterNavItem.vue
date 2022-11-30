@@ -1,15 +1,19 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { Prop } from "vue-property-decorator";
+import { defineComponent } from "vue";
 
-@Options({})
-export default class BsRouterNavItem extends Vue {
-  @Prop({ required: true })
-  public to!: string;
-
-  @Prop({ required: false, default: false })
-  public disabled!: boolean;
-}
+export default defineComponent({
+  props: {
+    to: {
+      type: String,
+      required: true,
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+  },
+});
 </script>
 
 <template>

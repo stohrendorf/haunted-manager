@@ -1,36 +1,40 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import { getProfile, login } from "@/components/ApiService";
 import { profileStore } from "@/components/ProfileStore";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
 import BsAlert from "@/components/bootstrap/BsAlert.vue";
+import { defineComponent } from "vue";
 
-@Options({ components: { BsAlert, FloatingSingleLineInput, BsBtn } })
-export default class LoginWidget extends Vue {
-  public profileInfo = profileStore();
+export default defineComponent({
+  components: { BsAlert, FloatingSingleLineInput, BsBtn },
+  data() {
+    return {
+      profileInfo: profileStore(),
+      username: "",
+      password: "",
+      loginError: "",
+    };
+  },
+  methods: {
+    async formSubmit() {
+      const loginResult = await login({
+        username: this.username.trim(),
+        password: this.password,
+      });
+      if (!loginResult.success) {
+        this.loginError = loginResult.message;
+        return;
+      }
 
-  async formSubmit() {
-    const loginResult = await login({
-      username: this.username.trim(),
-      password: this.password,
-    });
-    if (!loginResult.success) {
-      this.loginError = loginResult.message;
-      return;
-    }
+      this.username = "";
+      this.password = "";
+      this.loginError = "";
 
-    this.username = "";
-    this.password = "";
-    this.loginError = "";
-
-    this.profileInfo.$state = await getProfile();
-  }
-
-  private username: string = "";
-  private password: string = "";
-  private loginError: string = "";
-}
+      this.profileInfo.$state = await getProfile();
+    },
+  },
+});
 </script>
 
 <template>

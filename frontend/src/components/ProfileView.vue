@@ -1,5 +1,4 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import {
   changeEmail,
   changePassword,
@@ -11,49 +10,52 @@ import { profileStore } from "@/components/ProfileStore";
 import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import BsAlert from "@/components/bootstrap/BsAlert.vue";
+import { defineComponent } from "vue";
 
-@Options({
+export default defineComponent({
   components: { BsAlert, FloatingSingleLineInput, BsBtn },
-})
-export default class ProfileView extends Vue {
-  private profileInfo = profileStore();
-  private wantedEmail: string = "";
-  private wantedPassword: string = "";
-  private wantedUsername: string = "";
-  private err: string = "";
-
+  data() {
+    return {
+      profileInfo: profileStore(),
+      wantedEmail: "",
+      wantedPassword: "",
+      wantedUsername: "",
+      err: "",
+    };
+  },
   async created(): Promise<void> {
     this.profileInfo.$state = await getProfile();
     this.wantedEmail = this.profileInfo.email ?? "";
     this.wantedUsername = this.profileInfo.username;
-  }
+  },
+  methods: {
+    async refreshToken(): Promise<void> {
+      await regenerateToken();
+      this.profileInfo.$state = await getProfile();
+      this.wantedEmail = this.profileInfo.email ?? "";
+    },
 
-  async refreshToken(): Promise<void> {
-    await regenerateToken();
-    this.profileInfo.$state = await getProfile();
-    this.wantedEmail = this.profileInfo.email ?? "";
-  }
+    async changePassword(): Promise<void> {
+      const response = await changePassword({ password: this.wantedPassword });
+      if (response.success) this.err = "";
+      else this.err = response.message;
+    },
 
-  async changePassword(): Promise<void> {
-    const response = await changePassword({ password: this.wantedPassword });
-    if (response.success) this.err = "";
-    else this.err = response.message;
-  }
+    async changeEmail(): Promise<void> {
+      const response = await changeEmail({ email: this.wantedEmail });
+      this.profileInfo.$state = await getProfile();
+      if (response.success) this.err = "";
+      else this.err = response.message;
+    },
 
-  async changeEmail(): Promise<void> {
-    const response = await changeEmail({ email: this.wantedEmail });
-    this.profileInfo.$state = await getProfile();
-    if (response.success) this.err = "";
-    else this.err = response.message;
-  }
-
-  async changeUsername(): Promise<void> {
-    const response = await changeUsername({ username: this.wantedUsername });
-    this.profileInfo.$state = await getProfile();
-    if (response.success) this.err = "";
-    else this.err = response.message;
-  }
-}
+    async changeUsername(): Promise<void> {
+      const response = await changeUsername({ username: this.wantedUsername });
+      this.profileInfo.$state = await getProfile();
+      if (response.success) this.err = "";
+      else this.err = response.message;
+    },
+  },
+});
 </script>
 
 <template>

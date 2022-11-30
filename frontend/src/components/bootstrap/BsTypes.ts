@@ -1,4 +1,4 @@
-export type Variant =
+type Variant =
   | "primary"
   | "secondary"
   | "success"
@@ -7,3 +7,17 @@ export type Variant =
   | "danger"
   | "light"
   | "dark";
+
+interface VariantConstructor {
+  new (x: Variant): Variant;
+}
+
+export let Variant: VariantConstructor;
+
+type Ms = "auto" | "5" | "4" | "3" | "2" | "1";
+
+interface MsConstructor {
+  new (x: Ms): Ms;
+}
+
+export let Ms: MsConstructor;

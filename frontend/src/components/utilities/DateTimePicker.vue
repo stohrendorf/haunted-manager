@@ -1,16 +1,14 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { Prop } from "vue-property-decorator";
-import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import { TempusDominus, DateTime } from "@eonasdan/tempus-dominus";
+import { defineComponent } from "vue";
 
-@Options({
-  components: { BsBtn },
-})
-export default class DateTimePicker extends Vue {
-  @Prop({ required: true })
-  public modelValue!: string;
-
+export default defineComponent({
+  props: {
+    modelValue: {
+      type: String,
+      required: true,
+    },
+  },
   mounted(): void {
     const picker = new TempusDominus(this.$refs.picker as HTMLDivElement, {
       viewDate: new DateTime(this.modelValue),
@@ -27,8 +25,8 @@ export default class DateTimePicker extends Vue {
     picker.subscribe("change.td", (x) => {
       this.$emit("update:modelValue", (x.date as Date).toISOString());
     });
-  }
-}
+  },
+});
 </script>
 
 <template>

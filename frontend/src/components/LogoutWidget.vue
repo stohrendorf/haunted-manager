@@ -1,25 +1,30 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import { logout } from "@/components/ApiService";
 import { profileStore } from "@/components/ProfileStore";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
+import { defineComponent } from "vue";
 
-@Options({ components: { BsBtn } })
-export default class LogoutWidget extends Vue {
-  public profileInfo = profileStore();
-
-  async logoutClicked(): Promise<void> {
-    await logout();
-    this.profileInfo.$state = {
-      email: "",
-      username: "",
-      authenticated: false,
-      verified: false,
-      auth_token: null,
-      is_staff: false,
+export default defineComponent({
+  components: { BsBtn },
+  data() {
+    return {
+      profileInfo: profileStore(),
     };
-  }
-}
+  },
+  methods: {
+    async logoutClicked(): Promise<void> {
+      await logout();
+      this.profileInfo.$state = {
+        email: "",
+        username: "",
+        authenticated: false,
+        verified: false,
+        auth_token: null,
+        is_staff: false,
+      };
+    },
+  },
+});
 </script>
 
 <template>

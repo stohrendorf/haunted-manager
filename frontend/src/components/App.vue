@@ -1,9 +1,7 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
 import SiteAnnouncementsList from "@/components/SiteAnnouncementsList.vue";
 import LoginWidget from "@/components/LoginWidget.vue";
 import LogoutWidget from "@/components/LogoutWidget.vue";
-import NotVerifiedLock from "@/components/NotVerifiedLock.vue";
 import BsNavbar from "@/components/bootstrap/BsNavbar.vue";
 import BsNavbarNav from "@/components/bootstrap/BsNavbarNav.vue";
 import BsRouterNavItem from "@/components/bootstrap/BsRouterNavItem.vue";
@@ -16,44 +14,50 @@ import {
 import { profileStore } from "@/components/ProfileStore";
 import BsModal from "@/components/bootstrap/BsModal.vue";
 import ClipboardCopyable from "@/components/utilities/ClipboardCopyable.vue";
+import { defineComponent } from "vue";
+import { ComponentPublicInstance } from "@vue/runtime-core";
 
-@Options({
+export default defineComponent({
   components: {
     ClipboardCopyable,
     BsModal,
     SiteAnnouncementsList,
     LoginWidget,
     LogoutWidget,
-    NotVerifiedLock,
     BsNavbar,
     BsNavbarNav,
     BsRouterNavItem,
     BsDropdownNavItem,
   },
-})
-export default class App extends Vue {
-  public profileInfo = profileStore();
-  private err: Error | null = null;
-  private info: string = "";
-  private serverInfo: IServerInfoResponse = {
-    total_sessions: 0,
-    total_users: 0,
-    coop_url: "",
-  };
-
+  data() {
+    return {
+      profileInfo: profileStore(),
+      err: null as Error | null,
+      info: "",
+      serverInfo: {
+        total_sessions: 0,
+        total_users: 0,
+        coop_url: "",
+      } as IServerInfoResponse,
+    };
+  },
   async created(): Promise<void> {
     this.profileInfo.$state = await getProfile();
     this.serverInfo = await getServerInfo();
-  }
+  },
 
-  errorCaptured(err: Error, vm: Vue, info: string): boolean {
-    this.err = err;
+  errorCaptured(
+    err: unknown,
+    vm: ComponentPublicInstance | null,
+    info: string
+  ): boolean {
+    this.err = err as Error;
     this.info = info;
     console.error(err, info);
-    if (this.$refs.errorModal) (this.$refs.errorModal as BsModal).show();
+    if (this.$refs.errorModal) (this.$refs.errorModal as typeof BsModal).show();
     return false;
-  }
-}
+  },
+});
 </script>
 
 <template>
@@ -86,11 +90,10 @@ export default class App extends Vue {
           Sessions
         </bs-router-nav-item>
         <bs-router-nav-item
-          v-show="profileInfo.authenticated"
+          v-if="profileInfo.authenticated"
           to="/create-session"
           :disabled="!profileInfo.verified"
         >
-          <not-verified-lock />
           <span class="bi bi-plus-square-fill" />
           Create Session
         </bs-router-nav-item>
@@ -99,11 +102,10 @@ export default class App extends Vue {
           Ghosts
         </bs-router-nav-item>
         <bs-router-nav-item
-          v-show="profileInfo.authenticated"
+          v-if="profileInfo.authenticated"
           to="/upload-ghosts"
           :disabled="!profileInfo.verified"
         >
-          <not-verified-lock />
           <span class="bi bi-upload" />
           Upload Ghosts
         </bs-router-nav-item>
@@ -117,9 +119,9 @@ export default class App extends Vue {
       </bs-navbar-nav>
       <bs-navbar-nav ms="auto">
         <bs-dropdown-nav-item
-          v-show="profileInfo.authenticated"
+          v-if="profileInfo.authenticated"
           min-width="20em"
-          end="true"
+          end
         >
           <template #toggle>
             <span class="bi bi-key-fill" /> Session Credentials
@@ -151,14 +153,13 @@ export default class App extends Vue {
             </div>
           </div>
         </bs-dropdown-nav-item>
-        <bs-dropdown-nav-item v-show="profileInfo.authenticated" end="true">
+        <bs-dropdown-nav-item v-if="profileInfo.authenticated" end>
           <template #toggle>
-            <not-verified-lock />
             {{ profileInfo.username }}
           </template>
           <logout-widget />
         </bs-dropdown-nav-item>
-        <bs-dropdown-nav-item v-show="!profileInfo.authenticated" end="true">
+        <bs-dropdown-nav-item v-else end>
           <template #toggle> Login/Register </template>
           <login-widget />
         </bs-dropdown-nav-item>

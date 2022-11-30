@@ -1,29 +1,41 @@
 <script lang="ts">
-import { Vue } from "vue-class-component";
-import { Emit, Prop } from "vue-property-decorator";
 import { ISelectEntry } from "@/components/bootstrap/ISelectEntry";
+import { defineComponent, PropType } from "vue";
 
-export default class BsSelect extends Vue {
-  @Prop({ default: false })
-  public disabled!: boolean;
-  @Prop({ required: true })
-  public label!: string;
-  @Prop({ required: true })
-  public modelValue!: string;
-  @Prop({ required: true })
-  public items!: ISelectEntry[];
-
-  private selectedValue: any = null;
-
+export default defineComponent({
+  props: {
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    label: {
+      type: String,
+      required: true,
+    },
+    modelValue: {
+      type: [String, Number, Boolean],
+      required: true,
+    },
+    items: {
+      type: Object as PropType<ISelectEntry[]>,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      selectedValue: null as any | null,
+    };
+  },
   created() {
     this.selectedValue = this.modelValue;
-  }
-
-  @Emit("update:modelValue")
-  updatedSelection(): any {
-    return this.selectedValue;
-  }
-}
+  },
+  methods: {
+    updatedSelection() {
+      this.$emit("update:modelValue", this.selectedValue);
+    },
+  },
+});
 </script>
 
 <template>

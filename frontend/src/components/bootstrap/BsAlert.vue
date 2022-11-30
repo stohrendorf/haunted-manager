@@ -1,12 +1,15 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { Prop } from "vue-property-decorator";
 import { Variant } from "./BsTypes";
+import { defineComponent } from "vue";
 
-@Options({})
-export default class BsAlert extends Vue {
-  @Prop({ required: true }) public variant!: Variant;
-}
+export default defineComponent({
+  props: {
+    variant: {
+      type: Variant,
+      required: true,
+    },
+  },
+});
 </script>
 
 <template>

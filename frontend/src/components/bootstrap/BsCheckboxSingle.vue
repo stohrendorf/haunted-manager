@@ -1,28 +1,24 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { Prop, Watch } from "vue-property-decorator";
+import { defineComponent } from "vue";
 
-@Options({})
-export default class BsCheckboxSingle extends Vue {
-  @Prop({ required: true })
-  public modelValue!: boolean;
-
-  private checked: boolean = false;
-
+export default defineComponent({
+  props: {
+    modelValue: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      checked: false,
+    };
+  },
   created() {
     this.checked = this.modelValue;
-  }
-
-  @Watch("modelValue")
-  private modelValueChanged(): void {
-    this.checked = this.modelValue;
-  }
-
-  @Watch("checked")
-  private isCheckedChanged(): void {
-    this.$emit("update:modelValue", this.checked);
-  }
-}
+    this.$watch("modelValue", () => (this.checked = this.modelValue));
+    this.$watch("checked", () => this.$emit("update:modelValue", this.checked));
+  },
+});
 </script>
 
 <template>

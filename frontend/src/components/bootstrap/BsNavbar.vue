@@ -1,13 +1,16 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { Prop } from "vue-property-decorator";
 import { Variant } from "./BsTypes";
+import { defineComponent } from "vue";
 
-@Options({})
-export default class BsNavbar extends Vue {
-  @Prop({ required: true, default: "dark" })
-  public variant!: Variant;
-}
+export default defineComponent({
+  props: {
+    variant: {
+      type: Variant,
+      required: false,
+      default: "dark",
+    },
+  },
+});
 </script>
 
 <template>

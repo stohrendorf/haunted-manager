@@ -1,12 +1,14 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { Prop } from "vue-property-decorator";
+import { defineComponent } from "vue";
 
-@Options({})
-export default class ProgressBarSlice extends Vue {
-  @Prop({ required: true })
-  public percent: number = 0;
-}
+export default defineComponent({
+  props: {
+    percent: {
+      type: Number,
+      required: true,
+    },
+  },
+});
 </script>
 
 <template>

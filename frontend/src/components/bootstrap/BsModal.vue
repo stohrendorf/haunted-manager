@@ -1,30 +1,34 @@
 <script lang="ts">
-import { Options, Vue } from "vue-class-component";
-import { Prop } from "vue-property-decorator";
 import { Modal } from "bootstrap";
+import { defineComponent } from "vue";
 
-@Options({})
-export default class BsModal extends Vue {
-  @Prop({ required: true })
-  public title!: string;
-
-  private _modal!: Modal;
-
+export default defineComponent({
+  props: {
+    title: {
+      type: String,
+      required: true,
+    },
+  },
+  data() {
+    return {
+      modal: null as Modal | null,
+    };
+  },
   mounted() {
-    this._modal = new Modal(this.$refs.modal as Element, {
+    this.modal = new Modal(this.$refs.modal as Element, {
       backdrop: "static",
       keyboard: false,
     });
-  }
-
-  public toggle() {
-    this._modal.toggle();
-  }
-
-  public show() {
-    this._modal.show();
-  }
-}
+  },
+  methods: {
+    toggle() {
+      this.modal!.toggle();
+    },
+    show() {
+      this.modal!.show();
+    },
+  },
+});
 </script>
 
 <template>
