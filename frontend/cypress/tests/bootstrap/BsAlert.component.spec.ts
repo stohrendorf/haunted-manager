@@ -4,7 +4,6 @@ describe("<BsAlert />", () => {
   const msg = "test alert message";
 
   it("contains the message", () => {
-    // see: https://test-utils.vuejs.org/guide/
     cy.mount(BsAlert, {
       props: {
         variant: "danger",

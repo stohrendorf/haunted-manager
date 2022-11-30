@@ -4,7 +4,6 @@ describe("<BsCheckboxMultiple />", () => {
   const msg = "test checkbox message";
 
   it("contains the message", () => {
-    // see: https://test-utils.vuejs.org/guide/
     cy.mount(BsCheckboxMultiple, {
       props: {
         value: 123,
