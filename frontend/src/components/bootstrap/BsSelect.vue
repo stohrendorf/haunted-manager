@@ -1,6 +1,6 @@
 <script lang="ts">
 import { ISelectEntry } from "@/components/bootstrap/ISelectEntry";
-import { defineComponent, PropType } from "vue";
+import { PropType, defineComponent } from "vue";
 
 export default defineComponent({
   props: {

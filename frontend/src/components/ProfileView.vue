@@ -2,14 +2,14 @@
 import {
   changeEmail,
   changePassword,
+  changeUsername,
   getProfile,
   regenerateToken,
-  changeUsername,
 } from "@/components/ApiService";
 import { profileStore } from "@/components/ProfileStore";
-import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
-import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import BsAlert from "@/components/bootstrap/BsAlert.vue";
+import BsBtn from "@/components/bootstrap/BsBtn.vue";
+import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
 import { defineComponent } from "vue";
 
 export default defineComponent({

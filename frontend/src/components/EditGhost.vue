@@ -1,7 +1,7 @@
 <script lang="ts">
-import { getGhost, IGhostFileResponseEntry } from "@/components/ApiService";
-import BsBtn from "@/components/bootstrap/BsBtn.vue";
+import { IGhostFileResponseEntry, getGhost } from "@/components/ApiService";
 import GhostEditor from "@/components/GhostEditor.vue";
+import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import { defineComponent } from "vue";
 
 export default defineComponent({

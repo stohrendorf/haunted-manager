@@ -1,5 +1,5 @@
 <script lang="ts">
-import { getAnnouncements, IAnnouncementEntry } from "@/components/ApiService";
+import { IAnnouncementEntry, getAnnouncements } from "@/components/ApiService";
 import { defineComponent } from "vue";
 
 export default defineComponent({

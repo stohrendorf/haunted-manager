@@ -1,10 +1,10 @@
 <script lang="ts">
-import { getSessions, ISession } from "@/components/ApiService";
-import BsBtn from "@/components/bootstrap/BsBtn.vue";
-import BsTooltip from "@/components/bootstrap/BsTooltip";
+import { ISession, getSessions } from "@/components/ApiService";
 import { deleteSession as deleteSessionRequest } from "@/components/ApiService";
 import { profileStore } from "@/components/ProfileStore";
 import BsAlert from "@/components/bootstrap/BsAlert.vue";
+import BsBtn from "@/components/bootstrap/BsBtn.vue";
+import BsTooltip from "@/components/bootstrap/BsTooltip";
 import ClipboardCopyable from "@/components/utilities/ClipboardCopyable.vue";
 import { defineComponent } from "vue";
 

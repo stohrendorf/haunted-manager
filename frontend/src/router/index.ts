@@ -1,12 +1,12 @@
-import { createRouter, createWebHashHistory } from "vue-router";
+import CreateSession from "@/components/CreateSession.vue";
+import EditGhost from "@/components/EditGhost.vue";
+import EditSession from "@/components/EditSession.vue";
+import GhostList from "@/components/GhostList.vue";
 import ProfileView from "@/components/ProfileView.vue";
 import RegisterAccount from "@/components/RegisterAccount.vue";
 import SessionList from "@/components/SessionList.vue";
-import CreateSession from "@/components/CreateSession.vue";
-import EditSession from "@/components/EditSession.vue";
 import UploadGhost from "@/components/UploadGhost.vue";
-import GhostList from "@/components/GhostList.vue";
-import EditGhost from "@/components/EditGhost.vue";
+import { createRouter, createWebHashHistory } from "vue-router";
 
 const router = createRouter({
   history: createWebHashHistory(),

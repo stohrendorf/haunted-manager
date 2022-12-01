@@ -1,7 +1,7 @@
 <script lang="ts">
-import { createSession, ISession } from "@/components/ApiService";
-import BsBtn from "@/components/bootstrap/BsBtn.vue";
+import { ISession, createSession } from "@/components/ApiService";
 import SessionEditor from "@/components/SessionEditor.vue";
+import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import { defineComponent } from "vue";
 
 export default defineComponent({

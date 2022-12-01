@@ -1,18 +1,18 @@
 <script lang="ts">
 import {
-  getGhostsQuota,
-  IQuotaResponse,
-  uploadGhost,
-  getStagingGhosts,
   IGhostFileResponseEntry,
+  IQuotaResponse,
   ITag,
-  getTags,
   deleteGhost,
+  getGhostsQuota,
+  getStagingGhosts,
+  getTags,
+  uploadGhost,
 } from "@/components/ApiService";
-import ProgressBarSlice from "@/components/bootstrap/ProgressBarSlice.vue";
+import GhostEditor from "@/components/GhostEditor.vue";
 import BsAlert from "@/components/bootstrap/BsAlert.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
-import GhostEditor from "@/components/GhostEditor.vue";
+import ProgressBarSlice from "@/components/bootstrap/ProgressBarSlice.vue";
 import { defineComponent } from "vue";
 
 export default defineComponent({

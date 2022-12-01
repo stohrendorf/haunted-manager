@@ -1,5 +1,5 @@
 <script lang="ts">
-import { TempusDominus, DateTime } from "@eonasdan/tempus-dominus";
+import { DateTime, TempusDominus } from "@eonasdan/tempus-dominus";
 import { defineComponent } from "vue";
 
 export default defineComponent({

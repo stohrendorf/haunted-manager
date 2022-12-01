@@ -1,5 +1,5 @@
-import { defineStore } from "pinia";
 import { IProfileInfoResponse } from "@/components/ApiService";
+import { defineStore } from "pinia";
 
 export const profileStore = defineStore("profile", {
   state: (): IProfileInfoResponse => {

@@ -1,11 +1,11 @@
-import { createApp } from "vue";
 import App from "@/components/App.vue";
-import "bootstrap/dist/css/bootstrap.css";
-import "bootstrap-icons/font/bootstrap-icons.css";
 import router from "@/router";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import "bootstrap/dist/css/bootstrap.css";
 import moment from "moment";
 import "moment-timezone";
 import { createPinia } from "pinia";
+import { createApp } from "vue";
 
 const app = createApp(App);
 app.use(router);

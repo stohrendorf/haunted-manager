@@ -1,18 +1,18 @@
 <script lang="ts">
 import {
-  getTags,
   IGhostFileResponseEntry,
   ITag,
-  updateGhost,
   getAlternativeLevels,
+  getTags,
+  updateGhost,
 } from "@/components/ApiService";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
-import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
 import BsCheckboxMultiple from "@/components/bootstrap/BsCheckboxMultiple.vue";
 import BsCheckboxSingle from "@/components/bootstrap/BsCheckboxSingle.vue";
 import BsSelect from "@/components/bootstrap/BsSelect.vue";
+import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
 import { ISelectEntry } from "@/components/bootstrap/ISelectEntry";
-import { defineComponent, PropType } from "vue";
+import { PropType, defineComponent } from "vue";
 
 export default defineComponent({
   components: {

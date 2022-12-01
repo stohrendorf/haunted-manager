@@ -1,21 +1,21 @@
 <script lang="ts">
-import SiteAnnouncementsList from "@/components/SiteAnnouncementsList.vue";
+import {
+  IServerInfoResponse,
+  getProfile,
+  getServerInfo,
+} from "@/components/ApiService";
 import LoginWidget from "@/components/LoginWidget.vue";
 import LogoutWidget from "@/components/LogoutWidget.vue";
+import { profileStore } from "@/components/ProfileStore";
+import SiteAnnouncementsList from "@/components/SiteAnnouncementsList.vue";
+import BsDropdownNavItem from "@/components/bootstrap/BsDropdownNavItem.vue";
+import BsModal from "@/components/bootstrap/BsModal.vue";
 import BsNavbar from "@/components/bootstrap/BsNavbar.vue";
 import BsNavbarNav from "@/components/bootstrap/BsNavbarNav.vue";
 import BsRouterNavItem from "@/components/bootstrap/BsRouterNavItem.vue";
-import BsDropdownNavItem from "@/components/bootstrap/BsDropdownNavItem.vue";
-import {
-  getProfile,
-  getServerInfo,
-  IServerInfoResponse,
-} from "@/components/ApiService";
-import { profileStore } from "@/components/ProfileStore";
-import BsModal from "@/components/bootstrap/BsModal.vue";
 import ClipboardCopyable from "@/components/utilities/ClipboardCopyable.vue";
-import { defineComponent } from "vue";
 import { ComponentPublicInstance } from "@vue/runtime-core";
+import { defineComponent } from "vue";
 
 export default defineComponent({
   components: {

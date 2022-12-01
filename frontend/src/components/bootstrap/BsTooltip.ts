@@ -1,5 +1,5 @@
-import { Directive } from "vue";
 import { Tooltip } from "bootstrap";
+import { Directive } from "vue";
 
 const BsTooltip: Directive<HTMLElement> = {
   beforeMount(el) {

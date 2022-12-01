@@ -1,10 +1,10 @@
 <script lang="ts">
-import { getTags, ISession, ITag } from "@/components/ApiService";
-import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
+import { ISession, ITag, getTags } from "@/components/ApiService";
 import BsCheckboxMultiple from "@/components/bootstrap/BsCheckboxMultiple.vue";
+import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
 import DateTimePicker from "@/components/utilities/DateTimePicker.vue";
 import moment from "moment";
-import { defineComponent, PropType } from "vue";
+import { PropType, defineComponent } from "vue";
 
 export default defineComponent({
   components: {

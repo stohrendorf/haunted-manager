@@ -1,7 +1,7 @@
 <script lang="ts">
 import { IRegisterRequest, register } from "@/components/ApiService";
-import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import BsAlert from "@/components/bootstrap/BsAlert.vue";
+import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import { defineComponent } from "vue";
 
 export default defineComponent({

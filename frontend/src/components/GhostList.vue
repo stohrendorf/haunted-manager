@@ -1,17 +1,16 @@
 <script lang="ts">
 import {
-  getGhosts,
   IGhostFileResponseEntry,
   deleteGhost,
   downloadGhost,
+  getGhosts,
 } from "@/components/ApiService";
+import { profileStore } from "@/components/ProfileStore";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import BsTooltip from "@/components/bootstrap/BsTooltip";
-import { profileStore } from "@/components/ProfileStore";
-import { XzReadableStream } from "xzwasm";
-
 import { getData, getFiles } from "@/components/utilities/untar";
 import { defineComponent } from "vue";
+import { XzReadableStream } from "xzwasm";
 
 export default defineComponent({
   components: { BsBtn },

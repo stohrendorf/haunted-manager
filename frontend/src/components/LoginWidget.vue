@@ -1,9 +1,9 @@
 <script lang="ts">
 import { getProfile, login } from "@/components/ApiService";
 import { profileStore } from "@/components/ProfileStore";
+import BsAlert from "@/components/bootstrap/BsAlert.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
-import BsAlert from "@/components/bootstrap/BsAlert.vue";
 import { defineComponent } from "vue";
 
 export default defineComponent({
