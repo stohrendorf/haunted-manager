@@ -1,5 +1,6 @@
 <script lang="ts">
-import { ISession, editSession, getSession } from "@/components/ApiService";
+import { editSession, getSession } from "@/components/ApiService";
+import { ISessionEditModel } from "@/components/ISessionEditModel";
 import SessionEditor from "@/components/SessionEditor.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import { defineComponent } from "vue";
@@ -8,8 +9,7 @@ export default defineComponent({
   components: { BsBtn, SessionEditor },
   data() {
     return {
-      session: null as ISession | null,
-      selectedTags: [] as number[],
+      session: null as ISessionEditModel | null,
     };
   },
   async created(): Promise<void> {
@@ -17,14 +17,14 @@ export default defineComponent({
     if (session === null) {
       throw new Error("invalid session id");
     }
-    this.session = session;
+    this.session = { session: session, selectedTags: [] };
   },
   methods: {
     async updateSession(): Promise<void> {
-      await editSession(this.session!.id, {
-        description: this.session!.description,
-        tags: this.selectedTags,
-        time: this.session!.time,
+      await editSession(this.session!.session.id, {
+        description: this.session!.session.description,
+        tags: this.session!.selectedTags,
+        time: this.session!.session.time,
       });
       this.$router.back();
     },
@@ -33,11 +33,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <session-editor
-    v-if="session !== null"
-    v-model="session"
-    :selected-tags="selectedTags"
-  >
+  <session-editor v-if="session !== null" v-model="session">
     <bs-btn variant="success" @click="updateSession()">
       <span class="bi bi-save" /> Save
     </bs-btn>
