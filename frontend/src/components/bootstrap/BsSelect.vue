@@ -4,11 +4,6 @@ import { PropType, defineComponent } from "vue";
 
 export default defineComponent({
   props: {
-    disabled: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
     label: {
       type: String,
       required: true,
@@ -20,6 +15,11 @@ export default defineComponent({
     items: {
       type: Object as PropType<ISelectEntry[]>,
       required: true,
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   data() {
