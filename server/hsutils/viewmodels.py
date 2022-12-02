@@ -51,7 +51,9 @@ class HttpMethod(Enum):
 def validate_iso_date_time(data: Optional[str]):
     if data is None:
         raise SchemaValidationError("IsoDateTime is null")
-    if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+(\+[0-9]{2}:[0-9]{2}|Z)", data):
+    if not re.fullmatch(
+        r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(\+[0-9]{2}:[0-9]{2}|Z)", data
+    ):
         raise SchemaValidationError("IsoDateTime has an invalid format")
 
 

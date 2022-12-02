@@ -18,6 +18,7 @@ class Session(DataClassJsonMixin, Validatable):
     id: str
     owner: str
     players: List[str]
+    private: bool
     tags: List[SessionTag]
     time: Optional[TimeSpan]
 
@@ -39,6 +40,8 @@ class Session(DataClassJsonMixin, Validatable):
                 raise SchemaValidationError("Session.players is null")
             if len(self_players_entry) < 1:
                 raise SchemaValidationError("Session.players is too short")
+        if self.private is None:
+            raise SchemaValidationError("Session.private is null")
         if self.tags is None:
             raise SchemaValidationError("Session.tags is null")
         for self_tags_entry in self.tags:

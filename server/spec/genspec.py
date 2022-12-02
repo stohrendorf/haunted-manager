@@ -24,7 +24,9 @@ class TagName(StringField):
 class IsoDateTime(StringField):
     def __init__(self):
         # 2022-11-20T13:45:18.188Z
-        super().__init__(regex=r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+(\+[0-9]{2}:[0-9]{2}|Z)")
+        super().__init__(
+            regex=r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(\+[0-9]{2}:[0-9]{2}|Z)"
+        )
 
 
 class TimeSpan(Compound):
@@ -97,12 +99,14 @@ class Session(Compound):
     description = StringField()
     players = ArrayField(items=StringField(min_length=1))
     time = TimeSpan(nullable=True)
+    private = BooleanField()
 
 
 class CreateSessionRequest(Compound):
     description = StringField(max_length=512)
     tags = ArrayField(items=IntegerField())
     time = TimeSpan(nullable=True)
+    private = BooleanField()
 
 
 class SessionsResponse(Compound):

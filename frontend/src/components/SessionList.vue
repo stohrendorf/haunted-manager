@@ -58,6 +58,9 @@ export default defineComponent({
           <div class="col col-auto">
             <div class="row">
               <div>
+                <span v-if="session.private">
+                  <span class="bi bi-eye-slash" /> Private
+                </span>
                 <clipboard-copyable :value="session.id">
                   <code>{{ session.id }}</code>
                 </clipboard-copyable>

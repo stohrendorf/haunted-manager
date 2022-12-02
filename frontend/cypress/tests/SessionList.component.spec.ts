@@ -16,6 +16,7 @@ describe("<SessionList />", () => {
             owner: "owner1",
             players: ["player1"],
             time: null,
+            private: true,
           },
           {
             id: "id456",
@@ -24,6 +25,7 @@ describe("<SessionList />", () => {
             owner: "owner2",
             players: [],
             time: null,
+            private: false,
           },
         ],
       },

@@ -19,12 +19,12 @@ class TimeSpan(DataClassJsonMixin, Validatable):
         if self.end is None:
             raise SchemaValidationError("TimeSpan.end is null")
         if not re.fullmatch(
-            r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+(\+[0-9]{2}:[0-9]{2}|Z)", self.end
+            r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(\+[0-9]{2}:[0-9]{2}|Z)", self.end
         ):
             raise SchemaValidationError("TimeSpan.end has an invalid format")
         if self.start is None:
             raise SchemaValidationError("TimeSpan.start is null")
         if not re.fullmatch(
-            r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]+(\+[0-9]{2}:[0-9]{2}|Z)", self.start
+            r"[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(\+[0-9]{2}:[0-9]{2}|Z)", self.start
         ):
             raise SchemaValidationError("TimeSpan.start has an invalid format")

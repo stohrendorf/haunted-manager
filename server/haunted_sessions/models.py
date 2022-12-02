@@ -30,6 +30,7 @@ class Session(TimestampedModel):
     players = models.ManyToManyField(to=User, related_name="sessions")
     start = models.DateTimeField(null=True, default=None)
     end = models.DateTimeField(null=True, default=None)
+    private = models.BooleanField()
 
     def __str__(self):
         return str(self.key)

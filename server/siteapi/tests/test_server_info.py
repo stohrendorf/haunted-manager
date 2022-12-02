@@ -34,7 +34,7 @@ def test_server_info(client: Client, django_user_model):
     assert response.total_users == 1
 
     for _ in range(3):
-        Session.objects.create(owner=user, description="")
+        Session.objects.create(owner=user, description="", private=False)
     code, response = get_test_url(client, server_info.path, ServerInfoResponse)
     assert code == HTTPStatus.OK
     assert response is not None

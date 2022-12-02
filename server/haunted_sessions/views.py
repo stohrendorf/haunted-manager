@@ -3,6 +3,7 @@ from http import HTTPStatus
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from django.db.transaction import atomic
 from django.http import HttpRequest
 from django.views.decorators.csrf import csrf_exempt
@@ -63,12 +64,17 @@ def session_to_response(session: SessionModel) -> Session:
         )
         if session.is_event
         else None,
+        private=session.private,
     )
 
 
 def get_sessions(request: HttpRequest) -> SessionsResponse:
+    if request.user.is_staff or request.user.is_superuser:
+        sessions = SessionModel.objects
+    else:
+        sessions = SessionModel.objects.filter(Q(private=False) | Q(private=True, owner_id=request.user.id))
     return SessionsResponse(
-        sessions=[session_to_response(session) for session in SessionModel.objects.order_by("-created_at").all()],
+        sessions=[session_to_response(session) for session in sessions.order_by("-created_at").all()],
     )
 
 
@@ -104,6 +110,7 @@ def _apply_session_properties(
         session.start = None
         session.end = None
 
+    session.private = body.private
     session.save()
     return SuccessResponse(message="", success=True)
 
@@ -217,6 +224,7 @@ def create_session(
     session = SessionModel.objects.create(
         owner=request.user,
         description=body.description,
+        private=body.private,
     )
 
     return HTTPStatus.CREATED, _apply_session_properties(request, session, body)

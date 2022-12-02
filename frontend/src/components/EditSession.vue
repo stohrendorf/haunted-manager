@@ -25,6 +25,7 @@ export default defineComponent({
         description: this.session!.session.description,
         tags: this.session!.selectedTags,
         time: this.session!.session.time,
+        private: this.session!.session.private,
       });
       this.$router.back();
     },

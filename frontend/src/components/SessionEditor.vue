@@ -2,6 +2,8 @@
 import { ITag, getTags } from "@/components/ApiService";
 import { ISessionEditModel } from "@/components/ISessionEditModel";
 import BsCheckboxMultiple from "@/components/bootstrap/BsCheckboxMultiple.vue";
+import BsCheckboxSingle from "@/components/bootstrap/BsCheckboxSingle.vue";
+import BsTooltip from "@/components/bootstrap/BsTooltip";
 import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
 import DateTimePicker from "@/components/utilities/DateTimePicker.vue";
 import moment from "moment";
@@ -9,10 +11,12 @@ import { PropType, defineComponent } from "vue";
 
 export default defineComponent({
   components: {
+    BsCheckboxSingle,
     BsCheckboxMultiple,
     FloatingSingleLineInput,
     DateTimePicker,
   },
+  directives: { BsTooltip },
   props: {
     modelValue: {
       type: Object as PropType<ISessionEditModel>,
@@ -86,15 +90,22 @@ export default defineComponent({
     <div class="card">
       <div class="card-body">
         <div class="card-title form-check form-check-inline">
-          <input
-            :id="'event-checkbox--' + $.uid"
-            v-model="isEvent"
-            class="form-check-input"
-            type="checkbox"
-          />
-          <label :for="'event-checkbox--' + $.uid"> Scheduled Event </label>
+          <bs-checkbox-single
+            v-model="localData.session.private"
+            @change="sessionUpdated()"
+          >
+            <span
+              v-bs-tooltip
+              title="This session will not be listed for others."
+            >
+              <span class="bi bi-eye-slash" /> Private
+            </span>
+          </bs-checkbox-single>
+          <bs-checkbox-single v-model="isEvent" @change="sessionUpdated()">
+            Scheduled Event
+          </bs-checkbox-single>
         </div>
-        <div v-if="localData.session.time">
+        <div v-if="localData.session.time !== null">
           <date-time-picker
             v-model="localData.session.time.start"
             @change="sessionUpdated()"

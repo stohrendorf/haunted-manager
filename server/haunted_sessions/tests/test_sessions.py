@@ -27,7 +27,7 @@ def test_session_response_conversion(django_user_model):
         email="test@example.com",
         password="password!!!",
     )
-    db_session = Session.objects.create(owner=user, description="description")
+    db_session = Session.objects.create(owner=user, description="description", private=False)
     tag = Tag.objects.create(name="tag", description="tag-description")
     db_session.tags.add(tag)
     db_session.players.add(user)
@@ -79,7 +79,7 @@ def test_sessions_list(client: Client, django_user_model):
         email="test@example.com",
         password="password!!!",
     )
-    db_session = Session.objects.create(owner=user, description="description")
+    db_session = Session.objects.create(owner=user, description="description", private=False)
 
     code, response = get_test_url(
         client,
@@ -154,7 +154,7 @@ def test_session(client: Client, django_user_model):
         email="test@example.com",
         password="password!!!",
     )
-    db_session = Session.objects.create(owner=user, description="description")
+    db_session = Session.objects.create(owner=user, description="description", private=False)
 
     code, response = get_test_url(
         client,
@@ -216,7 +216,7 @@ def test_session_time_sanitization(django_user_model):
         password="password!!!",
     )
 
-    db_session = Session.objects.create(owner=user, description="description")
+    db_session = Session.objects.create(owner=user, description="description", private=False)
     assert db_session.start is None
     assert db_session.end is None
 
@@ -249,6 +249,7 @@ def test_create_session(client: Client, django_user_model):
             description="session description",
             tags=[],
             time=None,
+            private=False,
         ),
         SuccessResponse,
     )
@@ -280,6 +281,7 @@ def test_create_session(client: Client, django_user_model):
                 start=start_ts.isoformat(),
                 end=end_ts.isoformat(),
             ),
+            private=False,
         ),
         SuccessResponse,
     )
