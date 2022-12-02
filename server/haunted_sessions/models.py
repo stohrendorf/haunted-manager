@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 from hsutils import TimestampedModel
 
@@ -31,6 +32,7 @@ class Session(TimestampedModel):
     start = models.DateTimeField(null=True, default=None)
     end = models.DateTimeField(null=True, default=None)
     private = models.BooleanField()
+    last_used = models.DateTimeField(default=timezone.now, editable=False, blank=False, null=False)
 
     def __str__(self):
         return str(self.key)

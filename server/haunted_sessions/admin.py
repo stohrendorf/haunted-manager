@@ -8,7 +8,7 @@ class TagAdmin(admin.ModelAdmin):
 
 
 class SessionAdmin(admin.ModelAdmin):
-    list_display = ("owner", "key", "description")
+    list_display = ("owner", "key", "description", "last_used")
     list_display_links = ("owner", "key")
 
 

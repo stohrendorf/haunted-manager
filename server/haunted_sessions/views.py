@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.db.transaction import atomic
 from django.http import HttpRequest
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from haunted_auth.models import ApiKey
@@ -211,6 +212,8 @@ def update_sessions_players(request: HttpRequest, body: SessionsPlayersRequest) 
             db_session = SessionModel.objects.get(key=session.session_id)
         except SessionModel.DoesNotExist:
             continue
+        if session.usernames:
+            db_session.last_used = timezone.now()
         for user in session.usernames:
             try:
                 db_user = User.objects.get(username=user)
