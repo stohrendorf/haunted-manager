@@ -23,12 +23,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <ghost-editor
-    v-if="ghost !== null"
-    v-model="ghost"
-    :published="ghost.published"
-    @saved="$router.back()"
-  >
+  <ghost-editor v-if="ghost !== null" v-model="ghost" @saved="$router.back()">
     <bs-btn variant="danger" @click="$router.back()">
       <span class="bi bi-x-square" /> Abort
     </bs-btn>
