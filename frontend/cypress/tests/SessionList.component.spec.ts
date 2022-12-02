@@ -70,4 +70,107 @@ describe("<SessionList />", () => {
       .find("div")
       .should("contain.text", "description def");
   });
+
+  it("shows and hides private indicator", () => {
+    cy.intercept("GET", "/api/v0/sessions", {
+      body: {
+        sessions: [
+          {
+            id: "id123",
+            description: "description abc",
+            tags: [
+              { name: "tag1", description: "tag description 1" },
+              { name: "tag2", description: "tag description 2" },
+            ],
+            owner: "owner1",
+            players: ["player1"],
+            time: null,
+            private: true,
+          },
+          {
+            id: "id456",
+            description: "description def",
+            tags: [{ name: "tag3", description: "tag description 3" }],
+            owner: "owner2",
+            players: [],
+            time: null,
+            private: false,
+          },
+        ],
+      },
+    });
+
+    cy.mount(SessionList, {
+      global: {
+        plugins: setActivePinia(createPinia()),
+      },
+    });
+
+    cy.get(".list-group-item").should("have.length", 2);
+
+    cy.get(".list-group-item")
+      .eq(0)
+      .find(".bi.bi-eye-slash")
+      .should("be.visible");
+    cy.get(".list-group-item")
+      .eq(1)
+      .find(".bi.bi-eye-slash")
+      .should("not.exist");
+  });
+
+  it("shows and hides edit and delete buttons", () => {
+    const privilegedUsername = "owner";
+    cy.intercept("GET", "/api/v0/sessions", {
+      body: {
+        sessions: [
+          {
+            id: "id123",
+            description: "description abc",
+            tags: [
+              { name: "tag1", description: "tag description 1" },
+              { name: "tag2", description: "tag description 2" },
+            ],
+            owner: privilegedUsername,
+            players: ["player1"],
+            time: null,
+            private: false,
+          },
+          {
+            id: "id456",
+            description: "description def",
+            tags: [{ name: "tag3", description: "tag description 3" }],
+            owner: privilegedUsername + "-unprivileged",
+            players: [],
+            time: null,
+            private: false,
+          },
+        ],
+      },
+    });
+
+    cy.mount(SessionList, {
+      global: {
+        plugins: setActivePinia(createPinia()),
+      },
+    }).then((wrapper) => {
+      wrapper.component.profile.username = privilegedUsername;
+    });
+
+    cy.get(".list-group-item").should("have.length", 2);
+
+    cy.get(".list-group-item")
+      .eq(0)
+      .find(".bi.bi-trash")
+      .should("exist")
+      .parent()
+      .should("contain.text", "Delete");
+    cy.get(".list-group-item")
+      .eq(0)
+      .find(".bi.bi-pencil")
+      .should("exist")
+      .parent()
+      .should("contain.text", "Edit");
+    cy.get(".list-group-item").eq(1).find(".bi.bi-trash").should("not.exist");
+    cy.get(".list-group-item").eq(1).find(".bi.bi-pencil").should("not.exist");
+  });
 });
