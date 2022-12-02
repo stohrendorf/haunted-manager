@@ -37,11 +37,11 @@ export default defineComponent({
     };
   },
   async created(): Promise<void> {
-    this.localGhost = { ...this.modelValue };
+    this.localGhost = JSON.parse(JSON.stringify(this.modelValue));
     this.$watch(
       () => this.modelValue,
       () => {
-        this.localGhost = { ...this.modelValue };
+        this.localGhost = JSON.parse(JSON.stringify(this.modelValue));
       }
     );
 

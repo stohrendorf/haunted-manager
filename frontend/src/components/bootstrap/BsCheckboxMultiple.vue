@@ -16,56 +16,50 @@ export default defineComponent({
       },
     },
   },
-  emits: ["onChecked", "update:modelValue"],
   data() {
     return {
-      checked: false,
       localModelValue: [] as any[],
     };
   },
+  computed: {
+    checked: {
+      get(): boolean {
+        const value = JSON.stringify(this.value);
+        return this.localModelValue.some((x) => JSON.stringify(x) == value);
+      },
+      set(value: boolean) {
+        const stringValue = JSON.stringify(this.value);
+        if (
+          value &&
+          !this.localModelValue.some((x) => JSON.stringify(x) == stringValue)
+        ) {
+          this.localModelValue.push(this.value);
+        } else if (
+          !value &&
+          this.localModelValue.some((x) => JSON.stringify(x) == stringValue)
+        ) {
+          this.localModelValue.splice(
+            this.localModelValue.findIndex(
+              (x) => JSON.stringify(x) === stringValue
+            ),
+            1
+          );
+        } else {
+          return;
+        }
+        this.$emit("update:modelValue", this.localModelValue);
+      },
+    },
+  },
   created: function (): void {
-    const updateChecked = () => {
-      const value = JSON.stringify(this.value);
-      this.checked = this.modelValue.some((x) => JSON.stringify(x) == value);
-      this.$emit("onChecked", this.checked);
-    };
-
+    this.localModelValue = [...this.modelValue];
     this.$watch(
       () => this.modelValue,
       () => {
         this.localModelValue = [...this.modelValue];
-        updateChecked();
       }
     );
-    this.$watch(() => this.value, updateChecked);
-    updateChecked();
   },
-  methods: {
-    changed(): void {
-      const checked = (
-        document.getElementById(String(this.$.uid)) as HTMLInputElement
-      ).checked;
-      const value = JSON.stringify(this.value);
-      if (
-        checked &&
-        !this.localModelValue.some((x) => JSON.stringify(x) == value)
-      ) {
-        this.localModelValue.push(this.value);
-      } else if (
-        !checked &&
-        this.localModelValue.some((x) => JSON.stringify(x) == value)
-      ) {
-        this.localModelValue.splice(
-          this.localModelValue.findIndex((x) => JSON.stringify(x) === value),
-          1
-        );
-      } else return;
-      this.$emit("update:modelValue", this.localModelValue);
-      this.checked = checked;
-      this.$emit("onChecked", this.checked);
-    },
-  },
-  emit: ["onChecked"],
 });
 </script>
 
@@ -76,10 +70,10 @@ export default defineComponent({
       v-model="checked"
       class="form-check-input"
       type="checkbox"
-      :value="value"
-      @input="changed"
     />
-    <label :for="$.uid"><slot /></label>
+    <label :for="$.uid">
+      <slot />
+    </label>
   </div>
 </template>
 

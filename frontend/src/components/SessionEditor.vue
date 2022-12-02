@@ -23,7 +23,6 @@ export default defineComponent({
       required: true,
     },
   },
-  events: ["update:session", "update:selectedTags"],
   data() {
     return {
       tags: null as ITag[] | null,
@@ -53,11 +52,11 @@ export default defineComponent({
   },
   async created(): Promise<void> {
     this.tags = (await getTags()).tags;
-    this.localData = { ...this.modelValue };
+    this.localData = JSON.parse(JSON.stringify(this.modelValue));
     this.$watch(
       () => this.modelValue,
       () => {
-        this.localData = { ...this.modelValue };
+        this.localData = JSON.parse(JSON.stringify(this.modelValue));
         this.updateSelectedTagsFromSession();
       }
     );
@@ -69,9 +68,11 @@ export default defineComponent({
         (sessionTag) =>
           this.tags!.filter((tag) => tag.name === sessionTag.name)[0].id
       );
-      this.sessionUpdated();
     },
     sessionUpdated() {
+      this.localData!.session.tags = this.tags!.filter((tag) =>
+        this.localData!.selectedTags.includes(tag.id)
+      );
       this.$emit("update:modelValue", this.localData);
     },
   },
@@ -130,7 +131,7 @@ export default defineComponent({
         <bs-checkbox-multiple
           v-model="localData.selectedTags"
           :value="tag.id"
-          @change="sessionUpdated"
+          @change="sessionUpdated()"
         >
           <span class="badge bg-secondary">{{ tag.name }}</span>
           {{ tag.description }}
