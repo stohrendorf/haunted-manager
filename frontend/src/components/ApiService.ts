@@ -99,6 +99,8 @@ export interface IRegisterRequest {
 
 export interface IServerInfoResponse {
   coop_url: string;
+  total_ghost_duration: number;
+  total_ghosts: number;
   total_sessions: number;
   total_users: number;
 }
@@ -705,6 +707,34 @@ function validateServerInfoResponse(data: IServerInfoResponse): void {
   }
   if (data.coop_url.length < 1) {
     throw new SchemaValidationError("ServerInfoResponse.coop_url is too short");
+  }
+  if (data.total_ghost_duration === undefined) {
+    throw new SchemaValidationError(
+      "ServerInfoResponse.total_ghost_duration is undefined"
+    );
+  }
+  if (data.total_ghost_duration === null) {
+    throw new SchemaValidationError(
+      "ServerInfoResponse.total_ghost_duration is null"
+    );
+  }
+  if (data.total_ghost_duration < 0) {
+    throw new SchemaValidationError(
+      "ServerInfoResponse.total_ghost_duration has a value below minimum"
+    );
+  }
+  if (data.total_ghosts === undefined) {
+    throw new SchemaValidationError(
+      "ServerInfoResponse.total_ghosts is undefined"
+    );
+  }
+  if (data.total_ghosts === null) {
+    throw new SchemaValidationError("ServerInfoResponse.total_ghosts is null");
+  }
+  if (data.total_ghosts < 0) {
+    throw new SchemaValidationError(
+      "ServerInfoResponse.total_ghosts has a value below minimum"
+    );
   }
   if (data.total_sessions === undefined) {
     throw new SchemaValidationError(

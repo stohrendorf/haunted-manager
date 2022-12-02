@@ -54,7 +54,9 @@ export default defineComponent({
     this.err = err as Error;
     this.info = info;
     console.error(err, info);
-    if (this.$refs.errorModal) (this.$refs.errorModal as typeof BsModal).show();
+    if (this.$refs.errorModal) {
+      (this.$refs.errorModal as typeof BsModal).show();
+    }
     return false;
   },
 });
@@ -112,9 +114,12 @@ export default defineComponent({
       </bs-navbar-nav>
       <bs-navbar-nav ms="auto">
         <li class="navbar-text text-info">
-          <span class="bi bi-info-circle" />
-          Happily providing {{ serverInfo.total_sessions }} sessions for
-          {{ serverInfo.total_users }} users.
+          <span class="bi bi-bar-chart" />
+          {{ serverInfo.total_users }} users,
+          {{ serverInfo.total_sessions }} sessions,
+          {{ serverInfo.total_ghosts }} ghosts,
+          {{ $filters.seconds(serverInfo.total_ghost_duration) }}
+          total ghost time
         </li>
       </bs-navbar-nav>
       <bs-navbar-nav ms="auto">
@@ -160,7 +165,7 @@ export default defineComponent({
           <logout-widget />
         </bs-dropdown-nav-item>
         <bs-dropdown-nav-item v-else end>
-          <template #toggle> Login/Register </template>
+          <template #toggle> Login/Register</template>
           <login-widget />
         </bs-dropdown-nav-item>
       </bs-navbar-nav>

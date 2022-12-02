@@ -37,6 +37,8 @@ class TimeSpan(Compound):
 class ServerInfoResponse(Compound):
     total_users = IntegerField(min=0)
     total_sessions = IntegerField(min=0)
+    total_ghosts = IntegerField(min=0)
+    total_ghost_duration = IntegerField(min=0)
     coop_url = StringField(min_length=1)
 
 
