@@ -42,11 +42,13 @@ def test_session_response_conversion(django_user_model):
     assert converted.players[0] == "username"
     assert converted.id == db_session.key.hex
     assert converted.time is None
+    assert converted.private is False
 
     time_start = timezone.now()
     time_end = timezone.now() + timedelta(hours=2)
     db_session.start = time_start
     db_session.end = time_end
+    db_session.private = True
     db_session.save()
     converted = session_to_response(db_session)
     assert len(converted.tags) == 1
@@ -59,6 +61,7 @@ def test_session_response_conversion(django_user_model):
     assert converted.time is not None
     assert converted.time.start == time_start.isoformat()
     assert converted.time.end == time_end.isoformat()
+    assert converted.private is True
 
 
 @pytest.mark.django_db
@@ -137,7 +140,7 @@ def test_sessions_list(client: Client, django_user_model):
 
 
 @pytest.mark.django_db
-def test_session(client: Client, django_user_model):
+def test_single_session(client: Client, django_user_model):
     code, response = get_test_url(
         client,
         "api/v0/sessions/" + uuid.uuid4().hex,
@@ -156,6 +159,7 @@ def test_session(client: Client, django_user_model):
     )
     db_session = Session.objects.create(owner=user, description="description", private=False)
 
+    client.force_login(user)
     code, response = get_test_url(
         client,
         "api/v0/sessions/" + db_session.key.hex,
@@ -178,13 +182,14 @@ def test_session(client: Client, django_user_model):
     assert code == HTTPStatus.OK
     assert response is not None
     assert len(response.sessions) == 1
-    (s,) = response.sessions
-    assert s.description == "description"
-    assert s.owner == user.username
-    assert len(s.players) == 0
-    assert len(s.tags) == 1
-    assert s.tags[0].name == "tag"
-    assert s.tags[0].description == "tag-description"
+    (session,) = response.sessions
+    assert session.description == "description"
+    assert session.owner == user.username
+    assert len(session.players) == 0
+    assert len(session.tags) == 1
+    assert session.tags[0].name == "tag"
+    assert session.tags[0].description == "tag-description"
+    assert session.private is False
 
     db_session.players.add(user)
     db_session.save()
@@ -197,14 +202,14 @@ def test_session(client: Client, django_user_model):
     assert code == HTTPStatus.OK
     assert response is not None
     assert len(response.sessions) == 1
-    (s,) = response.sessions
-    assert s.description == "description"
-    assert s.owner == user.username
-    assert len(s.players) == 1
-    assert s.players[0] == "username"
-    assert len(s.tags) == 1
-    assert s.tags[0].name == "tag"
-    assert s.tags[0].description == "tag-description"
+    (session,) = response.sessions
+    assert session.description == "description"
+    assert session.owner == user.username
+    assert len(session.players) == 1
+    assert session.players[0] == "username"
+    assert len(session.tags) == 1
+    assert session.tags[0].name == "tag"
+    assert session.tags[0].description == "tag-description"
 
 
 @pytest.mark.django_db
@@ -296,3 +301,62 @@ def test_create_session(client: Client, django_user_model):
     assert session.start == start_ts
     assert session.end == end_ts
     assert session.players.count() == 0
+
+
+@pytest.mark.django_db
+def test_single_session_privacy(client: Client, django_user_model):
+    code, response = get_test_url(
+        client,
+        "api/v0/sessions/" + uuid.uuid4().hex,
+        SessionResponse,
+    )
+    assert code == HTTPStatus.NOT_FOUND
+    assert response is not None
+    assert response.session is None
+
+    assert django_user_model.objects.count() == 0
+    user = django_user_model.objects.create_user(
+        is_active=True,
+        username="username",
+        email="test@example.com",
+        password="password!!!",
+    )
+    db_session = Session.objects.create(owner=user, description="description", private=False)
+
+    code, response = get_test_url(
+        client,
+        "api/v0/sessions/" + db_session.key.hex,
+        SessionResponse,
+    )
+    assert code == HTTPStatus.OK
+    assert response is not None
+    assert response.session is not None
+    assert response.session.id == db_session.key.hex
+    assert response.session.private is False
+
+    db_session.private = True
+    db_session.save()
+
+    client.logout()
+    code, response = get_test_url(
+        client,
+        "api/v0/sessions/" + db_session.key.hex,
+        SessionResponse,
+    )
+
+    assert code == HTTPStatus.NOT_FOUND
+    assert response.session is None
+
+    client.force_login(user)
+
+    code, response = get_test_url(
+        client,
+        "api/v0/sessions/" + db_session.key.hex,
+        SessionResponse,
+    )
+
+    assert code == HTTPStatus.OK
+    assert response is not None
+    assert response.session is not None
+    assert response.session.id == db_session.key.hex
+    assert response.session.private is True

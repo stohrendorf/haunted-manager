@@ -84,6 +84,11 @@ def get_session(request: HttpRequest, session_id: str) -> SessionResponse | tupl
     except SessionModel.DoesNotExist:
         return HTTPStatus.NOT_FOUND, SessionResponse(session=None)
 
+    if request.user.is_staff or request.user.is_superuser:
+        pass
+    elif session.private and session.owner != request.user:
+        return HTTPStatus.NOT_FOUND, SessionResponse(session=None)
+
     return SessionResponse(session=session_to_response(session))
 
 
