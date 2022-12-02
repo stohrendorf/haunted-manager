@@ -12,11 +12,9 @@
 // You can read more here:
 // https://on.cypress.io/configuration
 // ***********************************************************
-
 import "./commands";
-import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
-
+import "bootstrap/dist/css/bootstrap.css";
 import { mount } from "cypress/vue";
 
 declare global {

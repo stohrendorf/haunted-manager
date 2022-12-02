@@ -7,6 +7,10 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    label: {
+      type: String,
+      required: true,
+    },
     disabled: {
       type: Boolean,
       required: false,
@@ -16,10 +20,6 @@ export default defineComponent({
       type: Boolean,
       required: false,
       default: false,
-    },
-    label: {
-      type: String,
-      required: true,
     },
     placeholder: {
       type: String,
