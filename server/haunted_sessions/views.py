@@ -220,6 +220,7 @@ def update_sessions_players(request: HttpRequest, body: SessionsPlayersRequest) 
             except User.DoesNotExist:
                 continue
             db_session.players.add(db_user)
+        db_session.save()
     return Empty()
 
 
