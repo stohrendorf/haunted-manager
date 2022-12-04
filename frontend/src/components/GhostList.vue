@@ -9,6 +9,7 @@ import {
 } from "@/components/ApiService";
 import { profileStore } from "@/components/ProfileStore";
 import TagFilterSelector from "@/components/TagFilterSelector.vue";
+import TagList from "@/components/TagList.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import BsTooltip from "@/components/bootstrap/BsTooltip";
 import { getData, getFiles } from "@/components/utilities/untar";
@@ -16,7 +17,7 @@ import { defineComponent } from "vue";
 import { XzReadableStream } from "xzwasm";
 
 export default defineComponent({
-  components: { TagFilterSelector, BsBtn },
+  components: { TagList, TagFilterSelector, BsBtn },
   directives: { BsTooltip },
   data() {
     return {
@@ -89,17 +90,7 @@ export default defineComponent({
         :key="ghost.id"
         class="list-group-item"
       >
-        <div>
-          <span
-            v-for="tag in ghost.tags"
-            :key="tag.name"
-            v-bs-tooltip
-            :title="tag.description"
-            class="badge bg-secondary me-1"
-          >
-            {{ tag.name }}
-          </span>
-        </div>
+        <tag-list :tags="ghost.tags" />
         <div>
           <a href="" @click.prevent="downloadGhost(ghost.id)">
             <strong>{{ ghost.level_display }}</strong>

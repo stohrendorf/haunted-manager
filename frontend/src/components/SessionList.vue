@@ -3,6 +3,7 @@ import { ISession, ITag, getSessions } from "@/components/ApiService";
 import { deleteSession as deleteSessionRequest } from "@/components/ApiService";
 import { profileStore } from "@/components/ProfileStore";
 import TagFilterSelector from "@/components/TagFilterSelector.vue";
+import TagList from "@/components/TagList.vue";
 import BsAlert from "@/components/bootstrap/BsAlert.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import BsTooltip from "@/components/bootstrap/BsTooltip";
@@ -10,7 +11,7 @@ import ClipboardCopyable from "@/components/utilities/ClipboardCopyable.vue";
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  components: { ClipboardCopyable, BsAlert, BsBtn, TagFilterSelector },
+  components: { ClipboardCopyable, BsAlert, BsBtn, TagFilterSelector, TagList },
   directives: { BsTooltip },
   data() {
     return {
@@ -70,15 +71,7 @@ export default defineComponent({
               <span class="bi bi-eye-slash" /> Private
             </span>
 
-            <span
-              v-for="tag in session.tags"
-              :key="tag.name"
-              v-bs-tooltip
-              :title="tag.description"
-              class="badge bg-secondary me-1"
-            >
-              {{ tag.name }}
-            </span>
+            <tag-list :tags="session.tags" />
           </div>
         </div>
 
