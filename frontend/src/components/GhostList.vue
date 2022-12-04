@@ -1,11 +1,14 @@
 <script lang="ts">
 import {
   IGhostFileResponseEntry,
+  ITag,
   deleteGhost,
   downloadGhost,
   getGhosts,
+  getTags,
 } from "@/components/ApiService";
 import { profileStore } from "@/components/ProfileStore";
+import TagFilterSelector from "@/components/TagFilterSelector.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import BsTooltip from "@/components/bootstrap/BsTooltip";
 import { getData, getFiles } from "@/components/utilities/untar";
@@ -13,16 +16,31 @@ import { defineComponent } from "vue";
 import { XzReadableStream } from "xzwasm";
 
 export default defineComponent({
-  components: { BsBtn },
+  components: { TagFilterSelector, BsBtn },
   directives: { BsTooltip },
   data() {
     return {
       ghosts: [] as IGhostFileResponseEntry[],
       profile: profileStore(),
+      tags: [] as ITag[],
+      filterTags: [] as ITag[],
     };
+  },
+  computed: {
+    filteredGhosts() {
+      if (this.filterTags.length === 0) {
+        return this.ghosts;
+      }
+      return this.ghosts.filter((ghost) =>
+        this.filterTags.every((filterTag) =>
+          ghost.tags.map((ghostTag) => ghostTag.id).includes(filterTag.id)
+        )
+      );
+    },
   },
   async created(): Promise<void> {
     this.ghosts = (await getGhosts()).files;
+    this.tags = (await getTags()).tags;
   },
   methods: {
     async deleteGhost(id: number): Promise<void> {
@@ -63,8 +81,14 @@ export default defineComponent({
 <template>
   <div>
     <a ref="downloadAnchor" class="hiding" />
-    <div class="list-group">
-      <div v-for="ghost in ghosts" :key="ghost.id" class="list-group-item">
+    <tag-filter-selector v-model="filterTags" />
+
+    <div class="list-group mt-1">
+      <div
+        v-for="ghost in filteredGhosts"
+        :key="ghost.id"
+        class="list-group-item"
+      >
         <div>
           <span
             v-for="tag in ghost.tags"

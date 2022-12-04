@@ -1,7 +1,8 @@
 <script lang="ts">
-import { ISession, getSessions } from "@/components/ApiService";
+import { ISession, ITag, getSessions } from "@/components/ApiService";
 import { deleteSession as deleteSessionRequest } from "@/components/ApiService";
 import { profileStore } from "@/components/ProfileStore";
+import TagFilterSelector from "@/components/TagFilterSelector.vue";
 import BsAlert from "@/components/bootstrap/BsAlert.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import BsTooltip from "@/components/bootstrap/BsTooltip";
@@ -9,13 +10,26 @@ import ClipboardCopyable from "@/components/utilities/ClipboardCopyable.vue";
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  components: { ClipboardCopyable, BsAlert, BsBtn },
+  components: { ClipboardCopyable, BsAlert, BsBtn, TagFilterSelector },
   directives: { BsTooltip },
   data() {
     return {
       sessions: [] as ISession[],
       profile: profileStore(),
+      filterTags: [] as ITag[],
     };
+  },
+  computed: {
+    filteredSessions() {
+      if (this.filterTags.length === 0) {
+        return this.sessions;
+      }
+      return this.sessions.filter((session) =>
+        this.filterTags.every((filterTag) =>
+          session.tags.map((sessionTag) => sessionTag.id).includes(filterTag.id)
+        )
+      );
+    },
   },
   async created() {
     this.sessions = (await getSessions()).sessions;
@@ -31,12 +45,13 @@ export default defineComponent({
 
 <template>
   <div>
-    <bs-alert v-show="!profile.authenticated" variant="primary">
+    <bs-alert v-if="!profile.authenticated" variant="primary">
       To join a session, you need to register.
     </bs-alert>
-    <div class="list-group">
+    <tag-filter-selector v-model="filterTags" />
+    <div class="list-group mt-1">
       <div
-        v-for="session in sessions"
+        v-for="session in filteredSessions"
         :key="session.id"
         class="list-group-item"
       >
