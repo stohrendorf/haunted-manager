@@ -11,8 +11,8 @@ def migrate_levels(apps, schema_editor):
     Level = apps.get_model("ghost_sharing", "Level")
     Ghost = apps.get_model("ghost_sharing", "Ghost")
 
-    call_command("loaddata", "ghost_sharing/fixtures/gameflows.json")
-    call_command("loaddata", "ghost_sharing/fixtures/levels.json")
+    call_command("loaddata", "fixtures/gameflows.json")
+    call_command("loaddata", "fixtures/levels.json")
     db_alias = schema_editor.connection.alias
     unknown_gameflow = Gameflow.objects.get(
         identifier="unknown",

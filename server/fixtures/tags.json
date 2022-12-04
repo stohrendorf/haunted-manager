@@ -1,0 +1,142 @@
+[
+  {
+    "model":  "haunted_sessions.tag",
+    "pk":     1,
+    "fields": {
+      "created_at":  "2022-10-30T18:14:00.063Z",
+      "updated_at":  "2022-10-30T18:14:00.063Z",
+      "name":        "NL",
+      "description": "No Loads"
+    }
+  },
+  {
+    "model":  "haunted_sessions.tag",
+    "pk":     2,
+    "fields": {
+      "created_at":  "2022-10-30T18:14:06.409Z",
+      "updated_at":  "2022-10-30T18:14:06.409Z",
+      "name":        "NM",
+      "description": "No Meds"
+    }
+  },
+  {
+    "model":  "haunted_sessions.tag",
+    "pk":     3,
+    "fields": {
+      "created_at":  "2022-10-30T18:14:21.601Z",
+      "updated_at":  "2022-10-30T18:14:21.601Z",
+      "name":        "PO",
+      "description": "Pistols Only"
+    }
+  },
+  {
+    "model":  "haunted_sessions.tag",
+    "pk":     4,
+    "fields": {
+      "created_at":  "2022-10-31T07:23:27.435Z",
+      "updated_at":  "2022-10-31T07:23:27.435Z",
+      "name":        "AS",
+      "description": "All Secrets"
+    }
+  },
+  {
+    "model":  "haunted_sessions.tag",
+    "pk":     5,
+    "fields": {
+      "created_at":  "2022-10-31T07:23:50.656Z",
+      "updated_at":  "2022-10-31T07:23:50.656Z",
+      "name":        "SR",
+      "description": "Speedrun"
+    }
+  },
+  {
+    "model":  "haunted_sessions.tag",
+    "pk":     6,
+    "fields": {
+      "created_at":  "2022-10-31T07:24:46.626Z",
+      "updated_at":  "2022-10-31T07:24:46.626Z",
+      "name":        "Teaching",
+      "description": "Players helping players"
+    }
+  },
+  {
+    "model":  "haunted_sessions.tag",
+    "pk":     7,
+    "fields": {
+      "created_at":  "2022-11-02T10:45:54.148Z",
+      "updated_at":  "2022-11-02T10:45:54.148Z",
+      "name":        "Casual",
+      "description": "Just playing"
+    }
+  },
+  {
+    "model":  "haunted_sessions.tag",
+    "pk":     8,
+    "fields": {
+      "created_at":  "2022-11-02T10:46:12.149Z",
+      "updated_at":  "2022-11-02T10:46:12.149Z",
+      "name":        "Fun",
+      "description": "Just having fun, no restrictions"
+    }
+  },
+  {
+    "model":  "haunted_sessions.tag",
+    "pk":     9,
+    "fields": {
+      "created_at":  "2022-11-02T18:35:25.228Z",
+      "updated_at":  "2022-11-02T18:35:25.228Z",
+      "name":        "OL",
+      "description": "One Life - No Health Restore"
+    }
+  },
+  {
+    "model":  "haunted_sessions.tag",
+    "pk":     10,
+    "fields": {
+      "created_at":  "2022-11-02T21:03:00.989Z",
+      "updated_at":  "2022-11-02T21:03:00.989Z",
+      "name":        "TR1",
+      "description": "Tomb Raider 1 - Main Game"
+    }
+  },
+  {
+    "model":  "haunted_sessions.tag",
+    "pk":     11,
+    "fields": {
+      "created_at":  "2022-11-02T21:03:17.257Z",
+      "updated_at":  "2022-11-02T21:03:17.257Z",
+      "name":        "TR1UB",
+      "description": "Tomb Raider 1 - Unfinished Business"
+    }
+  },
+  {
+    "model":  "haunted_sessions.tag",
+    "pk":     12,
+    "fields": {
+      "created_at":  "2022-11-02T21:03:27.125Z",
+      "updated_at":  "2022-11-02T21:03:27.125Z",
+      "name":        "Sabatu",
+      "description": "Sabatu's Tomb Raider"
+    }
+  },
+  {
+    "model":  "haunted_sessions.tag",
+    "pk":     13,
+    "fields": {
+      "created_at":  "2022-11-26T17:54:25.994Z",
+      "updated_at":  "2022-11-26T17:54:25.994Z",
+      "name":        "Glitchless",
+      "description": "No glitches allowed"
+    }
+  },
+  {
+    "model":  "haunted_sessions.tag",
+    "pk":     14,
+    "fields": {
+      "created_at":  "2022-11-26T17:56:14.368Z",
+      "updated_at":  "2022-11-26T17:56:14.368Z",
+      "name":        "NoCheat",
+      "description": "No cheats allowed"
+    }
+  }
+]
