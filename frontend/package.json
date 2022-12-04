@@ -24,7 +24,6 @@
     "pinia": "*",
     "vue": "^3",
     "vue-router": "*",
-    "vue-upload-component": "*",
     "xzwasm": "*"
   },
   "devDependencies": {
