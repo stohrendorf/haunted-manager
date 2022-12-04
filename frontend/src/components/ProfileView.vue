@@ -37,22 +37,31 @@ export default defineComponent({
 
     async changePassword(): Promise<void> {
       const response = await changePassword({ password: this.wantedPassword });
-      if (response.success) this.err = "";
-      else this.err = response.message;
+      if (response.success) {
+        this.err = "";
+      } else {
+        this.err = response.message;
+      }
     },
 
     async changeEmail(): Promise<void> {
       const response = await changeEmail({ email: this.wantedEmail });
       this.profileInfo.$state = await getProfile();
-      if (response.success) this.err = "";
-      else this.err = response.message;
+      if (response.success) {
+        this.err = "";
+      } else {
+        this.err = response.message;
+      }
     },
 
     async changeUsername(): Promise<void> {
       const response = await changeUsername({ username: this.wantedUsername });
       this.profileInfo.$state = await getProfile();
-      if (response.success) this.err = "";
-      else this.err = response.message;
+      if (response.success) {
+        this.err = "";
+      } else {
+        this.err = response.message;
+      }
     },
   },
 });
@@ -61,11 +70,6 @@ export default defineComponent({
 <template>
   <div>
     <h3>Profile</h3>
-
-    <bs-alert v-show="!profileInfo.verified" variant="warning">
-      You haven't verified your email address yet. You are not allowed to create
-      sessions.
-    </bs-alert>
 
     <bs-alert v-show="err" variant="danger">
       <div v-for="(line, i) in err.split('\n')" :key="i">
@@ -101,7 +105,7 @@ export default defineComponent({
       required
     >
       <bs-btn
-        :disabled="profileInfo.verified && profileInfo.email === wantedEmail"
+        :disabled="profileInfo.email === wantedEmail"
         variant="primary"
         @click="changeEmail()"
       >

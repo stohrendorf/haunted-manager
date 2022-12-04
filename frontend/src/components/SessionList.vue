@@ -34,12 +34,6 @@ export default defineComponent({
     <bs-alert v-show="!profile.authenticated" variant="primary">
       To join a session, you need to register.
     </bs-alert>
-    <bs-alert
-      v-show="profile.authenticated && !profile.verified"
-      variant="primary"
-    >
-      To create a session, you need to verify your email address.
-    </bs-alert>
     <div class="list-group">
       <div
         v-for="session in sessions"

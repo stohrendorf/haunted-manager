@@ -83,7 +83,6 @@ export interface IProfileInfoResponse {
   email: string | null;
   is_staff: boolean;
   username: string;
-  verified: boolean;
 }
 
 export interface IQuotaResponse {
@@ -632,14 +631,6 @@ function validateProfileInfoResponse(data: IProfileInfoResponse): void {
     throw new SchemaValidationError(
       "ProfileInfoResponse.username is too short"
     );
-  }
-  if (data.verified === undefined) {
-    throw new SchemaValidationError(
-      "ProfileInfoResponse.verified is undefined"
-    );
-  }
-  if (data.verified === null) {
-    throw new SchemaValidationError("ProfileInfoResponse.verified is null");
   }
 }
 

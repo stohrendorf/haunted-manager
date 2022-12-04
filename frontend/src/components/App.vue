@@ -94,7 +94,6 @@ export default defineComponent({
         <bs-router-nav-item
           v-if="profileInfo.authenticated"
           to="/create-session"
-          :disabled="!profileInfo.verified"
         >
           <span class="bi bi-plus-square-fill" />
           Create Session
@@ -106,7 +105,6 @@ export default defineComponent({
         <bs-router-nav-item
           v-if="profileInfo.authenticated"
           to="/upload-ghosts"
-          :disabled="!profileInfo.verified"
         >
           <span class="bi bi-upload" />
           Upload Ghosts

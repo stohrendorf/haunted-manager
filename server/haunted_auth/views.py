@@ -49,7 +49,6 @@ def profile(request: HttpRequest) -> ProfileInfoResponse:
         return ProfileInfoResponse(
             username="anonymous",
             authenticated=False,
-            verified=False,
             email=None,
             auth_token=None,
             is_staff=False,
@@ -61,8 +60,7 @@ def profile(request: HttpRequest) -> ProfileInfoResponse:
         key = None
     return ProfileInfoResponse(
         username=request.user.get_username(),
-        authenticated=request.user.is_authenticated,
-        verified=request.user.is_active,
+        authenticated=request.user.is_active and request.user.is_authenticated,
         email=request.user.email,
         auth_token=key.key.hex if key else None,
         is_staff=request.user.is_active and (request.user.is_staff or request.user.is_superuser),

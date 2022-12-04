@@ -17,7 +17,6 @@ class ProfileInfoResponse(DataClassJsonMixin, Validatable):
     email: Optional[str]
     is_staff: bool
     username: str
-    verified: bool
 
     def validate(self):
         if self.auth_token is not None:
@@ -34,5 +33,3 @@ class ProfileInfoResponse(DataClassJsonMixin, Validatable):
             raise SchemaValidationError("ProfileInfoResponse.username is null")
         if len(self.username) < 1:
             raise SchemaValidationError("ProfileInfoResponse.username is too short")
-        if self.verified is None:
-            raise SchemaValidationError("ProfileInfoResponse.verified is null")

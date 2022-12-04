@@ -45,7 +45,6 @@ class ServerInfoResponse(Compound):
 class ProfileInfoResponse(Compound):
     username = StringField(min_length=1)
     authenticated = BooleanField()
-    verified = BooleanField()
     email = StringField(nullable=True, min_length=1)
     auth_token = StringField(nullable=True, min_length=1)
     is_staff = BooleanField()

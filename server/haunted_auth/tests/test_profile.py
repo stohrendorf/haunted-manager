@@ -29,7 +29,6 @@ def test_profile_anonymous(client: Client, django_user_model):
     assert response is not None
     assert response.email is None
     assert response.authenticated is False
-    assert response.verified is False
 
 
 @pytest.mark.django_db
@@ -48,7 +47,6 @@ def test_profile_registered(client: Client, django_user_model):
     assert response is not None
     assert response.email == "user@example.com"
     assert response.authenticated is True
-    assert response.verified is True
 
 
 @pytest.mark.django_db
