@@ -35,7 +35,6 @@ from .schemas.SessionPlayers import SessionPlayers
 from .schemas.SessionResponse import SessionResponse
 from .schemas.SessionsPlayersRequest import SessionsPlayersRequest
 from .schemas.SessionsResponse import SessionsResponse
-from .schemas.SessionTag import SessionTag
 from .schemas.SuccessResponse import SuccessResponse
 from .schemas.Tag import Tag
 from .schemas.TagsResponse import TagsResponse

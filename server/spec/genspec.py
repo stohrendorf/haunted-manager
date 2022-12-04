@@ -79,11 +79,6 @@ class Tag(Compound):
     description = StringField()
 
 
-class SessionTag(Compound):
-    name = StringField(min_length=1)
-    description = StringField(min_length=1)
-
-
 class TagsResponse(Compound):
     tags = ArrayField(items=Tag())
 
@@ -95,7 +90,7 @@ class SuccessResponse(Compound):
 
 class Session(Compound):
     id = StringField(min_length=1)
-    tags = ArrayField(items=SessionTag())
+    tags = ArrayField(items=Tag())
     owner = StringField(min_length=1)
     description = StringField()
     players = ArrayField(items=StringField(min_length=1))

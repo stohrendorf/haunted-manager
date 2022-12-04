@@ -110,7 +110,7 @@ export interface ISession {
   owner: string;
   players: string[];
   private: boolean;
-  tags: ISessionTag[];
+  tags: ITag[];
   time: ITimeSpan | null;
 }
 
@@ -128,11 +128,6 @@ export interface ISessionPlayers {
 
 export interface ISessionResponse {
   session: ISession | null;
-}
-
-export interface ISessionTag {
-  description: string;
-  name: string;
 }
 
 export interface ISessionsPlayersRequest {
@@ -813,7 +808,7 @@ function validateSession(data: ISession): void {
     throw new SchemaValidationError("Session.tags is null");
   }
   for (const fieldData of data.tags) {
-    validateSessionTag(fieldData);
+    validateTag(fieldData);
   }
 
   if (data.time === undefined) {
@@ -914,27 +909,6 @@ function validateSessionResponse(data: ISessionResponse): void {
   }
   if (data.session !== null) {
     validateSession(data.session);
-  }
-}
-
-function validateSessionTag(data: ISessionTag): void {
-  if (data.description === undefined) {
-    throw new SchemaValidationError("SessionTag.description is undefined");
-  }
-  if (data.description === null) {
-    throw new SchemaValidationError("SessionTag.description is null");
-  }
-  if (data.description.length < 1) {
-    throw new SchemaValidationError("SessionTag.description is too short");
-  }
-  if (data.name === undefined) {
-    throw new SchemaValidationError("SessionTag.name is undefined");
-  }
-  if (data.name === null) {
-    throw new SchemaValidationError("SessionTag.name is null");
-  }
-  if (data.name.length < 1) {
-    throw new SchemaValidationError("SessionTag.name is too short");
   }
 }
 

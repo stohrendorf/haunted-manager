@@ -1,6 +1,5 @@
 <script lang="ts">
 import { ISession, createSession } from "@/components/ApiService";
-import { ISessionEditModel } from "@/components/ISessionEditModel";
 import SessionEditor from "@/components/SessionEditor.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import { defineComponent } from "vue";
@@ -10,26 +9,23 @@ export default defineComponent({
   data() {
     return {
       session: {
-        session: {
-          id: "",
-          owner: "",
-          description: "",
-          tags: [],
-          players: [],
-          time: null,
-          private: false,
-        } as ISession,
-        selectedTags: [],
-      } as ISessionEditModel,
+        id: "",
+        owner: "",
+        description: "",
+        tags: [],
+        players: [],
+        time: null,
+        private: false,
+      } as ISession,
     };
   },
   methods: {
     async createSession(): Promise<void> {
       await createSession({
-        description: this.session.session.description,
-        tags: this.session.selectedTags,
-        time: this.session.session.time,
-        private: this.session.session.private,
+        description: this.session.description,
+        tags: this.session.tags.map((tag) => tag.id),
+        time: this.session.time,
+        private: this.session.private,
       });
       this.$router.push("/");
     },

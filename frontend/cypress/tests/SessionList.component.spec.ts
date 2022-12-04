@@ -1,7 +1,16 @@
+import { ISessionsResponse, ITagsResponse } from "@/components/ApiService";
 import SessionList from "@/components/SessionList.vue";
 import { createPinia, setActivePinia } from "pinia";
 
 describe("<SessionList />", () => {
+  beforeEach(() => {
+    cy.intercept("GET", "/api/v0/tags", {
+      body: {
+        tags: [],
+      } as ITagsResponse,
+    });
+  });
+
   it("contains items", () => {
     cy.intercept("GET", "/api/v0/sessions", {
       body: {
@@ -10,8 +19,8 @@ describe("<SessionList />", () => {
             id: "id123",
             description: "description abc",
             tags: [
-              { name: "tag1", description: "tag description 1" },
-              { name: "tag2", description: "tag description 2" },
+              { id: 1, name: "tag1", description: "tag description 1" },
+              { id: 2, name: "tag2", description: "tag description 2" },
             ],
             owner: "owner1",
             players: ["player1"],
@@ -21,14 +30,14 @@ describe("<SessionList />", () => {
           {
             id: "id456",
             description: "description def",
-            tags: [{ name: "tag3", description: "tag description 3" }],
+            tags: [{ id: 3, name: "tag3", description: "tag description 3" }],
             owner: "owner2",
             players: [],
             time: null,
             private: false,
           },
         ],
-      },
+      } as ISessionsResponse,
     });
 
     cy.mount(SessionList, {
@@ -79,8 +88,8 @@ describe("<SessionList />", () => {
             id: "id123",
             description: "description abc",
             tags: [
-              { name: "tag1", description: "tag description 1" },
-              { name: "tag2", description: "tag description 2" },
+              { id: 1, name: "tag1", description: "tag description 1" },
+              { id: 2, name: "tag2", description: "tag description 2" },
             ],
             owner: "owner1",
             players: ["player1"],
@@ -90,14 +99,14 @@ describe("<SessionList />", () => {
           {
             id: "id456",
             description: "description def",
-            tags: [{ name: "tag3", description: "tag description 3" }],
+            tags: [{ id: 3, name: "tag3", description: "tag description 3" }],
             owner: "owner2",
             players: [],
             time: null,
             private: false,
           },
         ],
-      },
+      } as ISessionsResponse,
     });
 
     cy.mount(SessionList, {
@@ -127,8 +136,8 @@ describe("<SessionList />", () => {
             id: "id123",
             description: "description abc",
             tags: [
-              { name: "tag1", description: "tag description 1" },
-              { name: "tag2", description: "tag description 2" },
+              { id: 1, name: "tag1", description: "tag description 1" },
+              { id: 2, name: "tag2", description: "tag description 2" },
             ],
             owner: privilegedUsername,
             players: ["player1"],
@@ -138,14 +147,14 @@ describe("<SessionList />", () => {
           {
             id: "id456",
             description: "description def",
-            tags: [{ name: "tag3", description: "tag description 3" }],
+            tags: [{ id: 3, name: "tag3", description: "tag description 3" }],
             owner: privilegedUsername + "-unprivileged",
             players: [],
             time: null,
             private: false,
           },
         ],
-      },
+      } as ISessionsResponse,
     });
 
     cy.mount(SessionList, {

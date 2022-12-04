@@ -7,7 +7,7 @@ from django.core.files.uploadedfile import UploadedFile
 
 from ..error import SchemaValidationError
 from ..json_response import Validatable
-from .SessionTag import SessionTag
+from .Tag import Tag
 from .TimeSpan import TimeSpan
 
 
@@ -19,7 +19,7 @@ class Session(DataClassJsonMixin, Validatable):
     owner: str
     players: List[str]
     private: bool
-    tags: List[SessionTag]
+    tags: List[Tag]
     time: Optional[TimeSpan]
 
     def validate(self):

@@ -2,11 +2,9 @@
 import {
   IGhostFileResponseEntry,
   IQuotaResponse,
-  ITag,
   deleteGhost,
   getGhostsQuota,
   getStagingGhosts,
-  getTags,
   uploadGhost,
 } from "@/components/ApiService";
 import GhostEditor from "@/components/GhostEditor.vue";
@@ -28,13 +26,11 @@ export default defineComponent({
       quota: { max: 0, current: 0 } as IQuotaResponse,
       quotaPercent: 0.0,
       stagingGhosts: [] as IGhostFileResponseEntry[],
-      tags: [] as ITag[],
       file: null as File | null,
     };
   },
   async mounted(): Promise<void> {
     await this.updateQuota();
-    this.tags = (await getTags()).tags;
   },
   methods: {
     async updateQuota(): Promise<void> {

@@ -1,7 +1,6 @@
 <script lang="ts">
-import { ITag, getTags } from "@/components/ApiService";
-import { ISessionEditModel } from "@/components/ISessionEditModel";
-import BsCheckboxMultiple from "@/components/bootstrap/BsCheckboxMultiple.vue";
+import { ISession, ITag, getTags } from "@/components/ApiService";
+import TagsSelector from "@/components/TagsSelector.vue";
 import BsCheckboxSingle from "@/components/bootstrap/BsCheckboxSingle.vue";
 import BsTooltip from "@/components/bootstrap/BsTooltip";
 import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
@@ -11,40 +10,40 @@ import { PropType, defineComponent } from "vue";
 
 export default defineComponent({
   components: {
+    TagsSelector,
     BsCheckboxSingle,
-    BsCheckboxMultiple,
     FloatingSingleLineInput,
     DateTimePicker,
   },
   directives: { BsTooltip },
   props: {
     modelValue: {
-      type: Object as PropType<ISessionEditModel>,
+      type: Object as PropType<ISession>,
       required: true,
     },
   },
   data() {
     return {
       tags: null as ITag[] | null,
-      localData: null as ISessionEditModel | null,
+      localSession: null as ISession | null,
     };
   },
   computed: {
     isEvent: {
       get(): boolean {
-        return this.localData!.session.time !== null;
+        return this.localSession!.time !== null;
       },
       set(value: boolean) {
-        if (value === (this.localData!.session.time !== null)) {
+        if (value === (this.localSession!.time !== null)) {
           return;
         }
         if (value) {
-          this.localData!.session.time = {
+          this.localSession!.time = {
             start: moment().toISOString(),
             end: moment().toISOString(),
           };
         } else {
-          this.localData!.session.time = null;
+          this.localSession!.time = null;
         }
         this.sessionUpdated();
       },
@@ -52,28 +51,17 @@ export default defineComponent({
   },
   async created(): Promise<void> {
     this.tags = (await getTags()).tags;
-    this.localData = JSON.parse(JSON.stringify(this.modelValue));
+    this.localSession = JSON.parse(JSON.stringify(this.modelValue));
     this.$watch(
       () => this.modelValue,
       () => {
-        this.localData = JSON.parse(JSON.stringify(this.modelValue));
-        this.updateSelectedTagsFromSession();
+        this.localSession = JSON.parse(JSON.stringify(this.modelValue));
       }
     );
-    this.updateSelectedTagsFromSession();
   },
   methods: {
-    updateSelectedTagsFromSession(): void {
-      this.localData!.selectedTags = this.localData!.session.tags.map(
-        (sessionTag) =>
-          this.tags!.filter((tag) => tag.name === sessionTag.name)[0].id
-      );
-    },
     sessionUpdated() {
-      this.localData!.session.tags = this.tags!.filter((tag) =>
-        this.localData!.selectedTags.includes(tag.id)
-      );
-      this.$emit("update:modelValue", this.localData);
+      this.$emit("update:modelValue", this.localSession);
     },
   },
 });
@@ -82,7 +70,7 @@ export default defineComponent({
 <template>
   <form v-if="tags != null">
     <floating-single-line-input
-      v-model="localData.session.description"
+      v-model="localSession.description"
       label="Description"
       required
       @change="sessionUpdated()"
@@ -92,7 +80,7 @@ export default defineComponent({
       <div class="card-body">
         <div class="card-title form-check form-check-inline">
           <bs-checkbox-single
-            v-model="localData.session.private"
+            v-model="localSession.private"
             @change="sessionUpdated()"
           >
             <span
@@ -106,38 +94,27 @@ export default defineComponent({
             Scheduled Event
           </bs-checkbox-single>
         </div>
-        <div v-if="localData.session.time !== null">
+        <div v-if="localSession.time !== null">
           <date-time-picker
-            v-model="localData.session.time.start"
+            v-model="localSession.time.start"
             @change="sessionUpdated()"
           >
             <strong> Start Time </strong>
-            {{ $filters.datetime(localData.session.time.start) }}
+            {{ $filters.datetime(localSession.time.start) }}
           </date-time-picker>
           <date-time-picker
-            v-model="localData.session.time.end"
+            v-model="localSession.time.end"
             @change="sessionUpdated()"
           >
             <strong> End Time </strong>
-            {{ $filters.datetime(localData.session.time.end) }}
+            {{ $filters.datetime(localSession.time.end) }}
           </date-time-picker>
           <small>All times are in your local time zone.</small>
         </div>
       </div>
     </div>
 
-    <ul class="list-unstyled">
-      <li v-for="tag in tags" :key="tag.id">
-        <bs-checkbox-multiple
-          v-model="localData.selectedTags"
-          :value="tag.id"
-          @change="sessionUpdated()"
-        >
-          <span class="badge bg-secondary">{{ tag.name }}</span>
-          {{ tag.description }}
-        </bs-checkbox-multiple>
-      </li>
-    </ul>
+    <tags-selector v-model="localSession.tags" @change="sessionUpdated()" />
     <slot />
   </form>
 </template>

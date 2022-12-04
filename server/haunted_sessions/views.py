@@ -20,7 +20,6 @@ from hsutils.viewmodels import (
     SessionResponse,
     SessionsPlayersRequest,
     SessionsResponse,
-    SessionTag,
     SuccessResponse,
     Tag,
     TagsResponse,
@@ -50,7 +49,8 @@ def session_to_response(session: SessionModel) -> Session:
     return Session(
         id=session.key.hex,
         tags=[
-            SessionTag(
+            Tag(
+                id=t.id,
                 name=t.name,
                 description=t.description,
             )

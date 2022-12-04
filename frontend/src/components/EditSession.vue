@@ -1,6 +1,5 @@
 <script lang="ts">
-import { editSession, getSession } from "@/components/ApiService";
-import { ISessionEditModel } from "@/components/ISessionEditModel";
+import { ISession, editSession, getSession } from "@/components/ApiService";
 import SessionEditor from "@/components/SessionEditor.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import { defineComponent } from "vue";
@@ -9,7 +8,7 @@ export default defineComponent({
   components: { BsBtn, SessionEditor },
   data() {
     return {
-      session: null as ISessionEditModel | null,
+      session: null as ISession | null,
     };
   },
   async created(): Promise<void> {
@@ -17,15 +16,15 @@ export default defineComponent({
     if (session === null) {
       throw new Error("invalid session id");
     }
-    this.session = { session: session, selectedTags: [] };
+    this.session = session;
   },
   methods: {
     async updateSession(): Promise<void> {
-      await editSession(this.session!.session.id, {
-        description: this.session!.session.description,
-        tags: this.session!.selectedTags,
-        time: this.session!.session.time,
-        private: this.session!.session.private,
+      await editSession(this.session!.id, {
+        description: this.session!.description,
+        tags: this.session!.tags.map((tag) => tag.id),
+        time: this.session!.time,
+        private: this.session!.private,
       });
       this.$router.back();
     },

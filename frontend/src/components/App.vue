@@ -171,7 +171,7 @@ export default defineComponent({
 
     <article class="container-fluid container-md pb-5 mb-5 mt-2">
       <site-announcements-list />
-      <router-view />
+      <router-view class="mt-1" />
     </article>
 
     <footer class="bg-dark text-light fixed-bottom">

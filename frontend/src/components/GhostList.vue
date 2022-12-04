@@ -31,7 +31,9 @@ export default defineComponent({
     },
     async downloadGhost(id: number): Promise<void> {
       const archive = await downloadGhost(id);
-      if (archive === null) return;
+      if (archive === null) {
+        return;
+      }
 
       const tarDataArray = [];
       for (const reader = new XzReadableStream(archive).getReader(); ; ) {
@@ -64,6 +66,17 @@ export default defineComponent({
     <div class="list-group">
       <div v-for="ghost in ghosts" :key="ghost.id" class="list-group-item">
         <div>
+          <span
+            v-for="tag in ghost.tags"
+            :key="tag.name"
+            v-bs-tooltip
+            :title="tag.description"
+            class="badge bg-secondary me-1"
+          >
+            {{ tag.name }}
+          </span>
+        </div>
+        <div>
           <a href="" @click.prevent="downloadGhost(ghost.id)">
             <strong>{{ ghost.level_display }}</strong>
           </a>
@@ -74,18 +87,6 @@ export default defineComponent({
           &bull;
           {{ ghost.username }}
           &bull; Finish Type: {{ ghost.finish_type }}
-          <span v-if="ghost.tags">
-            &bull;
-            <span
-              v-for="tag in ghost.tags"
-              :key="tag.name"
-              v-bs-tooltip
-              :title="tag.description"
-              class="badge bg-secondary"
-            >
-              {{ tag.name }}
-            </span>
-          </span>
         </div>
         <div v-if="ghost.description">
           {{ ghost.description }}

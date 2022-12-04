@@ -6,8 +6,8 @@ import {
   getTags,
   updateGhost,
 } from "@/components/ApiService";
+import TagsSelector from "@/components/TagsSelector.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
-import BsCheckboxMultiple from "@/components/bootstrap/BsCheckboxMultiple.vue";
 import BsCheckboxSingle from "@/components/bootstrap/BsCheckboxSingle.vue";
 import BsSelect from "@/components/bootstrap/BsSelect.vue";
 import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
@@ -16,8 +16,8 @@ import { PropType, defineComponent } from "vue";
 
 export default defineComponent({
   components: {
+    TagsSelector,
     BsSelect,
-    BsCheckboxMultiple,
     BsBtn,
     FloatingSingleLineInput,
     BsCheckboxSingle,
@@ -87,25 +87,13 @@ export default defineComponent({
         </bs-checkbox-single>
       </div>
     </div>
-    <div class="row">
-      <floating-single-line-input
-        v-model="localGhost.description"
-        label="Description"
-        @change="updated()"
-      ></floating-single-line-input>
-    </div>
-    <div class="row">
-      <bs-checkbox-multiple
-        v-for="tag in tags"
-        :key="tag.id"
-        v-model="localGhost.tags"
-        :value="tag"
-        @change="updated()"
-      >
-        <span class="badge bg-secondary">{{ tag.name }}</span>
-        {{ tag.description }}
-      </bs-checkbox-multiple>
-    </div>
+    <floating-single-line-input
+      v-model="localGhost.description"
+      class="row"
+      label="Description"
+      @change="updated()"
+    />
+    <tags-selector v-model="localGhost.tags" class="row" />
     <div class="row row-cols-auto">
       <bs-btn variant="success" small @click="saveGhost()">
         <span class="bi bi-save"></span> Save
