@@ -169,7 +169,10 @@ def _ghost_to_response(ghost: Ghost) -> GhostFileResponseEntry:
 
 def _get_ghosts(published: bool) -> GhostFilesResponse:
     return GhostFilesResponse(
-        files=[_ghost_to_response(ghost) for ghost in Ghost.objects.filter(published=published).all()],
+        files=[
+            _ghost_to_response(ghost)
+            for ghost in Ghost.objects.filter(published=published).order_by("-created_at").all()
+        ],
     )
 
 
