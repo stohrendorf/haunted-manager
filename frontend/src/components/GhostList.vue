@@ -69,7 +69,7 @@ export default defineComponent({
   },
   computed: {
     filteredGhosts() {
-      let orderedGhosts = this.ghosts;
+      let orderedGhosts = [...this.ghosts];
       if (this.filterTags.length !== 0) {
         orderedGhosts = this.ghosts.filter((ghost) =>
           this.filterTags.every((filterTag) =>
