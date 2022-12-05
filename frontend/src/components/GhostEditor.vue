@@ -31,7 +31,7 @@ export default defineComponent({
   emits: ["saved", "update:modelValue"],
   data() {
     return {
-      tags: null as ITag[] | null,
+      tags: [] as ITag[],
       alternativeLevels: null as ISelectEntry[] | null,
       localGhost: null as IGhostFileResponseEntry | null,
     };
@@ -93,7 +93,11 @@ export default defineComponent({
       label="Description"
       @change="updated()"
     />
-    <tags-selector v-model="localGhost.tags" class="row" />
+    <tags-selector
+      v-model="localGhost.tags"
+      :available-tags="tags"
+      class="row"
+    />
     <div class="row row-cols-auto">
       <bs-btn variant="success" small @click="saveGhost()">
         <span class="bi bi-save"></span> Save

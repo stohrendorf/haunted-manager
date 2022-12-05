@@ -5,7 +5,6 @@ import {
   deleteGhost,
   downloadGhost,
   getGhosts,
-  getTags,
 } from "@/components/ApiService";
 import { profileStore } from "@/components/ProfileStore";
 import TagFilterSelector from "@/components/TagFilterSelector.vue";
@@ -41,7 +40,14 @@ export default defineComponent({
   },
   async created(): Promise<void> {
     this.ghosts = (await getGhosts()).files;
-    this.tags = (await getTags()).tags;
+    const uniqueTags = new Map<number, ITag>();
+    for (const ghost of this.ghosts) {
+      for (const tag of ghost.tags) {
+        uniqueTags.set(tag.id, tag);
+      }
+    }
+    this.tags = [...uniqueTags.values()];
+    this.tags.sort((a, b) => a.name.localeCompare(b.name));
   },
   methods: {
     async deleteGhost(id: number): Promise<void> {
@@ -82,7 +88,7 @@ export default defineComponent({
 <template>
   <div>
     <a ref="downloadAnchor" class="hiding" />
-    <tag-filter-selector v-model="filterTags" />
+    <tag-filter-selector v-model="filterTags" :available-tags="tags" />
 
     <div class="list-group mt-1">
       <div

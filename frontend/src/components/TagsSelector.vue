@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ITag, getTags } from "@/components/ApiService";
+import { ITag } from "@/components/ApiService";
 import BsCheckboxMultiple from "@/components/bootstrap/BsCheckboxMultiple.vue";
 import { PropType, defineComponent } from "vue";
 
@@ -12,16 +12,20 @@ export default defineComponent({
       type: Array as PropType<ITag[]>,
       required: true,
     },
+    availableTags: {
+      type: Array as PropType<ITag[]>,
+      required: false,
+      default: null,
+    },
   },
   emits: ["saved", "update:modelValue"],
   data() {
     return {
-      tags: null as ITag[] | null,
+      localTags: null as ITag[] | null,
       selectedTags: [] as ITag[],
     };
   },
   async created(): Promise<void> {
-    this.tags = (await getTags()).tags;
     this.selectedTags = [...this.modelValue];
     this.$watch(
       () => this.modelValue,
@@ -35,7 +39,7 @@ export default defineComponent({
 
 <template>
   <ul class="list-unstyled">
-    <li v-for="tag in tags" :key="tag.id">
+    <li v-for="tag in availableTags" :key="tag.id">
       <bs-checkbox-multiple
         v-model="selectedTags"
         :value="tag"

@@ -33,7 +33,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <session-editor v-if="session !== null" v-model="session">
+  <session-editor v-if="session" v-model="session">
     <bs-btn variant="success" @click="updateSession()">
       <span class="bi bi-save" /> Save
     </bs-btn>

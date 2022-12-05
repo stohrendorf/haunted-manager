@@ -24,7 +24,7 @@ export default defineComponent({
   },
   data() {
     return {
-      tags: null as ITag[] | null,
+      tags: [] as ITag[],
       localSession: null as ISession | null,
     };
   },
@@ -68,7 +68,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <form v-if="tags != null">
+  <form v-if="tags != null && localSession">
     <floating-single-line-input
       v-model="localSession.description"
       label="Description"
@@ -114,7 +114,11 @@ export default defineComponent({
       </div>
     </div>
 
-    <tags-selector v-model="localSession.tags" @change="sessionUpdated()" />
+    <tags-selector
+      v-model="localSession.tags"
+      :available-tags="tags"
+      @change="sessionUpdated()"
+    />
     <slot />
   </form>
 </template>

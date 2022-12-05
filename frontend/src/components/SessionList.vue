@@ -18,6 +18,7 @@ export default defineComponent({
       sessions: [] as ISession[],
       profile: profileStore(),
       filterTags: [] as ITag[],
+      tags: [] as ITag[],
     };
   },
   computed: {
@@ -34,6 +35,14 @@ export default defineComponent({
   },
   async created() {
     this.sessions = (await getSessions()).sessions;
+    const uniqueTags = new Map<number, ITag>();
+    for (const session of this.sessions) {
+      for (const tag of session.tags) {
+        uniqueTags.set(tag.id, tag);
+      }
+    }
+    this.tags = [...uniqueTags.values()];
+    this.tags.sort((a, b) => a.name.localeCompare(b.name));
   },
   methods: {
     async deleteSession(id: string): Promise<void> {
@@ -49,7 +58,7 @@ export default defineComponent({
     <bs-alert v-if="!profile.authenticated" variant="primary">
       To join a session, you need to register.
     </bs-alert>
-    <tag-filter-selector v-model="filterTags" />
+    <tag-filter-selector v-model="filterTags" :available-tags="tags" />
     <div class="list-group mt-1">
       <div
         v-for="session in filteredSessions"

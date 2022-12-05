@@ -1,5 +1,5 @@
 <script lang="ts">
-import { ITag, getTags } from "@/components/ApiService";
+import { ITag } from "@/components/ApiService";
 import TagsSelector from "@/components/TagsSelector.vue";
 import BsTooltip from "@/components/bootstrap/BsTooltip";
 import { PropType, defineComponent } from "vue";
@@ -16,15 +16,17 @@ export default defineComponent({
       type: Array as PropType<ITag[]>,
       required: true,
     },
+    availableTags: {
+      type: Array as PropType<ITag[]>,
+      required: true,
+    },
   },
   data() {
     return {
-      tags: [] as ITag[],
       filterTags: [] as ITag[],
     };
   },
   async created() {
-    this.tags = (await getTags()).tags;
     this.filterTags = [...this.modelValue];
     this.$watch(
       () => this.modelValue,
@@ -63,6 +65,7 @@ export default defineComponent({
       <tags-selector
         v-model="filterTags"
         class="ms-2"
+        :available-tags="availableTags"
         @change="$emit('update:modelValue', filterTags)"
       />
     </div>
