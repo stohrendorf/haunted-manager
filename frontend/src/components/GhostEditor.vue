@@ -12,6 +12,7 @@ import BsCheckboxSingle from "@/components/bootstrap/BsCheckboxSingle.vue";
 import BsSelect from "@/components/bootstrap/BsSelect.vue";
 import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
 import { ISelectEntry } from "@/components/bootstrap/ISelectEntry";
+import { seconds } from "@/components/filters";
 import { PropType, defineComponent } from "vue";
 
 export default defineComponent({
@@ -65,6 +66,8 @@ export default defineComponent({
     updated() {
       this.$emit("update:modelValue", this.localGhost);
     },
+
+    seconds,
   },
 });
 </script>
@@ -80,7 +83,7 @@ export default defineComponent({
           @change="updated()"
         />
         <span class="bi bi-stopwatch"></span>
-        {{ $filters.seconds(localGhost.duration) }}
+        {{ seconds(localGhost.duration) }}
         &bull;
         <bs-checkbox-single v-model="localGhost.published" @change="updated()">
           <span class="bi bi-cloud" /> Published

@@ -11,6 +11,7 @@ import TagFilterSelector from "@/components/TagFilterSelector.vue";
 import TagList from "@/components/TagList.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import BsTooltip from "@/components/bootstrap/BsTooltip";
+import { seconds } from "@/components/filters";
 import { getData, getFiles } from "@/components/utilities/untar";
 import { defineComponent } from "vue";
 import { XzReadableStream } from "xzwasm";
@@ -81,6 +82,8 @@ export default defineComponent({
         a.click();
       }
     },
+
+    seconds,
   },
 });
 </script>
@@ -104,7 +107,7 @@ export default defineComponent({
           &bull;
           <span class="bi bi-download"></span> {{ ghost.downloads }}
           &bull;
-          {{ $filters.seconds(ghost.duration) }}
+          {{ seconds(ghost.duration) }}
           &bull;
           {{ ghost.username }}
           &bull; Finish Type: {{ ghost.finish_type }}

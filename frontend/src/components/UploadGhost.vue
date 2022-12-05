@@ -11,6 +11,7 @@ import GhostEditor from "@/components/GhostEditor.vue";
 import BsAlert from "@/components/bootstrap/BsAlert.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import ProgressBarSlice from "@/components/bootstrap/ProgressBarSlice.vue";
+import { prettyBytes } from "@/components/filters";
 import { defineComponent } from "vue";
 
 export default defineComponent({
@@ -84,6 +85,8 @@ export default defineComponent({
     async updateGhostList(): Promise<void> {
       this.stagingGhosts = (await getStagingGhosts()).files;
     },
+
+    prettyBytes,
   },
 });
 </script>
@@ -109,8 +112,8 @@ export default defineComponent({
       >
         <span class="text-black">
           Quota
-          {{ $filters.prettyBytes(quota.current, true) }} of
-          {{ $filters.prettyBytes(quota.max, true) }}
+          {{ prettyBytes(quota.current, true) }} of
+          {{ prettyBytes(quota.max, true) }}
         </span>
       </progress-bar-slice>
     </div>

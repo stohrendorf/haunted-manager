@@ -7,6 +7,7 @@ import TagList from "@/components/TagList.vue";
 import BsAlert from "@/components/bootstrap/BsAlert.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import BsTooltip from "@/components/bootstrap/BsTooltip";
+import { datetime } from "@/components/filters";
 import ClipboardCopyable from "@/components/utilities/ClipboardCopyable.vue";
 import { defineComponent } from "vue";
 
@@ -49,6 +50,8 @@ export default defineComponent({
       await deleteSessionRequest(id);
       this.sessions = (await getSessions()).sessions;
     },
+
+    datetime,
   },
 });
 </script>
@@ -68,8 +71,8 @@ export default defineComponent({
         <div v-if="session.time !== null" class="row">
           <div class="col mb-2 rounded border-secondary border">
             <span class="bi bi-calendar3" /> Scheduled event, starting
-            {{ $filters.datetime(session.time.start) }}, ending
-            {{ $filters.datetime(session.time.end) }}.
+            {{ datetime(session.time.start) }}, ending
+            {{ datetime(session.time.end) }}.
             <small>All times are in your local time zone.</small>
           </div>
         </div>

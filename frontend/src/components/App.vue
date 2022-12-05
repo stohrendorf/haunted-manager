@@ -13,6 +13,7 @@ import BsModal from "@/components/bootstrap/BsModal.vue";
 import BsNavbar from "@/components/bootstrap/BsNavbar.vue";
 import BsNavbarNav from "@/components/bootstrap/BsNavbarNav.vue";
 import BsRouterNavItem from "@/components/bootstrap/BsRouterNavItem.vue";
+import { seconds } from "@/components/filters";
 import ClipboardCopyable from "@/components/utilities/ClipboardCopyable.vue";
 import { ComponentPublicInstance } from "@vue/runtime-core";
 import { defineComponent } from "vue";
@@ -58,6 +59,9 @@ export default defineComponent({
       (this.$refs.errorModal as typeof BsModal).show();
     }
     return false;
+  },
+  methods: {
+    seconds,
   },
 });
 </script>
@@ -116,7 +120,7 @@ export default defineComponent({
           {{ serverInfo.total_users }} users,
           {{ serverInfo.total_sessions }} sessions,
           {{ serverInfo.total_ghosts }} ghosts,
-          {{ $filters.seconds(serverInfo.total_ghost_duration) }}
+          {{ seconds(serverInfo.total_ghost_duration) }}
           total ghost time
         </li>
       </bs-navbar-nav>

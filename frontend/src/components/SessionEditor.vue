@@ -4,6 +4,7 @@ import TagsSelector from "@/components/TagsSelector.vue";
 import BsCheckboxSingle from "@/components/bootstrap/BsCheckboxSingle.vue";
 import BsTooltip from "@/components/bootstrap/BsTooltip";
 import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
+import { datetime } from "@/components/filters";
 import DateTimePicker from "@/components/utilities/DateTimePicker.vue";
 import moment from "moment";
 import { PropType, defineComponent } from "vue";
@@ -63,6 +64,8 @@ export default defineComponent({
     sessionUpdated() {
       this.$emit("update:modelValue", this.localSession);
     },
+
+    datetime,
   },
 });
 </script>
@@ -100,14 +103,14 @@ export default defineComponent({
             @change="sessionUpdated()"
           >
             <strong> Start Time </strong>
-            {{ $filters.datetime(localSession.time.start) }}
+            {{ datetime(localSession.time.start) }}
           </date-time-picker>
           <date-time-picker
             v-model="localSession.time.end"
             @change="sessionUpdated()"
           >
             <strong> End Time </strong>
-            {{ $filters.datetime(localSession.time.end) }}
+            {{ datetime(localSession.time.end) }}
           </date-time-picker>
           <small>All times are in your local time zone.</small>
         </div>
