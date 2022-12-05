@@ -18,6 +18,13 @@ import { getData, getFiles } from "@/components/utilities/untar";
 import { defineComponent } from "vue";
 import { XzReadableStream } from "xzwasm";
 
+enum Ordering {
+  Default,
+  Reverse,
+  DurationAsc,
+  DurationDesc,
+}
+
 export default defineComponent({
   components: { BsSelect, TagList, TagFilterSelector, BsBtn },
   directives: { BsTooltip },
@@ -29,18 +36,53 @@ export default defineComponent({
       filterTags: [] as ITag[],
       levels: [] as ISelectEntry[],
       levelFilter: null as number | null,
+      ordering: Ordering.Default as Ordering,
+      orderingItems: [
+        {
+          value: Ordering.Default,
+          title: "Newest First",
+        },
+        {
+          value: Ordering.Reverse,
+          title: "Oldest First",
+        },
+        {
+          value: Ordering.DurationAsc,
+          title: "Fastest First",
+        },
+        {
+          value: Ordering.DurationDesc,
+          title: "Longest First",
+        },
+      ] as ISelectEntry[],
     };
   },
   computed: {
     filteredGhosts() {
-      if (this.filterTags.length === 0) {
-        return this.ghosts;
+      let orderedGhosts = this.ghosts;
+      if (this.filterTags.length !== 0) {
+        orderedGhosts = this.ghosts.filter((ghost) =>
+          this.filterTags.every((filterTag) =>
+            ghost.tags.map((ghostTag) => ghostTag.id).includes(filterTag.id)
+          )
+        );
       }
-      return this.ghosts.filter((ghost) =>
-        this.filterTags.every((filterTag) =>
-          ghost.tags.map((ghostTag) => ghostTag.id).includes(filterTag.id)
-        )
-      );
+
+      switch (this.ordering) {
+        case Ordering.Default:
+          break;
+        case Ordering.Reverse:
+          orderedGhosts.reverse();
+          break;
+        case Ordering.DurationAsc:
+          orderedGhosts.sort((a, b) => (a.duration < b.duration ? -1 : 1));
+          break;
+        case Ordering.DurationDesc:
+          orderedGhosts.sort((a, b) => (a.duration > b.duration ? -1 : 1));
+          break;
+      }
+
+      return orderedGhosts;
     },
   },
   async created(): Promise<void> {
@@ -109,7 +151,12 @@ export default defineComponent({
         v-model="levelFilter"
         :items="levels"
         label="Level Filter"
-        style="display: inline-block"
+        class="ms-1"
+      />
+      <bs-select
+        v-model="ordering"
+        :items="orderingItems"
+        label="Ordering"
         class="ms-1"
       />
     </div>
