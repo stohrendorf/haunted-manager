@@ -23,6 +23,8 @@ enum Ordering {
   Reverse,
   DurationAsc,
   DurationDesc,
+  DownloadsAsc,
+  DownloadsDesc,
 }
 
 export default defineComponent({
@@ -54,6 +56,14 @@ export default defineComponent({
           value: Ordering.DurationDesc,
           title: "Longest First",
         },
+        {
+          value: Ordering.DownloadsAsc,
+          title: "Least Downloads First",
+        },
+        {
+          value: Ordering.DownloadsDesc,
+          title: "Most Downloads First",
+        },
       ] as ISelectEntry[],
     };
   },
@@ -79,6 +89,12 @@ export default defineComponent({
           break;
         case Ordering.DurationDesc:
           orderedGhosts.sort((a, b) => (a.duration > b.duration ? -1 : 1));
+          break;
+        case Ordering.DownloadsAsc:
+          orderedGhosts.sort((a, b) => (a.downloads < b.downloads ? -1 : 1));
+          break;
+        case Ordering.DownloadsDesc:
+          orderedGhosts.sort((a, b) => (a.downloads > b.downloads ? -1 : 1));
           break;
       }
 
