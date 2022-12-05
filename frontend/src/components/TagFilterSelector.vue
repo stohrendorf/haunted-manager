@@ -46,18 +46,24 @@ export default defineComponent({
       aria-expanded="false"
       class="btn btn-primary dropdown-toggle"
     >
-      <span class="bi bi-filter" />
-      <span v-show="filterTags.length === 0"> No Filter </span>
+      <span v-show="filterTags.length === 0">
+        <span class="bi bi-funnel" />
+        <span> No Tag Filter </span>
+      </span>
+
       <span v-show="filterTags.length !== 0">
-        All of
-        <span
-          v-for="tag in filterTags"
-          :key="tag.name"
-          v-bs-tooltip
-          :title="tag.description"
-          class="badge bg-secondary ms-1"
-        >
-          {{ tag.name }}
+        <span class="bi bi-funnel-fill" />
+        <span>
+          All of
+          <span
+            v-for="tag in filterTags"
+            :key="tag.name"
+            v-bs-tooltip
+            :title="tag.description"
+            class="badge bg-secondary ms-1"
+          >
+            {{ tag.name }}
+          </span>
         </span>
       </span>
     </button>

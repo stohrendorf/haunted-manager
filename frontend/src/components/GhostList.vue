@@ -10,14 +10,16 @@ import { profileStore } from "@/components/ProfileStore";
 import TagFilterSelector from "@/components/TagFilterSelector.vue";
 import TagList from "@/components/TagList.vue";
 import BsBtn from "@/components/bootstrap/BsBtn.vue";
+import BsSelect from "@/components/bootstrap/BsSelect.vue";
 import BsTooltip from "@/components/bootstrap/BsTooltip";
+import { ISelectEntry } from "@/components/bootstrap/ISelectEntry";
 import { seconds } from "@/components/filters";
 import { getData, getFiles } from "@/components/utilities/untar";
 import { defineComponent } from "vue";
 import { XzReadableStream } from "xzwasm";
 
 export default defineComponent({
-  components: { TagList, TagFilterSelector, BsBtn },
+  components: { BsSelect, TagList, TagFilterSelector, BsBtn },
   directives: { BsTooltip },
   data() {
     return {
@@ -25,6 +27,8 @@ export default defineComponent({
       profile: profileStore(),
       tags: [] as ITag[],
       filterTags: [] as ITag[],
+      levels: [] as ISelectEntry[],
+      levelFilter: null as number | null,
     };
   },
   computed: {
@@ -42,13 +46,21 @@ export default defineComponent({
   async created(): Promise<void> {
     this.ghosts = (await getGhosts()).files;
     const uniqueTags = new Map<number, ITag>();
+    const uniqueLevels = new Map<number, ISelectEntry>();
     for (const ghost of this.ghosts) {
       for (const tag of ghost.tags) {
         uniqueTags.set(tag.id, tag);
       }
+      uniqueLevels.set(ghost.level_id, {
+        value: ghost.level_id,
+        title: ghost.level_display,
+      });
     }
     this.tags = [...uniqueTags.values()];
     this.tags.sort((a, b) => a.name.localeCompare(b.name));
+    let levels = [...uniqueLevels.values()];
+    levels.sort((a, b) => a.title.localeCompare(b.title));
+    this.levels = [{ value: null, title: "No Level Filter" }, ...levels];
   },
   methods: {
     async deleteGhost(id: number): Promise<void> {
@@ -91,11 +103,21 @@ export default defineComponent({
 <template>
   <div>
     <a ref="downloadAnchor" class="hiding" />
-    <tag-filter-selector v-model="filterTags" :available-tags="tags" />
+    <div class="input-group">
+      <tag-filter-selector v-model="filterTags" :available-tags="tags" />
+      <bs-select
+        v-model="levelFilter"
+        :items="levels"
+        label="Level Filter"
+        style="display: inline-block"
+        class="ms-1"
+      />
+    </div>
 
     <div class="list-group mt-1">
       <div
         v-for="ghost in filteredGhosts"
+        v-show="levelFilter === null || levelFilter === ghost.level_id"
         :key="ghost.id"
         class="list-group-item"
       >
