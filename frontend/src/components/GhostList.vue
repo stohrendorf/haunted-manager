@@ -38,6 +38,8 @@ export default defineComponent({
       filterTags: [] as ITag[],
       levels: [] as ISelectEntry[],
       levelFilter: null as number | null,
+      finishTypes: [] as ISelectEntry[],
+      finishTypeFilter: null as string | null,
       ordering: Ordering.Default as Ordering,
       orderingItems: [
         {
@@ -105,6 +107,7 @@ export default defineComponent({
     this.ghosts = (await getGhosts()).files;
     const uniqueTags = new Map<number, ITag>();
     const uniqueLevels = new Map<number, ISelectEntry>();
+    const uniqueFinishTypes = [] as string[];
     for (const ghost of this.ghosts) {
       for (const tag of ghost.tags) {
         uniqueTags.set(tag.id, tag);
@@ -113,12 +116,23 @@ export default defineComponent({
         value: ghost.level_id,
         title: ghost.level_display,
       });
+      if (!uniqueFinishTypes.includes(ghost.finish_type)) {
+        uniqueFinishTypes.push(ghost.finish_type);
+      }
     }
     this.tags = [...uniqueTags.values()];
     this.tags.sort((a, b) => a.name.localeCompare(b.name));
     let levels = [...uniqueLevels.values()];
     levels.sort((a, b) => a.title.localeCompare(b.title));
     this.levels = [{ value: null, title: "No Level Filter" }, ...levels];
+    uniqueFinishTypes.sort();
+    this.finishTypes = [
+      { value: null, title: "No Finish Type Filter" },
+      ...uniqueFinishTypes.map((t) => ({
+        value: t,
+        title: t,
+      })),
+    ];
   },
   methods: {
     async deleteGhost(id: number): Promise<void> {
@@ -170,6 +184,12 @@ export default defineComponent({
         class="ms-1"
       />
       <bs-select
+        v-model="finishTypeFilter"
+        :items="finishTypes"
+        label="Finish Type Filter"
+        class="ms-1"
+      />
+      <bs-select
         v-model="ordering"
         :items="orderingItems"
         label="Ordering"
@@ -180,7 +200,10 @@ export default defineComponent({
     <div class="list-group mt-1">
       <div
         v-for="ghost in filteredGhosts"
-        v-show="levelFilter === null || levelFilter === ghost.level_id"
+        v-show="
+          (levelFilter === null || levelFilter === ghost.level_id) &&
+          (finishTypeFilter === null || finishTypeFilter === ghost.finish_type)
+        "
         :key="ghost.id"
         class="list-group-item"
       >
