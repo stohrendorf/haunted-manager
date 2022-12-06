@@ -197,57 +197,85 @@ export default defineComponent({
       />
     </div>
 
-    <div class="list-group mt-1">
-      <div
-        v-for="ghost in filteredGhosts"
-        v-show="
-          (levelFilter === null || levelFilter === ghost.level_id) &&
-          (finishTypeFilter === null || finishTypeFilter === ghost.finish_type)
-        "
-        :key="ghost.id"
-        class="list-group-item"
-      >
-        <tag-list :tags="ghost.tags" />
-        <div>
-          <a href="" @click.prevent="downloadGhost(ghost.id)">
-            <strong>{{ ghost.level_display }}</strong>
-          </a>
-          &bull;
-          <span class="bi bi-download"></span> {{ ghost.downloads }}
-          &bull;
-          {{ seconds(ghost.duration) }}
-          &bull;
-          {{ ghost.username }}
-          &bull; Finish Type: {{ ghost.finish_type }}
-        </div>
-        <div v-if="ghost.description">
-          {{ ghost.description }}
-        </div>
-        <div
-          v-if="
-            profile.$state.username === ghost.username ||
-            profile.$state.is_staff
+    <table class="table table-bordered table-hover">
+      <thead>
+        <tr>
+          <th scope="col" class="fit">
+            <span v-bs-tooltip class="bi bi-download" title="Downloads"></span>
+          </th>
+          <th scope="col" class="fit">Level</th>
+          <th scope="col" class="fit">Duration</th>
+          <th scope="col" class="fit">Tags</th>
+          <th scope="col" class="fit">Finish Type</th>
+          <th scope="col" class="fit">Uploader</th>
+          <th scope="col">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          v-for="ghost in filteredGhosts"
+          v-show="
+            (levelFilter === null || levelFilter === ghost.level_id) &&
+            (finishTypeFilter === null ||
+              finishTypeFilter === ghost.finish_type)
           "
-          class="row mt-1"
+          :key="ghost.id"
         >
-          <div class="col col-auto">
-            <bs-btn variant="danger" small @click="deleteGhost(ghost.id)">
-              <i class="bi bi-trash" /> Delete
-            </bs-btn>
-          </div>
-          <div class="col col-auto">
-            <bs-btn
-              variant="primary"
-              small
-              @click="$router.push('/edit-ghost/' + ghost.id)"
+          <td class="fit">
+            {{ ghost.downloads }}
+          </td>
+          <td class="fit">
+            <a href="" @click.prevent="downloadGhost(ghost.id)">
+              {{ ghost.level_display }}
+            </a>
+            <div
+              v-if="
+                profile.$state.username === ghost.username ||
+                profile.$state.is_staff
+              "
+              class="row mt-1"
             >
-              <i class="bi bi-pencil" /> Edit
-            </bs-btn>
-          </div>
-        </div>
-      </div>
-    </div>
+              <div class="col col-auto">
+                <bs-btn variant="danger" small @click="deleteGhost(ghost.id)">
+                  <i class="bi bi-trash" /> Delete
+                </bs-btn>
+              </div>
+              <div class="col col-auto">
+                <bs-btn
+                  variant="primary"
+                  small
+                  @click="$router.push('/edit-ghost/' + ghost.id)"
+                >
+                  <i class="bi bi-pencil" /> Edit
+                </bs-btn>
+              </div>
+            </div>
+          </td>
+          <td class="fit">
+            {{ seconds(ghost.duration) }}
+          </td>
+          <td class="fit">
+            <tag-list :tags="ghost.tags" />
+          </td>
+          <td class="fit">
+            {{ ghost.finish_type }}
+          </td>
+          <td class="fit">
+            {{ ghost.username }}
+          </td>
+          <td>
+            {{ ghost.description }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+td.fit,
+th.fit {
+  width: 0.1%;
+  white-space: nowrap;
+}
+</style>
