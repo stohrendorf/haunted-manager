@@ -76,7 +76,7 @@ export default defineComponent({
       v-model="localSession.description"
       label="Description"
       required
-      @change="sessionUpdated()"
+      @update:modelValue="sessionUpdated()"
     />
 
     <div class="card">
@@ -84,7 +84,7 @@ export default defineComponent({
         <div class="card-title form-check form-check-inline">
           <bs-checkbox-single
             v-model="localSession.private"
-            @change="sessionUpdated()"
+            @update:modelValue="sessionUpdated()"
           >
             <span
               v-bs-tooltip
@@ -93,21 +93,24 @@ export default defineComponent({
               <span class="bi bi-eye-slash" /> Private
             </span>
           </bs-checkbox-single>
-          <bs-checkbox-single v-model="isEvent" @change="sessionUpdated()">
+          <bs-checkbox-single
+            v-model="isEvent"
+            @update:modelValue="sessionUpdated()"
+          >
             Scheduled Event
           </bs-checkbox-single>
         </div>
         <div v-if="localSession.time !== null">
           <date-time-picker
             v-model="localSession.time.start"
-            @change="sessionUpdated()"
+            @update:modelValue="sessionUpdated()"
           >
             <strong> Start Time </strong>
             {{ datetime(localSession.time.start) }}
           </date-time-picker>
           <date-time-picker
             v-model="localSession.time.end"
-            @change="sessionUpdated()"
+            @update:modelValue="sessionUpdated()"
           >
             <strong> End Time </strong>
             {{ datetime(localSession.time.end) }}
@@ -120,7 +123,7 @@ export default defineComponent({
     <tags-selector
       v-model="localSession.tags"
       :available-tags="tags"
-      @change="sessionUpdated()"
+      @update:modelValue="sessionUpdated()"
     />
     <slot />
   </form>

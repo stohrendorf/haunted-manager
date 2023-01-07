@@ -80,12 +80,15 @@ export default defineComponent({
           v-model="localGhost.level_id"
           :items="alternativeLevels"
           label="Level"
-          @change="updated()"
+          @update:modelValue="updated()"
         />
         <span class="bi bi-stopwatch"></span>
         {{ seconds(localGhost.duration) }}
         &bull;
-        <bs-checkbox-single v-model="localGhost.published" @change="updated()">
+        <bs-checkbox-single
+          v-model="localGhost.published"
+          @update:modelValue="updated()"
+        >
           <span class="bi bi-cloud" /> Published
         </bs-checkbox-single>
       </div>
@@ -94,7 +97,7 @@ export default defineComponent({
       v-model="localGhost.description"
       class="row"
       label="Description"
-      @change="updated()"
+      @update:modelValue="updated()"
     />
     <tags-selector
       v-model="localGhost.tags"

@@ -72,7 +72,7 @@ export default defineComponent({
         v-model="filterTags"
         class="ms-2"
         :available-tags="availableTags"
-        @change="$emit('update:modelValue', filterTags)"
+        @update:modelValue="$emit('update:modelValue', filterTags)"
       />
     </div>
   </div>
