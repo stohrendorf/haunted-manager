@@ -86,7 +86,7 @@ export default defineComponent({
 
     <bs-navbar variant="dark">
       <template #brand>
-        <img src="../assets/logo.png" alt="Logo" style="height: 20px" />
+        <img src="logo.png" alt="Logo" style="height: 20px" />
         Haunted Server
       </template>
 
