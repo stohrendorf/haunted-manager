@@ -32,7 +32,7 @@ export default defineComponent({
       <span class="bi bi-person" /> Profile
     </router-link>
     <bs-btn variant="primary" @click="logoutClicked">
-      <span class="bi bi-lock" /> Logout
+      <span class="bi bi-box-arrow-left" /> Logout
     </bs-btn>
   </div>
 </template>

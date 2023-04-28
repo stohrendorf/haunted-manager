@@ -167,7 +167,7 @@ export default defineComponent({
         </bs-dropdown-nav-item>
         <bs-dropdown-nav-item v-if="profileInfo.authenticated" end>
           <template #toggle>
-            {{ profileInfo.username }}
+            <span class="bi bi-person-fill" /> {{ profileInfo.username }}
           </template>
           <logout-widget />
         </bs-dropdown-nav-item>
