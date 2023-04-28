@@ -146,9 +146,7 @@ def gen_django(
         schema_outputs[schema.typename()] = schema_output
 
     output = "from typing import Callable, Optional, List\n"
-    output += (
-        "from django.http import HttpRequest, HttpResponseBase, JsonResponse, FileResponse as DjangoFileResponse\n"
-    )
+    output += "from django.http import HttpRequest, HttpResponse, JsonResponse, FileResponse as DjangoFileResponse\n"
     output += "from django.core.files.uploadedfile import UploadedFile\n"
     output += "from django.urls import path\n"
     output += "from enum import Enum\n"
@@ -201,7 +199,9 @@ def gen_django(
             output += f"        {method.name.lower()}_handler: {handler_signature},\n"
         output += "    ):\n"
         output += (
-            "        def dispatch(" + ", ".join(["request: HttpRequest"] + url_args_in) + ") -> HttpResponseBase:\n"
+            "        def dispatch("
+            + ", ".join(["request: HttpRequest"] + url_args_in)
+            + ") -> HttpResponse | JsonResponse:\n"
         )
         for method, endpoint in methods_endpoints.items():
             output += f'            if request.method == "{method.value}":\n'

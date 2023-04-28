@@ -6,7 +6,7 @@ from typing import Callable, List, Optional
 
 from django.core.files.uploadedfile import UploadedFile
 from django.http import FileResponse as DjangoFileResponse
-from django.http import HttpRequest, HttpResponseBase, JsonResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.urls import path
 
 from .error import SchemaValidationError
@@ -66,7 +66,7 @@ class server_info:
         *,
         get_handler: Callable[[HttpRequest], ServerInfoResponse | tuple[int, ServerInfoResponse]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -96,7 +96,7 @@ class tags:
         *,
         get_handler: Callable[[HttpRequest], TagsResponse | tuple[int, TagsResponse]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -127,7 +127,7 @@ class sessions:
         get_handler: Callable[[HttpRequest], SessionsResponse | tuple[int, SessionsResponse]],
         post_handler: Callable[[HttpRequest, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             if request.method == "POST":
@@ -180,7 +180,7 @@ class session:
         post_handler: Callable[[HttpRequest, str, CreateSessionRequest], SuccessResponse | tuple[int, SuccessResponse]],
         delete_handler: Callable[[HttpRequest, str], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest, session_id: str) -> HttpResponseBase:
+        def dispatch(request: HttpRequest, session_id: str) -> HttpResponse | JsonResponse:
             if request.method == "GET":
                 return cls.do_get(request, get_handler, session_id)
             if request.method == "POST":
@@ -250,7 +250,7 @@ class session_access:
         *,
         post_handler: Callable[[HttpRequest, SessionAccessRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "POST":
                 return cls.do_post(request, post_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -287,7 +287,7 @@ class session_players:
         *,
         post_handler: Callable[[HttpRequest, SessionsPlayersRequest], Empty | tuple[int, Empty]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "POST":
                 return cls.do_post(request, post_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -323,7 +323,7 @@ class announcements:
         *,
         get_handler: Callable[[HttpRequest], AnnouncementsResponse | tuple[int, AnnouncementsResponse]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -354,7 +354,7 @@ class profile:
         *,
         get_handler: Callable[[HttpRequest], ProfileInfoResponse | tuple[int, ProfileInfoResponse]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -384,7 +384,7 @@ class change_username:
         *,
         post_handler: Callable[[HttpRequest, ChangeUsernameRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "POST":
                 return cls.do_post(request, post_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -421,7 +421,7 @@ class regenerate_token:
         *,
         get_handler: Callable[[HttpRequest], Empty | tuple[int, Empty]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -451,7 +451,7 @@ class login:
         *,
         post_handler: Callable[[HttpRequest, LoginRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "POST":
                 return cls.do_post(request, post_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -488,7 +488,7 @@ class register:
         *,
         post_handler: Callable[[HttpRequest, RegisterRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "POST":
                 return cls.do_post(request, post_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -525,7 +525,7 @@ class change_password:
         *,
         post_handler: Callable[[HttpRequest, ChangePasswordRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "POST":
                 return cls.do_post(request, post_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -562,7 +562,7 @@ class change_email:
         *,
         post_handler: Callable[[HttpRequest, ChangeEmailRequest], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "POST":
                 return cls.do_post(request, post_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -599,7 +599,7 @@ class logout:
         *,
         get_handler: Callable[[HttpRequest], Empty | tuple[int, Empty]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -630,7 +630,7 @@ class ghosts:
         get_handler: Callable[[HttpRequest], GhostFilesResponse | tuple[int, GhostFilesResponse]],
         post_handler: Callable[[HttpRequest, dict[str, UploadedFile]], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             if request.method == "POST":
@@ -676,7 +676,7 @@ class download_ghost:
         *,
         get_handler: Callable[[HttpRequest, int], DjangoFileResponse],
     ):
-        def dispatch(request: HttpRequest, id: int) -> HttpResponseBase:
+        def dispatch(request: HttpRequest, id: int) -> HttpResponse | JsonResponse:
             if request.method == "GET":
                 return cls.do_get(request, get_handler, id)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -703,7 +703,7 @@ class single_ghost:
         post_handler: Callable[[HttpRequest, int, GhostInfoRequest], SuccessResponse | tuple[int, SuccessResponse]],
         delete_handler: Callable[[HttpRequest, int], SuccessResponse | tuple[int, SuccessResponse]],
     ):
-        def dispatch(request: HttpRequest, id: int) -> HttpResponseBase:
+        def dispatch(request: HttpRequest, id: int) -> HttpResponse | JsonResponse:
             if request.method == "GET":
                 return cls.do_get(request, get_handler, id)
             if request.method == "POST":
@@ -773,7 +773,7 @@ class staging_ghosts:
         *,
         get_handler: Callable[[HttpRequest], GhostFilesResponse | tuple[int, GhostFilesResponse]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -803,7 +803,7 @@ class quota:
         *,
         get_handler: Callable[[HttpRequest], QuotaResponse | tuple[int, QuotaResponse]],
     ):
-        def dispatch(request: HttpRequest) -> HttpResponseBase:
+        def dispatch(request: HttpRequest) -> HttpResponse | JsonResponse:
             if request.method == "GET":
                 return cls.do_get(request, get_handler)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)
@@ -833,7 +833,7 @@ class levels:
         *,
         get_handler: Callable[[HttpRequest, str], LevelsResponse | tuple[int, LevelsResponse]],
     ):
-        def dispatch(request: HttpRequest, identifier: str) -> HttpResponseBase:
+        def dispatch(request: HttpRequest, identifier: str) -> HttpResponse | JsonResponse:
             if request.method == "GET":
                 return cls.do_get(request, get_handler, identifier)
             return JsonResponse(data={}, status=HTTPStatus.METHOD_NOT_ALLOWED)

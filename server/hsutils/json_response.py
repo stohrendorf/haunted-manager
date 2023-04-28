@@ -4,7 +4,6 @@ from typing import Callable, Concatenate, ParamSpec, TypeVar
 
 from dataclasses_json import DataClassJsonMixin
 from django.http import HttpRequest, HttpResponse, HttpResponseServerError, JsonResponse
-from django.http.response import HttpResponseBase
 
 
 class Validatable:
@@ -18,15 +17,15 @@ P = ParamSpec("P")
 
 def json_response(
     handler: Callable[Concatenate[HttpRequest, P], HttpResponse | T | tuple[int, T]],
-) -> Callable[Concatenate[HttpRequest, P], HttpResponseBase]:
+) -> Callable[Concatenate[HttpRequest, P], HttpResponse | JsonResponse]:
     @wraps(handler)
-    def wrapper(request: HttpRequest, *args: P.args, **kwargs: P.kwargs) -> HttpResponseBase:
+    def wrapper(request: HttpRequest, *args: P.args, **kwargs: P.kwargs) -> HttpResponse | JsonResponse:
         try:
             response_data = handler(request, *args, **kwargs)
-            if isinstance(response_data, HttpResponseBase):
+            if isinstance(response_data, (HttpResponse, JsonResponse)):
                 return response_data
 
-            response_code = HttpResponseBase.status_code
+            response_code = HttpResponse.status_code
             if isinstance(response_data, tuple):
                 response_code, response_data = response_data
 
