@@ -1,3 +1,4 @@
+import About from "@/components/AboutPage.vue";
 import CreateSession from "@/components/CreateSession.vue";
 import EditGhost from "@/components/EditGhost.vue";
 import EditSession from "@/components/EditSession.vue";
@@ -19,6 +20,7 @@ const router = createRouter({
     { path: "/ghosts", component: GhostList },
     { path: "/upload-ghosts", component: UploadGhost },
     { path: "/edit-ghost/:id", component: EditGhost },
+    { path: "/about", component: About },
   ],
   linkActiveClass: "active",
 });

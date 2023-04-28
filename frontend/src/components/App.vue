@@ -42,6 +42,7 @@ export default defineComponent({
       } as IServerInfoResponse,
     };
   },
+
   async created(): Promise<void> {
     this.profileInfo.$state = await getProfile();
     this.serverInfo = await getServerInfo();
@@ -113,6 +114,10 @@ export default defineComponent({
           <span class="bi bi-upload" />
           Upload Ghosts
         </bs-router-nav-item>
+        <bs-router-nav-item to="/about">
+          <span class="bi bi-question-circle" />
+          About
+        </bs-router-nav-item>
       </bs-navbar-nav>
       <bs-navbar-nav ms="auto">
         <li class="navbar-text text-info">
@@ -167,7 +172,9 @@ export default defineComponent({
           <logout-widget />
         </bs-dropdown-nav-item>
         <bs-dropdown-nav-item v-else end>
-          <template #toggle> Login/Register</template>
+          <template #toggle
+            ><span class="bi bi-box-arrow-in-right" /> Login/Register
+          </template>
           <login-widget />
         </bs-dropdown-nav-item>
       </bs-navbar-nav>
