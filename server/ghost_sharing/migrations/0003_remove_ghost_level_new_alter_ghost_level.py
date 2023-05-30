@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("ghost_sharing", "0002_gameflow_level_ghost_level_new"),
     ]

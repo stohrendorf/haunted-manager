@@ -26,7 +26,6 @@ def migrate_levels(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("ghost_sharing", "0001_initial"),
     ]

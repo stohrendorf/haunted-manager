@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("haunted_auth", "0002_alter_apikey_options"),
     ]

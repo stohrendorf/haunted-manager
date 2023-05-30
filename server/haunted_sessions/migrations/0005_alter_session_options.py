@@ -4,7 +4,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("haunted_sessions", "0004_session_end_session_is_event_session_start"),
     ]

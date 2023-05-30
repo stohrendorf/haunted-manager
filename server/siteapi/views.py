@@ -34,7 +34,7 @@ def get_server_info(request: HttpRequest) -> ServerInfoResponse:
         total_sessions=Session.objects.count(),
         total_ghosts=Ghost.objects.count(),
         total_ghost_duration=int(
-            (Ghost.objects.all().aggregate(Sum("duration"))["duration__sum"] or timedelta(seconds=0)).total_seconds()
+            (Ghost.objects.all().aggregate(Sum("duration"))["duration__sum"] or timedelta(seconds=0)).total_seconds(),
         ),
         coop_url=settings.COOP_SERVER_URL,
     )

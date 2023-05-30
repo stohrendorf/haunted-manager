@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         (total_deleted, objects_deleted) = Session.objects.filter(
-            last_used__lt=timezone.now() - timedelta(weeks=settings.SESSION_RETENTION_WEEKS)
+            last_used__lt=timezone.now() - timedelta(weeks=settings.SESSION_RETENTION_WEEKS),
         ).delete()
         sessions_deleted = objects_deleted.get(Session._meta.label, 0)
         self.stdout.write(f"Deleted {total_deleted} objects, {sessions_deleted} sessions")

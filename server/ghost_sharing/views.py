@@ -276,5 +276,5 @@ def get_alternative_levels(request: HttpRequest, identifier: str) -> LevelsRespo
                 title=f"{level.gameflow.title} - {level.title}",
             )
             for level in Level.objects.filter(identifier=identifier).all()
-        ]
+        ],
     )

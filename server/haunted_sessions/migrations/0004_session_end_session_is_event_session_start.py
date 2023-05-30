@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("haunted_sessions", "0003_alter_session_options_alter_tag_options"),
     ]
