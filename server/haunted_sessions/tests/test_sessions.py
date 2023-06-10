@@ -1,6 +1,7 @@
 import uuid
 from datetime import timedelta
 from http import HTTPStatus
+from uuid import uuid4
 
 import pytest
 from django.test import Client
@@ -15,6 +16,7 @@ from hsutils.viewmodels import (
     SessionsResponse,
     SuccessResponse,
     TimeSpan,
+    session,
     sessions,
 )
 
@@ -294,13 +296,72 @@ def test_create_session(client: Client, django_user_model):
     assert response is not None
     assert response.success is True
 
-    (session,) = Session.objects.all()
-    assert session.owner == user
-    assert session.description == "session description"
-    assert list(session.tags.all()) == [tag2]
-    assert session.start == start_ts
-    assert session.end == end_ts
-    assert session.players.count() == 0
+    (session_object,) = Session.objects.all()
+    assert session_object.owner == user
+    assert session_object.description == "session description"
+    assert list(session_object.tags.all()) == [tag2]
+    assert session_object.start == start_ts
+    assert session_object.end == end_ts
+    assert session_object.players.count() == 0
+
+
+@pytest.mark.django_db
+def test_edit_session(client: Client, django_user_model):
+    user = django_user_model.objects.create_user(
+        is_active=True,
+        username="username",
+        email="test@example.com",
+        password="password!!!",
+    )
+    Tag.objects.create(name="tag1", description="foo1")
+    tag2 = Tag.objects.create(name="tag2", description="foo2")
+
+    start_ts = timezone.now() + timedelta(hours=3)
+    end_ts = timezone.now() + timedelta(hours=4)
+
+    request = CreateSessionRequest(
+        description="session description",
+        tags=[tag2.id],
+        time=TimeSpan(
+            start=start_ts.isoformat(),
+            end=end_ts.isoformat(),
+        ),
+        private=False,
+    )
+
+    client.force_login(user)
+    post_test_url(
+        client,
+        sessions.path,
+        request,
+        SuccessResponse,
+    )
+
+    code, response = post_test_url(
+        client,
+        session.path.replace("<str:session_id>", str(uuid4())),
+        request,
+        SuccessResponse,
+    )
+    assert code == HTTPStatus.NOT_FOUND
+    assert response.success is False
+
+    (session_object,) = Session.objects.all()
+
+    request.description = "changed description"
+    request.tags = []
+    code, response = post_test_url(
+        client,
+        session.path.replace("<str:session_id>", str(session_object.key)),
+        request,
+        SuccessResponse,
+    )
+    assert code == HTTPStatus.OK
+    assert response.success
+
+    (session_object,) = Session.objects.all()
+    assert not session_object.tags.all()
+    assert session_object.description == "changed description"
 
 
 @pytest.mark.django_db
