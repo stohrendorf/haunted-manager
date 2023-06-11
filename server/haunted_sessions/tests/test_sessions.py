@@ -39,9 +39,9 @@ def test_session_response_conversion(django_user_model):
     assert len(converted.tags) == 1
     assert converted.tags[0].name == "tag"
     assert converted.tags[0].description == "tag-description"
-    assert converted.owner == "username"
+    assert converted.owner == user.username
     assert len(converted.players) == 1
-    assert converted.players[0] == "username"
+    assert converted.players[0] == user.username
     assert converted.id == db_session.key.hex
     assert converted.time is None
     assert converted.private is False
@@ -56,9 +56,9 @@ def test_session_response_conversion(django_user_model):
     assert len(converted.tags) == 1
     assert converted.tags[0].name == "tag"
     assert converted.tags[0].description == "tag-description"
-    assert converted.owner == "username"
+    assert converted.owner == user.username
     assert len(converted.players) == 1
-    assert converted.players[0] == "username"
+    assert converted.players[0] == user.username
     assert converted.id == db_session.key.hex
     assert converted.time is not None
     assert converted.time.start == time_start.isoformat()
@@ -135,7 +135,7 @@ def test_sessions_list(client: Client, django_user_model):
     assert session.description == "description"
     assert session.owner == user.username
     assert len(session.players) == 1
-    assert session.players[0] == "username"
+    assert session.players[0] == user.username
     assert len(session.tags) == 1
     assert session.tags[0].name == "tag"
     assert session.tags[0].description == "tag-description"
@@ -159,22 +159,100 @@ def test_single_session(client: Client, django_user_model):
         email="test@example.com",
         password="password!!!",
     )
-    db_session = Session.objects.create(owner=user, description="description", private=False)
+    private_user = django_user_model.objects.create_user(
+        is_active=True,
+        username="private",
+        email="private@example.com",
+        password="password!!!",
+    )
+    super_user = django_user_model.objects.create_user(
+        is_active=True,
+        username="admin",
+        email="admin@example.com",
+        password="password!!!",
+    )
+    super_user.is_staff = True
+    super_user.save()
+    db_session_public = Session.objects.create(owner=super_user, description="description", private=False)
+    db_session_private = Session.objects.create(owner=private_user, description="description", private=True)
 
+    # normal user only sees his the public session
     client.force_login(user)
     code, response = get_test_url(
         client,
-        "api/v0/sessions/" + db_session.key.hex,
+        sessions.path,
+        SessionsResponse,
+    )
+    assert code == HTTPStatus.OK
+    assert response is not None
+    assert len(response.sessions) == 1
+
+    code, response = get_test_url(
+        client,
+        "api/v0/sessions/" + db_session_private.key.hex,
+        SessionResponse,
+    )
+    assert code == HTTPStatus.NOT_FOUND
+    assert response is not None
+    assert response.session is None
+
+    # private user sees the public session and the private session
+    client.force_login(private_user)
+    code, response = get_test_url(
+        client,
+        sessions.path,
+        SessionsResponse,
+    )
+    assert code == HTTPStatus.OK
+    assert response is not None
+    assert len(response.sessions) == 2
+
+    for db_session in (db_session_public, db_session_private):
+        code, response = get_test_url(
+            client,
+            "api/v0/sessions/" + db_session.key.hex,
+            SessionResponse,
+        )
+        assert code == HTTPStatus.OK
+        assert response is not None
+        assert response.session is not None
+
+    # admin/staff can see all sessions
+    client.force_login(super_user)
+    code, response = get_test_url(
+        client,
+        sessions.path,
+        SessionsResponse,
+    )
+    assert code == HTTPStatus.OK
+    assert response is not None
+    assert len(response.sessions) == 2
+
+    for db_session in (db_session_public, db_session_private):
+        code, response = get_test_url(
+            client,
+            "api/v0/sessions/" + db_session.key.hex,
+            SessionResponse,
+        )
+        assert code == HTTPStatus.OK
+        assert response is not None
+        assert response.session is not None
+
+    # verify that the normal user gets his session data
+    client.force_login(user)
+    code, response = get_test_url(
+        client,
+        "api/v0/sessions/" + db_session_public.key.hex,
         SessionResponse,
     )
     assert code == HTTPStatus.OK
     assert response is not None
     assert response.session is not None
-    assert response.session.id == db_session.key.hex
+    assert response.session.id == db_session_public.key.hex
 
     tag = Tag.objects.create(name="tag", description="tag-description")
-    db_session.tags.add(tag)
-    db_session.save()
+    db_session_public.tags.add(tag)
+    db_session_public.save()
 
     code, response = get_test_url(
         client,
@@ -186,15 +264,15 @@ def test_single_session(client: Client, django_user_model):
     assert len(response.sessions) == 1
     (session,) = response.sessions
     assert session.description == "description"
-    assert session.owner == user.username
+    assert session.owner == super_user.username
     assert len(session.players) == 0
     assert len(session.tags) == 1
     assert session.tags[0].name == "tag"
     assert session.tags[0].description == "tag-description"
     assert session.private is False
 
-    db_session.players.add(user)
-    db_session.save()
+    db_session_public.players.add(user)
+    db_session_public.save()
 
     code, response = get_test_url(
         client,
@@ -206,9 +284,9 @@ def test_single_session(client: Client, django_user_model):
     assert len(response.sessions) == 1
     (session,) = response.sessions
     assert session.description == "description"
-    assert session.owner == user.username
+    assert session.owner == super_user.username
     assert len(session.players) == 1
-    assert session.players[0] == "username"
+    assert session.players[0] == user.username
     assert len(session.tags) == 1
     assert session.tags[0].name == "tag"
     assert session.tags[0].description == "tag-description"
