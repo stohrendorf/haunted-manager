@@ -391,6 +391,21 @@ def test_edit_session(client: Client, django_user_model):
         email="test@example.com",
         password="password!!!",
     )
+    foreign_user = django_user_model.objects.create_user(
+        is_active=True,
+        username="foreigner",
+        email="foreigner@example.com",
+        password="password!!!",
+    )
+    staff_user = django_user_model.objects.create_user(
+        is_active=True,
+        username="staff",
+        email="staff@example.com",
+        password="password!!!",
+    )
+    staff_user.is_staff = True
+    staff_user.save()
+
     Tag.objects.create(name="tag1", description="foo1")
     tag2 = Tag.objects.create(name="tag2", description="foo2")
 
@@ -428,6 +443,39 @@ def test_edit_session(client: Client, django_user_model):
 
     request.description = "changed description"
     request.tags = []
+
+    # anonymous users mustn't be able to change it
+    client.logout()
+    code, response = post_test_url(
+        client,
+        session.path.replace("<str:session_id>", str(session_object.key)),
+        request,
+        SuccessResponse,
+    )
+    assert code == HTTPStatus.UNAUTHORIZED
+    assert response.success is False
+
+    (session_object,) = Session.objects.all()
+    assert session_object.tags.all()
+    assert session_object.description == "session description"
+
+    # non-owning users mustn't be able to change it
+    client.force_login(foreign_user)
+    code, response = post_test_url(
+        client,
+        session.path.replace("<str:session_id>", str(session_object.key)),
+        request,
+        SuccessResponse,
+    )
+    assert code == HTTPStatus.FORBIDDEN
+    assert response.success is False
+
+    (session_object,) = Session.objects.all()
+    assert session_object.tags.all()
+    assert session_object.description == "session description"
+
+    # owners must be able to change it
+    client.force_login(user)
     code, response = post_test_url(
         client,
         session.path.replace("<str:session_id>", str(session_object.key)),
@@ -440,6 +488,24 @@ def test_edit_session(client: Client, django_user_model):
     (session_object,) = Session.objects.all()
     assert not session_object.tags.all()
     assert session_object.description == "changed description"
+
+    # staff must be able to change it
+    request.description = "another description"
+    request.tags = [tag2.id]
+
+    client.force_login(staff_user)
+    code, response = post_test_url(
+        client,
+        session.path.replace("<str:session_id>", str(session_object.key)),
+        request,
+        SuccessResponse,
+    )
+    assert code == HTTPStatus.OK
+    assert response.success
+
+    (session_object,) = Session.objects.all()
+    assert session_object.tags.all()
+    assert session_object.description == "another description"
 
 
 @pytest.mark.django_db
