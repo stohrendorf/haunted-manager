@@ -9,7 +9,7 @@ from django.utils import timezone
 
 from haunted_sessions.models import Session, Tag
 from haunted_sessions.views import session_to_response
-from hsutils.test_utils import get_test_url, post_test_url
+from hsutils.test_utils import delete_test_url, get_test_url, post_test_url
 from hsutils.viewmodels import (
     CreateSessionRequest,
     SessionResponse,
@@ -565,3 +565,65 @@ def test_single_session_privacy(client: Client, django_user_model):
     assert response.session is not None
     assert response.session.id == db_session.key.hex
     assert response.session.private is True
+
+
+@pytest.mark.django_db
+def test_delete_session(client: Client, django_user_model):
+    client.logout()
+    code, response = delete_test_url(
+        client,
+        "api/v0/sessions/" + uuid4().hex,
+        SuccessResponse,
+    )
+    assert code == HTTPStatus.UNAUTHORIZED
+    assert response is not None
+    assert response.success is False
+
+    user = django_user_model.objects.create_user(
+        is_active=True,
+        username="username",
+        email="test@example.com",
+        password="password!!!",
+    )
+    other_user = django_user_model.objects.create_user(
+        is_active=True,
+        username="foreigner",
+        email="foreigner@example.com",
+        password="password!!!",
+    )
+    staff_user = django_user_model.objects.create_user(
+        is_active=True,
+        username="staff",
+        email="staff@example.com",
+        password="password!!!",
+    )
+    staff_user.is_staff = True
+    staff_user.save()
+
+    client.force_login(user)
+    code, response = delete_test_url(
+        client,
+        "api/v0/sessions/" + uuid4().hex,
+        SuccessResponse,
+    )
+    assert code == HTTPStatus.NOT_FOUND
+    assert response is not None
+    assert response.success is False
+
+    def test(db_user, db_session, success):
+        client.force_login(db_user)
+        code, response = delete_test_url(
+            client,
+            "api/v0/sessions/" + db_session.key.hex,
+            SuccessResponse,
+        )
+        assert code == (HTTPStatus.OK if success else HTTPStatus.FORBIDDEN)
+        assert response is not None
+        assert response.success == success
+
+    db_session = Session.objects.create(owner=user, description="description", private=False)
+    test(other_user, db_session, False)
+    test(user, db_session, True)
+
+    db_session = Session.objects.create(owner=user, description="description", private=False)
+    test(staff_user, db_session, True)
