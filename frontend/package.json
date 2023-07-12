@@ -45,7 +45,7 @@
     "cypress-teamcity-reporter": "*",
     "eslint": "*",
     "eslint-config-prettier": "*",
-    "eslint-plugin-prettier": "*",
+    "eslint-plugin-prettier": "<5",
     "eslint-plugin-vue": "*",
     "happy-dom": "*",
     "prettier": "*",
