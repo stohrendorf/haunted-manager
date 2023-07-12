@@ -29,7 +29,6 @@ INSTALLED_APPS = [
     "django_email_verification",
     "environ",
     "ckeditor",
-    "ckeditor_skins",
 ]
 
 MIDDLEWARE = [
@@ -163,7 +162,6 @@ CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 
 CKEDITOR_CONFIGS = {
     "default": {
-        "skin": "moono-dark",
         "toolbar": [
             {
                 "name": "document",
