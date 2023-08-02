@@ -74,7 +74,7 @@ def _field_to_type_sig(field: BaseField) -> str:
 
 
 def gen_vue(schemas: list[BaseField | Compound], endpoints: dict[ApiPath, dict[HttpMethod, Endpoint]]) -> str:
-    output = "/* eslint-disable no-empty */\n"
+    output = "/* eslint-disable no-empty comma-dangle */\n"
     output += "// noinspection RedundantIfStatementJS\n"
 
     for schema in schemas:
