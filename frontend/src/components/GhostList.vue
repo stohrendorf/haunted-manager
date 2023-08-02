@@ -75,8 +75,8 @@ export default defineComponent({
       if (this.filterTags.length !== 0) {
         orderedGhosts = this.ghosts.filter((ghost) =>
           this.filterTags.every((filterTag) =>
-            ghost.tags.map((ghostTag) => ghostTag.id).includes(filterTag.id)
-          )
+            ghost.tags.map((ghostTag) => ghostTag.id).includes(filterTag.id),
+          ),
         );
       }
 
@@ -155,7 +155,7 @@ export default defineComponent({
       }
       const tarData = new Uint8Array(tarDataArray);
       const entries = getFiles(tarData).filter((e) =>
-        e.name.toLowerCase().endsWith(".bin")
+        e.name.toLowerCase().endsWith(".bin"),
       );
       if (entries.length === 1) {
         const binData = getData(entries[0], tarData);

@@ -162,17 +162,17 @@ export interface ITimeSpan {
 function validateAnnouncementEntry(data: IAnnouncementEntry): void {
   if (data.background_color === undefined) {
     throw new SchemaValidationError(
-      "AnnouncementEntry.background_color is undefined"
+      "AnnouncementEntry.background_color is undefined",
     );
   }
   if (data.background_color === null) {
     throw new SchemaValidationError(
-      "AnnouncementEntry.background_color is null"
+      "AnnouncementEntry.background_color is null",
     );
   }
   if (data.background_color.length < 1) {
     throw new SchemaValidationError(
-      "AnnouncementEntry.background_color is too short"
+      "AnnouncementEntry.background_color is too short",
     );
   }
   if (data.message === undefined) {
@@ -186,7 +186,7 @@ function validateAnnouncementEntry(data: IAnnouncementEntry): void {
   }
   if (data.text_color === undefined) {
     throw new SchemaValidationError(
-      "AnnouncementEntry.text_color is undefined"
+      "AnnouncementEntry.text_color is undefined",
     );
   }
   if (data.text_color === null) {
@@ -194,7 +194,7 @@ function validateAnnouncementEntry(data: IAnnouncementEntry): void {
   }
   if (data.text_color.length < 1) {
     throw new SchemaValidationError(
-      "AnnouncementEntry.text_color is too short"
+      "AnnouncementEntry.text_color is too short",
     );
   }
 }
@@ -202,12 +202,12 @@ function validateAnnouncementEntry(data: IAnnouncementEntry): void {
 function validateAnnouncementsResponse(data: IAnnouncementsResponse): void {
   if (data.announcements === undefined) {
     throw new SchemaValidationError(
-      "AnnouncementsResponse.announcements is undefined"
+      "AnnouncementsResponse.announcements is undefined",
     );
   }
   if (data.announcements === null) {
     throw new SchemaValidationError(
-      "AnnouncementsResponse.announcements is null"
+      "AnnouncementsResponse.announcements is null",
     );
   }
   for (const fieldData of data.announcements) {
@@ -230,7 +230,7 @@ function validateChangeEmailRequest(data: IChangeEmailRequest): void {
 function validateChangePasswordRequest(data: IChangePasswordRequest): void {
   if (data.password === undefined) {
     throw new SchemaValidationError(
-      "ChangePasswordRequest.password is undefined"
+      "ChangePasswordRequest.password is undefined",
     );
   }
   if (data.password === null) {
@@ -238,7 +238,7 @@ function validateChangePasswordRequest(data: IChangePasswordRequest): void {
   }
   if (data.password.length < 1) {
     throw new SchemaValidationError(
-      "ChangePasswordRequest.password is too short"
+      "ChangePasswordRequest.password is too short",
     );
   }
 }
@@ -246,7 +246,7 @@ function validateChangePasswordRequest(data: IChangePasswordRequest): void {
 function validateChangeUsernameRequest(data: IChangeUsernameRequest): void {
   if (data.username === undefined) {
     throw new SchemaValidationError(
-      "ChangeUsernameRequest.username is undefined"
+      "ChangeUsernameRequest.username is undefined",
     );
   }
   if (data.username === null) {
@@ -254,7 +254,7 @@ function validateChangeUsernameRequest(data: IChangeUsernameRequest): void {
   }
   if (data.username.length < 1) {
     throw new SchemaValidationError(
-      "ChangeUsernameRequest.username is too short"
+      "ChangeUsernameRequest.username is too short",
     );
   }
 }
@@ -262,7 +262,7 @@ function validateChangeUsernameRequest(data: IChangeUsernameRequest): void {
 function validateCreateSessionRequest(data: ICreateSessionRequest): void {
   if (data.description === undefined) {
     throw new SchemaValidationError(
-      "CreateSessionRequest.description is undefined"
+      "CreateSessionRequest.description is undefined",
     );
   }
   if (data.description === null) {
@@ -270,12 +270,12 @@ function validateCreateSessionRequest(data: ICreateSessionRequest): void {
   }
   if (data.description.length > 512) {
     throw new SchemaValidationError(
-      "CreateSessionRequest.description is too long"
+      "CreateSessionRequest.description is too long",
     );
   }
   if (data.private === undefined) {
     throw new SchemaValidationError(
-      "CreateSessionRequest.private is undefined"
+      "CreateSessionRequest.private is undefined",
     );
   }
   if (data.private === null) {
@@ -318,17 +318,17 @@ function validateGhostFileResponse(data: IGhostFileResponse): void {
 function validateGhostFileResponseEntry(data: IGhostFileResponseEntry): void {
   if (data.description === undefined) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.description is undefined"
+      "GhostFileResponseEntry.description is undefined",
     );
   }
   if (data.description === null) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.description is null"
+      "GhostFileResponseEntry.description is null",
     );
   }
   if (data.downloads === undefined) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.downloads is undefined"
+      "GhostFileResponseEntry.downloads is undefined",
     );
   }
   if (data.downloads === null) {
@@ -336,12 +336,12 @@ function validateGhostFileResponseEntry(data: IGhostFileResponseEntry): void {
   }
   if (data.downloads < 0) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.downloads has a value below minimum"
+      "GhostFileResponseEntry.downloads has a value below minimum",
     );
   }
   if (data.duration === undefined) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.duration is undefined"
+      "GhostFileResponseEntry.duration is undefined",
     );
   }
   if (data.duration === null) {
@@ -349,17 +349,17 @@ function validateGhostFileResponseEntry(data: IGhostFileResponseEntry): void {
   }
   if (data.duration < 0) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.duration has a value below minimum"
+      "GhostFileResponseEntry.duration has a value below minimum",
     );
   }
   if (data.finish_type === undefined) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.finish_type is undefined"
+      "GhostFileResponseEntry.finish_type is undefined",
     );
   }
   if (data.finish_type === null) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.finish_type is null"
+      "GhostFileResponseEntry.finish_type is null",
     );
   }
   if (data.id === undefined) {
@@ -370,22 +370,22 @@ function validateGhostFileResponseEntry(data: IGhostFileResponseEntry): void {
   }
   if (data.level_display === undefined) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.level_display is undefined"
+      "GhostFileResponseEntry.level_display is undefined",
     );
   }
   if (data.level_display === null) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.level_display is null"
+      "GhostFileResponseEntry.level_display is null",
     );
   }
   if (data.level_display.length < 1) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.level_display is too short"
+      "GhostFileResponseEntry.level_display is too short",
     );
   }
   if (data.level_id === undefined) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.level_id is undefined"
+      "GhostFileResponseEntry.level_id is undefined",
     );
   }
   if (data.level_id === null) {
@@ -393,22 +393,22 @@ function validateGhostFileResponseEntry(data: IGhostFileResponseEntry): void {
   }
   if (data.level_identifier === undefined) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.level_identifier is undefined"
+      "GhostFileResponseEntry.level_identifier is undefined",
     );
   }
   if (data.level_identifier === null) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.level_identifier is null"
+      "GhostFileResponseEntry.level_identifier is null",
     );
   }
   if (data.level_identifier.length < 1) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.level_identifier is too short"
+      "GhostFileResponseEntry.level_identifier is too short",
     );
   }
   if (data.published === undefined) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.published is undefined"
+      "GhostFileResponseEntry.published is undefined",
     );
   }
   if (data.published === null) {
@@ -422,7 +422,7 @@ function validateGhostFileResponseEntry(data: IGhostFileResponseEntry): void {
   }
   if (data.size < 0) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.size has a value below minimum"
+      "GhostFileResponseEntry.size has a value below minimum",
     );
   }
   if (data.tags === undefined) {
@@ -437,7 +437,7 @@ function validateGhostFileResponseEntry(data: IGhostFileResponseEntry): void {
 
   if (data.username === undefined) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.username is undefined"
+      "GhostFileResponseEntry.username is undefined",
     );
   }
   if (data.username === null) {
@@ -445,7 +445,7 @@ function validateGhostFileResponseEntry(data: IGhostFileResponseEntry): void {
   }
   if (data.username.length < 1) {
     throw new SchemaValidationError(
-      "GhostFileResponseEntry.username is too short"
+      "GhostFileResponseEntry.username is too short",
     );
   }
 }
@@ -465,7 +465,7 @@ function validateGhostFilesResponse(data: IGhostFilesResponse): void {
 function validateGhostInfoRequest(data: IGhostInfoRequest): void {
   if (data.description === undefined) {
     throw new SchemaValidationError(
-      "GhostInfoRequest.description is undefined"
+      "GhostInfoRequest.description is undefined",
     );
   }
   if (data.description === null) {
@@ -508,7 +508,7 @@ function validateIsoDateTime(data?: string | null): void {
   }
   if (
     !data.match(
-      /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(\+[0-9]{2}:[0-9]{2}|Z)$/
+      /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(\+[0-9]{2}:[0-9]{2}|Z)$/,
     )
   ) {
     throw new SchemaValidationError("IsoDateTime has an invalid format");
@@ -578,24 +578,24 @@ function validateLoginRequest(data: ILoginRequest): void {
 function validateProfileInfoResponse(data: IProfileInfoResponse): void {
   if (data.auth_token === undefined) {
     throw new SchemaValidationError(
-      "ProfileInfoResponse.auth_token is undefined"
+      "ProfileInfoResponse.auth_token is undefined",
     );
   }
   if (data.auth_token !== null) {
     if (data.auth_token.length < 1) {
       throw new SchemaValidationError(
-        "ProfileInfoResponse.auth_token is too short"
+        "ProfileInfoResponse.auth_token is too short",
       );
     }
   }
   if (data.authenticated === undefined) {
     throw new SchemaValidationError(
-      "ProfileInfoResponse.authenticated is undefined"
+      "ProfileInfoResponse.authenticated is undefined",
     );
   }
   if (data.authenticated === null) {
     throw new SchemaValidationError(
-      "ProfileInfoResponse.authenticated is null"
+      "ProfileInfoResponse.authenticated is null",
     );
   }
   if (data.email === undefined) {
@@ -608,7 +608,7 @@ function validateProfileInfoResponse(data: IProfileInfoResponse): void {
   }
   if (data.is_staff === undefined) {
     throw new SchemaValidationError(
-      "ProfileInfoResponse.is_staff is undefined"
+      "ProfileInfoResponse.is_staff is undefined",
     );
   }
   if (data.is_staff === null) {
@@ -616,7 +616,7 @@ function validateProfileInfoResponse(data: IProfileInfoResponse): void {
   }
   if (data.username === undefined) {
     throw new SchemaValidationError(
-      "ProfileInfoResponse.username is undefined"
+      "ProfileInfoResponse.username is undefined",
     );
   }
   if (data.username === null) {
@@ -624,7 +624,7 @@ function validateProfileInfoResponse(data: IProfileInfoResponse): void {
   }
   if (data.username.length < 1) {
     throw new SchemaValidationError(
-      "ProfileInfoResponse.username is too short"
+      "ProfileInfoResponse.username is too short",
     );
   }
 }
@@ -638,7 +638,7 @@ function validateQuotaResponse(data: IQuotaResponse): void {
   }
   if (data.current < 0) {
     throw new SchemaValidationError(
-      "QuotaResponse.current has a value below minimum"
+      "QuotaResponse.current has a value below minimum",
     );
   }
   if (data.max === undefined) {
@@ -649,7 +649,7 @@ function validateQuotaResponse(data: IQuotaResponse): void {
   }
   if (data.max < 0) {
     throw new SchemaValidationError(
-      "QuotaResponse.max has a value below minimum"
+      "QuotaResponse.max has a value below minimum",
     );
   }
 }
@@ -696,22 +696,22 @@ function validateServerInfoResponse(data: IServerInfoResponse): void {
   }
   if (data.total_ghost_duration === undefined) {
     throw new SchemaValidationError(
-      "ServerInfoResponse.total_ghost_duration is undefined"
+      "ServerInfoResponse.total_ghost_duration is undefined",
     );
   }
   if (data.total_ghost_duration === null) {
     throw new SchemaValidationError(
-      "ServerInfoResponse.total_ghost_duration is null"
+      "ServerInfoResponse.total_ghost_duration is null",
     );
   }
   if (data.total_ghost_duration < 0) {
     throw new SchemaValidationError(
-      "ServerInfoResponse.total_ghost_duration has a value below minimum"
+      "ServerInfoResponse.total_ghost_duration has a value below minimum",
     );
   }
   if (data.total_ghosts === undefined) {
     throw new SchemaValidationError(
-      "ServerInfoResponse.total_ghosts is undefined"
+      "ServerInfoResponse.total_ghosts is undefined",
     );
   }
   if (data.total_ghosts === null) {
@@ -719,27 +719,27 @@ function validateServerInfoResponse(data: IServerInfoResponse): void {
   }
   if (data.total_ghosts < 0) {
     throw new SchemaValidationError(
-      "ServerInfoResponse.total_ghosts has a value below minimum"
+      "ServerInfoResponse.total_ghosts has a value below minimum",
     );
   }
   if (data.total_sessions === undefined) {
     throw new SchemaValidationError(
-      "ServerInfoResponse.total_sessions is undefined"
+      "ServerInfoResponse.total_sessions is undefined",
     );
   }
   if (data.total_sessions === null) {
     throw new SchemaValidationError(
-      "ServerInfoResponse.total_sessions is null"
+      "ServerInfoResponse.total_sessions is null",
     );
   }
   if (data.total_sessions < 0) {
     throw new SchemaValidationError(
-      "ServerInfoResponse.total_sessions has a value below minimum"
+      "ServerInfoResponse.total_sessions has a value below minimum",
     );
   }
   if (data.total_users === undefined) {
     throw new SchemaValidationError(
-      "ServerInfoResponse.total_users is undefined"
+      "ServerInfoResponse.total_users is undefined",
     );
   }
   if (data.total_users === null) {
@@ -747,7 +747,7 @@ function validateServerInfoResponse(data: IServerInfoResponse): void {
   }
   if (data.total_users < 0) {
     throw new SchemaValidationError(
-      "ServerInfoResponse.total_users has a value below minimum"
+      "ServerInfoResponse.total_users has a value below minimum",
     );
   }
 }
@@ -822,7 +822,7 @@ function validateSession(data: ISession): void {
 function validateSessionAccessRequest(data: ISessionAccessRequest): void {
   if (data.api_key === undefined) {
     throw new SchemaValidationError(
-      "SessionAccessRequest.api_key is undefined"
+      "SessionAccessRequest.api_key is undefined",
     );
   }
   if (data.api_key === null) {
@@ -830,12 +830,12 @@ function validateSessionAccessRequest(data: ISessionAccessRequest): void {
   }
   if (data.api_key.length < 1) {
     throw new SchemaValidationError(
-      "SessionAccessRequest.api_key is too short"
+      "SessionAccessRequest.api_key is too short",
     );
   }
   if (data.auth_token === undefined) {
     throw new SchemaValidationError(
-      "SessionAccessRequest.auth_token is undefined"
+      "SessionAccessRequest.auth_token is undefined",
     );
   }
   if (data.auth_token === null) {
@@ -843,12 +843,12 @@ function validateSessionAccessRequest(data: ISessionAccessRequest): void {
   }
   if (data.auth_token.length < 1) {
     throw new SchemaValidationError(
-      "SessionAccessRequest.auth_token is too short"
+      "SessionAccessRequest.auth_token is too short",
     );
   }
   if (data.session_id === undefined) {
     throw new SchemaValidationError(
-      "SessionAccessRequest.session_id is undefined"
+      "SessionAccessRequest.session_id is undefined",
     );
   }
   if (data.session_id === null) {
@@ -856,12 +856,12 @@ function validateSessionAccessRequest(data: ISessionAccessRequest): void {
   }
   if (data.session_id.length < 1) {
     throw new SchemaValidationError(
-      "SessionAccessRequest.session_id is too short"
+      "SessionAccessRequest.session_id is too short",
     );
   }
   if (data.username === undefined) {
     throw new SchemaValidationError(
-      "SessionAccessRequest.username is undefined"
+      "SessionAccessRequest.username is undefined",
     );
   }
   if (data.username === null) {
@@ -869,7 +869,7 @@ function validateSessionAccessRequest(data: ISessionAccessRequest): void {
   }
   if (data.username.length < 1) {
     throw new SchemaValidationError(
-      "SessionAccessRequest.username is too short"
+      "SessionAccessRequest.username is too short",
     );
   }
 }
@@ -915,7 +915,7 @@ function validateSessionResponse(data: ISessionResponse): void {
 function validateSessionsPlayersRequest(data: ISessionsPlayersRequest): void {
   if (data.api_key === undefined) {
     throw new SchemaValidationError(
-      "SessionsPlayersRequest.api_key is undefined"
+      "SessionsPlayersRequest.api_key is undefined",
     );
   }
   if (data.api_key === null) {
@@ -923,12 +923,12 @@ function validateSessionsPlayersRequest(data: ISessionsPlayersRequest): void {
   }
   if (data.api_key.length < 1) {
     throw new SchemaValidationError(
-      "SessionsPlayersRequest.api_key is too short"
+      "SessionsPlayersRequest.api_key is too short",
     );
   }
   if (data.sessions === undefined) {
     throw new SchemaValidationError(
-      "SessionsPlayersRequest.sessions is undefined"
+      "SessionsPlayersRequest.sessions is undefined",
     );
   }
   if (data.sessions === null) {
@@ -1011,7 +1011,7 @@ function validateTimeSpan(data: ITimeSpan): void {
   }
   if (
     !data.end.match(
-      /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(\+[0-9]{2}:[0-9]{2}|Z)$/
+      /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(\+[0-9]{2}:[0-9]{2}|Z)$/,
     )
   ) {
     throw new SchemaValidationError("TimeSpan.end has an invalid format");
@@ -1024,7 +1024,7 @@ function validateTimeSpan(data: ITimeSpan): void {
   }
   if (
     !data.start.match(
-      /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(\+[0-9]{2}:[0-9]{2}|Z)$/
+      /^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]+)?(\+[0-9]{2}:[0-9]{2}|Z)$/,
     )
   ) {
     throw new SchemaValidationError("TimeSpan.start has an invalid format");
@@ -1050,7 +1050,7 @@ export async function getSessions(): Promise<ISessionsResponse> {
 }
 
 export async function createSession(
-  body: ICreateSessionRequest
+  body: ICreateSessionRequest,
 ): Promise<ISuccessResponse> {
   validateCreateSessionRequest(body);
   const result = (await doPost(`/api/v0/sessions`, body)) as ISuccessResponse;
@@ -1060,7 +1060,7 @@ export async function createSession(
 
 export async function getSession(sessionId: string): Promise<ISessionResponse> {
   const result = (await doGet(
-    `/api/v0/sessions/${encodeURIComponent(sessionId)}`
+    `/api/v0/sessions/${encodeURIComponent(sessionId)}`,
   )) as ISessionResponse;
   validateSessionResponse(result);
   return result;
@@ -1068,46 +1068,46 @@ export async function getSession(sessionId: string): Promise<ISessionResponse> {
 
 export async function editSession(
   sessionId: string,
-  body: ICreateSessionRequest
+  body: ICreateSessionRequest,
 ): Promise<ISuccessResponse> {
   validateCreateSessionRequest(body);
   const result = (await doPost(
     `/api/v0/sessions/${encodeURIComponent(sessionId)}`,
-    body
+    body,
   )) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
 }
 
 export async function deleteSession(
-  sessionId: string
+  sessionId: string,
 ): Promise<ISuccessResponse> {
   const result = (await doDelete(
-    `/api/v0/sessions/${encodeURIComponent(sessionId)}`
+    `/api/v0/sessions/${encodeURIComponent(sessionId)}`,
   )) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
 }
 
 export async function checkSessionAccess(
-  body: ISessionAccessRequest
+  body: ISessionAccessRequest,
 ): Promise<ISuccessResponse> {
   validateSessionAccessRequest(body);
   const result = (await doPost(
     `/api/v0/sessions/check-access`,
-    body
+    body,
   )) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
 }
 
 export async function updateSessionsPlayers(
-  body: ISessionsPlayersRequest
+  body: ISessionsPlayersRequest,
 ): Promise<IEmpty> {
   validateSessionsPlayersRequest(body);
   const result = (await doPost(
     `/api/v0/sessions/session-players`,
-    body
+    body,
   )) as IEmpty;
   validateEmpty(result);
   return result;
@@ -1115,7 +1115,7 @@ export async function updateSessionsPlayers(
 
 export async function getAnnouncements(): Promise<IAnnouncementsResponse> {
   const result = (await doGet(
-    `/api/v0/announcements`
+    `/api/v0/announcements`,
   )) as IAnnouncementsResponse;
   validateAnnouncementsResponse(result);
   return result;
@@ -1128,12 +1128,12 @@ export async function getProfile(): Promise<IProfileInfoResponse> {
 }
 
 export async function changeUsername(
-  body: IChangeUsernameRequest
+  body: IChangeUsernameRequest,
 ): Promise<ISuccessResponse> {
   validateChangeUsernameRequest(body);
   const result = (await doPost(
     `/api/v0/auth/change-username`,
-    body
+    body,
   )) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
@@ -1153,36 +1153,36 @@ export async function login(body: ILoginRequest): Promise<ISuccessResponse> {
 }
 
 export async function register(
-  body: IRegisterRequest
+  body: IRegisterRequest,
 ): Promise<ISuccessResponse> {
   validateRegisterRequest(body);
   const result = (await doPost(
     `/api/v0/auth/register`,
-    body
+    body,
   )) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
 }
 
 export async function changePassword(
-  body: IChangePasswordRequest
+  body: IChangePasswordRequest,
 ): Promise<ISuccessResponse> {
   validateChangePasswordRequest(body);
   const result = (await doPost(
     `/api/v0/auth/change-password`,
-    body
+    body,
   )) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
 }
 
 export async function changeEmail(
-  body: IChangeEmailRequest
+  body: IChangeEmailRequest,
 ): Promise<ISuccessResponse> {
   validateChangeEmailRequest(body);
   const result = (await doPost(
     `/api/v0/auth/change-email`,
-    body
+    body,
   )) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
@@ -1203,24 +1203,24 @@ export async function getGhosts(): Promise<IGhostFilesResponse> {
 export async function uploadGhost(files: File[]): Promise<ISuccessResponse> {
   const result = (await doPostFiles(
     `/api/v0/ghosts`,
-    files
+    files,
   )) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
 }
 
 export async function downloadGhost(
-  id: number
+  id: number,
 ): Promise<ReadableStream<Uint8Array> | null> {
   const result = (await doGetFile(
-    `/api/v0/ghosts/${encodeURIComponent(id)}/download`
+    `/api/v0/ghosts/${encodeURIComponent(id)}/download`,
   )) as ReadableStream<Uint8Array> | null;
   return result;
 }
 
 export async function getGhost(id: number): Promise<IGhostFileResponse> {
   const result = (await doGet(
-    `/api/v0/ghosts/${encodeURIComponent(id)}`
+    `/api/v0/ghosts/${encodeURIComponent(id)}`,
   )) as IGhostFileResponse;
   validateGhostFileResponse(result);
   return result;
@@ -1228,12 +1228,12 @@ export async function getGhost(id: number): Promise<IGhostFileResponse> {
 
 export async function updateGhost(
   id: number,
-  body: IGhostInfoRequest
+  body: IGhostInfoRequest,
 ): Promise<ISuccessResponse> {
   validateGhostInfoRequest(body);
   const result = (await doPost(
     `/api/v0/ghosts/${encodeURIComponent(id)}`,
-    body
+    body,
   )) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
@@ -1241,7 +1241,7 @@ export async function updateGhost(
 
 export async function deleteGhost(id: number): Promise<ISuccessResponse> {
   const result = (await doDelete(
-    `/api/v0/ghosts/${encodeURIComponent(id)}`
+    `/api/v0/ghosts/${encodeURIComponent(id)}`,
   )) as ISuccessResponse;
   validateSuccessResponse(result);
   return result;
@@ -1260,10 +1260,10 @@ export async function getGhostsQuota(): Promise<IQuotaResponse> {
 }
 
 export async function getAlternativeLevels(
-  identifier: string
+  identifier: string,
 ): Promise<ILevelsResponse> {
   const result = (await doGet(
-    `/api/v0/levels/${encodeURIComponent(identifier)}`
+    `/api/v0/levels/${encodeURIComponent(identifier)}`,
   )) as ILevelsResponse;
   validateLevelsResponse(result);
   return result;
@@ -1299,7 +1299,7 @@ export async function doGet(url: string): Promise<object> {
 }
 
 export async function doGetFile(
-  url: string
+  url: string,
 ): Promise<ReadableStream<Uint8Array> | null> {
   return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
     credentials: "include",

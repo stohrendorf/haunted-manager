@@ -51,7 +51,7 @@ export default defineComponent({
   errorCaptured(
     err: unknown,
     vm: ComponentPublicInstance | null,
-    info: string
+    info: string,
   ): boolean {
     this.err = err as Error;
     this.info = info;

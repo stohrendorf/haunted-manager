@@ -37,7 +37,7 @@ export default defineComponent({
     async updateQuota(): Promise<void> {
       this.quota = await getGhostsQuota();
       this.quotaPercent = Math.round(
-        (this.quota.current / this.quota.max) * 100
+        (this.quota.current / this.quota.max) * 100,
       );
       await this.updateGhostList();
     },

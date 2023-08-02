@@ -31,7 +31,7 @@ export default defineComponent({
       () => this.modelValue,
       () => {
         this.selectedTags = [...this.modelValue];
-      }
+      },
     );
   },
 });

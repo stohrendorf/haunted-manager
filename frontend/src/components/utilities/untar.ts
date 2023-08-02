@@ -26,7 +26,9 @@ export function getFiles(data: Uint8Array): IEntry[] {
     const nameData = _tarRead(data, offset + NameOffset, NameSize);
     let name = "";
     for (const c of nameData) {
-      if (c === 0) break;
+      if (c === 0) {
+        break;
+      }
       name += String.fromCharCode(c);
     }
 
@@ -37,15 +39,15 @@ export function getFiles(data: Uint8Array): IEntry[] {
     const size = parseInt(
       _tarRead(data, offset + SizeOffset, SizeSize).reduce(
         (prev: string, b: number) => prev + String.fromCharCode(b),
-        ""
+        "",
       ),
-      8
+      8,
     );
     const type = parseInt(
       _tarRead(data, offset + TypeOffset, TypeSize).reduce(
         (prev: string, b: number) => prev + String.fromCharCode(b),
-        ""
-      )
+        "",
+      ),
     );
 
     // Save this as en entry if it is a file or directory

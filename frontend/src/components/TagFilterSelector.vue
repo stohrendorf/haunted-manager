@@ -32,7 +32,7 @@ export default defineComponent({
       () => this.modelValue,
       () => {
         this.filterTags = [...this.modelValue];
-      }
+      },
     );
   },
 });

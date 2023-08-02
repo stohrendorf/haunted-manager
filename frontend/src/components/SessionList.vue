@@ -29,8 +29,10 @@ export default defineComponent({
       }
       return this.sessions.filter((session) =>
         this.filterTags.every((filterTag) =>
-          session.tags.map((sessionTag) => sessionTag.id).includes(filterTag.id)
-        )
+          session.tags
+            .map((sessionTag) => sessionTag.id)
+            .includes(filterTag.id),
+        ),
       );
     },
   },

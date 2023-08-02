@@ -8,17 +8,17 @@ declare module "xzwasm" {
     getReader(options: { mode: "byob" }): ReadableStreamBYOBReader;
     getReader(): ReadableStreamDefaultReader<Uint8Array>;
     getReader(
-      options?: ReadableStreamGetReaderOptions
+      options?: ReadableStreamGetReaderOptions,
     ): ReadableStreamReader<Uint8Array>;
 
     pipeThrough<T>(
       transform: ReadableWritablePair<T, Uint8Array>,
-      options?: StreamPipeOptions
+      options?: StreamPipeOptions,
     ): ReadableStream<T>;
 
     pipeTo(
       destination: WritableStream<Uint8Array>,
-      options?: StreamPipeOptions
+      options?: StreamPipeOptions,
     ): Promise<void>;
 
     tee(): [ReadableStream<Uint8Array>, ReadableStream<Uint8Array>];

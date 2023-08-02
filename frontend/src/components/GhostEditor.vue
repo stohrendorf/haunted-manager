@@ -43,7 +43,7 @@ export default defineComponent({
       () => this.modelValue,
       () => {
         this.localGhost = JSON.parse(JSON.stringify(this.modelValue));
-      }
+      },
     );
 
     this.tags = (await getTags()).tags;

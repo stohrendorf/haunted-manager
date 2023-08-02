@@ -57,7 +57,7 @@ export default defineComponent({
       () => this.modelValue,
       () => {
         this.localSession = JSON.parse(JSON.stringify(this.modelValue));
-      }
+      },
     );
   },
   methods: {

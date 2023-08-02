@@ -40,9 +40,9 @@ export default defineComponent({
         ) {
           this.localModelValue.splice(
             this.localModelValue.findIndex(
-              (x) => JSON.stringify(x) === stringValue
+              (x) => JSON.stringify(x) === stringValue,
             ),
-            1
+            1,
           );
         } else {
           return;
@@ -57,7 +57,7 @@ export default defineComponent({
       () => this.modelValue,
       () => {
         this.localModelValue = [...this.modelValue];
-      }
+      },
     );
   },
 });
