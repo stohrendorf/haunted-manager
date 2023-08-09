@@ -7,7 +7,7 @@ license = "GPL-3"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-Django = "*"
+Django = "<4.2"
 Jinja2 = "*"
 django-cors-headers = "*"
 dataclasses-json = "*"
