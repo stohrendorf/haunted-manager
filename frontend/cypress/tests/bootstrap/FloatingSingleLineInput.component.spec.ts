@@ -62,7 +62,7 @@ describe("<FloatingSingleLineInput />", () => {
     component.then(async (wrapper) => {
       await wrapper.component.$nextTick();
       expect(
-        wrapper.wrapper.emitted("update:modelValue").reverse()[0][0]
+        wrapper.wrapper.emitted("update:modelValue").reverse()[0][0],
       ).to.equal(testInput);
     });
   });

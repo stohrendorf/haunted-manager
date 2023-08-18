@@ -88,7 +88,7 @@ describe("<BsSelect />", () => {
     component.then(async (wrapper) => {
       await wrapper.component.$nextTick();
       expect(wrapper.wrapper.emitted("update:modelValue")[0][0]).to.not.equal(
-        testValue
+        testValue,
       );
     });
   });
