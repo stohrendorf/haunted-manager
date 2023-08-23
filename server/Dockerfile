@@ -18,7 +18,7 @@ WORKDIR /usr/local/haunted-manager
 RUN mkdir -p /.cache/pypoetry && chown -R 1000 /.cache/pypoetry
 USER 1000
 
-COPY . .
+COPY --chown=1000 . .
 RUN chmod a+x manage.py \
     && poetry install --no-interaction --no-ansi \
     && poetry run coverage run -m pytest \
