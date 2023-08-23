@@ -23,6 +23,7 @@ RUN chmod a+x manage.py \
 
 EXPOSE 8000
 
+RUN chown -R 1000 .
 USER 1000
 
 CMD ["/bin/bash", "entrypoint.sh"]
