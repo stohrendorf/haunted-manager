@@ -15,6 +15,9 @@ RUN apt-get update -y \
     && mkdir -p /usr/local/haunted-manager
 
 WORKDIR /usr/local/haunted-manager
+RUN mkdir -p /.cache/pypoetry && chown -R 1000 /.cache/pypoetry
+USER 1000
+
 COPY . .
 RUN chmod a+x manage.py \
     && poetry install --no-interaction --no-ansi \
@@ -22,8 +25,5 @@ RUN chmod a+x manage.py \
     && poetry run coverage report
 
 EXPOSE 8000
-
-RUN mkdir -p /.cache/pypoetry && chown -R 1000 /.cache/pypoetry
-USER 1000
 
 CMD ["/bin/bash", "entrypoint.sh"]
