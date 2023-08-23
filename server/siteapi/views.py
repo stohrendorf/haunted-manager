@@ -32,7 +32,7 @@ def get_server_info(request: HttpRequest) -> ServerInfoResponse:
     return ServerInfoResponse(
         total_users=User.objects.filter(is_active=True).count(),
         total_sessions=Session.objects.count(),
-        total_ghosts=Ghost.objects.count(),
+        total_ghosts=Ghost.objects.filter(published=True).count(),
         total_ghost_duration=int(
             (Ghost.objects.all().aggregate(Sum("duration"))["duration__sum"] or timedelta(seconds=0)).total_seconds(),
         ),
