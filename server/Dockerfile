@@ -23,7 +23,7 @@ RUN chmod a+x manage.py \
 
 EXPOSE 8000
 
-RUN chown -R 1000 .
+RUN mkdir -p /.cache/pypoetry && chown -R 1000 /.cache/pypoetry
 USER 1000
 
 CMD ["/bin/bash", "entrypoint.sh"]
