@@ -15,7 +15,10 @@ RUN apt-get update -y \
     && mkdir -p /usr/local/haunted-manager
 
 WORKDIR /usr/local/haunted-manager
-RUN mkdir -p /.cache/pypoetry && chown -R 1000 /.cache/pypoetry
+RUN mkdir -p /.cache/pypoetry \
+    && chown -R 1000 /.cache/pypoetry \
+    && mkdir -p /usr/local/haunted-manager \
+    && chown -R 1000 /usr/local/haunted-manager
 USER 1000
 
 COPY --chown=1000 . .
