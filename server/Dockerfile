@@ -9,7 +9,7 @@ ENV PATH="$POETRY_HOME/bin:$PATH"
 ARG TEAMCITY_VERSION=""
 
 RUN apt-get update -y \
-    && apt-get install -y libmariadb-dev python-is-python3 \
+    && apt-get install -y --no-install-recommends libmariadb-dev python-is-python3 \
     && rm -rf /var/lib/apt/lists/* \
     && curl -sSL https://install.python-poetry.org | python3 - \
     && mkdir -p /usr/local/haunted-manager
@@ -22,5 +22,7 @@ RUN chmod a+x manage.py \
     && poetry run coverage report
 
 EXPOSE 8000
+
+USER 1000
 
 CMD ["/bin/bash", "entrypoint.sh"]

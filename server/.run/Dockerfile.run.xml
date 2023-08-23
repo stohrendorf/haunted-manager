@@ -2,7 +2,7 @@
   <configuration default="false" name="Dockerfile" type="docker-deploy" factoryName="dockerfile" server-name="Docker">
     <deployment type="dockerfile">
       <settings>
-        <option name="containerName" value="" />
+        <option name="containerName" value="hauntet-backend" />
         <option name="portBindings">
           <list>
             <DockerPortBindingImpl>
