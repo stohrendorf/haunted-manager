@@ -70,19 +70,15 @@ export default defineComponent({
 
     <h4>Do you use cookies?</h4>
     <p>
-      Yes, but this site only uses only cookies necessary for the site to
-      function. There are no analytics cookies or tracking cookies.
+      Yes, but this site only uses cookies necessary for the site to function.
+      There are no analytics cookies or tracking cookies.
     </p>
 
-    <h3>How do I join a coop session?</h3>
-    <p>
-      It's pretty simple. Don't get afraid of the lengthy explanation, as we try
-      to cover every detail. Once you get the hang of it, it's really simple.
-    </p>
+    <h3>How do I create an Account?</h3>
     <ol>
       <li>
-        Create an account by clicking the &ldquo;Login/Register&rdquo; dropdown
-        on the top right of this page, and then click on &ldquo;Register&rdquo;.
+        Click the &ldquo;Login/Register&rdquo; dropdown on the top right of this
+        page, and then click on &ldquo;Register&rdquo;.
       </li>
       <li>
         Enter your desired username, an e-mail address you have access to, and a
@@ -99,6 +95,29 @@ export default defineComponent({
         After that, you need to log in with your username and your password.
         Make sure you use the proper casing for your username.
       </li>
+    </ol>
+
+    <h3>How do I join a coop session?</h3>
+    <p>
+      It's pretty simple. Don't get afraid of the lengthy explanation, as we try
+      to cover every detail. Once you get the hang of it, it's really simple.
+    </p>
+    <p>The very short list is this:</p>
+    <ol>
+      <li>
+        Copy the common credentials required to join a session from the
+        &ldquo;Session Credentials&rdquo; dropdown. Use the blue clipboard
+        buttons next to the values to copy them to your clipboard and paste them
+        into the &ldquo;Configuration&rdquo; tab in the launcher. <br />
+        You usually only need to do this once.
+      </li>
+      <li>
+        Choose a session, and copy its &ldquo;Session ID&rdquo; to the launcher,
+        too.
+      </li>
+    </ol>
+    <p>The lengthy explanation of the above steps is this:</p>
+    <ol>
       <li>
         Once logged in, your username shows up in the upper right corner of the
         page. To the left of it, you'll find a new dropdown titled
