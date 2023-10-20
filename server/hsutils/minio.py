@@ -1,5 +1,5 @@
 from io import SEEK_END
-from typing import IO, Iterable
+from typing import BinaryIO, Iterable
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
@@ -91,7 +91,7 @@ def get_user_ghost_total_size(user: AbstractUser) -> int:
     return sum(size for _, size in get_staging_ghosts(user)) + sum(size for _, size in get_published_ghosts(user))
 
 
-def put_staging_ghost(ghost: Ghost, data: IO):
+def put_staging_ghost(ghost: Ghost, data: BinaryIO):
     data.seek(0, SEEK_END)
     length = data.tell()
     data.seek(0)
