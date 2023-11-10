@@ -13,7 +13,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div :class="['alert', 'alert-' + variant]" role="alert">
+  <div :class="['alert', `alert-${variant}`]" role="alert">
     <slot />
   </div>
 </template>

@@ -28,8 +28,8 @@ export default defineComponent({
       <slot name="toggle" />
     </a>
     <div
-      :class="['dropdown-menu', end ? 'dropdown-menu-end' : '']"
-      :style="minWidth !== null ? 'min-width:' + minWidth : ''"
+      :class="['dropdown-menu', { 'dropdown-menu-end': end }]"
+      :style="minWidth ? `min-width: ${minWidth}` : ''"
     >
       <slot />
     </div>

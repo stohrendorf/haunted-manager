@@ -1,5 +1,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
+import * as _ from "lodash";
 
 export default defineComponent({
   props: {
@@ -24,24 +25,20 @@ export default defineComponent({
   computed: {
     checked: {
       get(): boolean {
-        const value = JSON.stringify(this.value);
-        return this.localModelValue.some((x) => JSON.stringify(x) == value);
+        return this.localModelValue.some((x) => _.isEqual(x, this.value));
       },
       set(value: boolean) {
-        const stringValue = JSON.stringify(this.value);
         if (
           value &&
-          !this.localModelValue.some((x) => JSON.stringify(x) == stringValue)
+          !this.localModelValue.some((x) => _.isEqual(x, this.value))
         ) {
           this.localModelValue.push(this.value);
         } else if (
           !value &&
-          this.localModelValue.some((x) => JSON.stringify(x) == stringValue)
+          this.localModelValue.some((x) => _.isEqual(x, this.value))
         ) {
           this.localModelValue.splice(
-            this.localModelValue.findIndex(
-              (x) => JSON.stringify(x) === stringValue,
-            ),
+            this.localModelValue.findIndex((x) => _.isEqual(x, this.value)),
             1,
           );
         } else {
@@ -66,12 +63,12 @@ export default defineComponent({
 <template>
   <div class="form-check form-check-inline">
     <input
-      :id="$.uid"
+      :id="$.uid + ''"
       v-model="checked"
       class="form-check-input"
       type="checkbox"
     />
-    <label :for="$.uid">
+    <label :for="$.uid + ''">
       <slot />
     </label>
   </div>

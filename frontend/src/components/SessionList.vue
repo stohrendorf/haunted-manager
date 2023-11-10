@@ -1,6 +1,10 @@
 <script lang="ts">
-import { ISession, ITag, getSessions } from "@/components/ApiService";
-import { deleteSession as deleteSessionRequest } from "@/components/ApiService";
+import {
+  ISession,
+  ITag,
+  getSessions,
+  deleteSession as deleteSessionRequest,
+} from "@/components/ApiService";
 import { profileStore } from "@/components/ProfileStore";
 import TagFilterSelector from "@/components/TagFilterSelector.vue";
 import TagList from "@/components/TagList.vue";

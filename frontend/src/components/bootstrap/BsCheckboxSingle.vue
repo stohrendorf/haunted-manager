@@ -24,12 +24,14 @@ export default defineComponent({
 <template>
   <div class="form-check form-check-inline">
     <input
-      :id="$.uid"
+      :id="$.uid + ''"
       v-model="checked"
       class="form-check-input"
       type="checkbox"
     />
-    <label :for="$.uid"><slot /></label>
+    <label :for="$.uid + ''">
+      <slot />
+    </label>
   </div>
 </template>
 
