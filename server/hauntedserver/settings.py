@@ -4,8 +4,6 @@ from pathlib import Path
 
 import environ
 
-from haunted_auth.email import email_verified_callback
-
 env = environ.Env()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -114,7 +112,7 @@ def verified_callback(user):
     user.is_active = True
 
 
-EMAIL_VERIFIED_CALLBACK = verified_callback
+EMAIL_MAIL_CALLBACK = verified_callback
 
 EMAIL_MAIL_HTML = "email_confirmation_body.html.j2"
 EMAIL_MAIL_PLAIN = "email_confirmation_body.txt.j2"
@@ -152,7 +150,6 @@ EMAIL_PORT = env.int("EMAIL_PORT")
 EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = env.bool("EMAIL_USE_TLS")
-EMAIL_MAIL_CALLBACK = email_verified_callback
 
 SITE_ID = env.int("SITE_ID")
 
