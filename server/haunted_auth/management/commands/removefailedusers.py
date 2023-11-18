@@ -12,6 +12,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         User = get_user_model()
         (total_deleted, objects_deleted) = User.objects.filter(
+            is_active=False,
             last_login__isnull=True,
             date_joined__lt=timezone.now() - timedelta(seconds=settings.EMAIL_MAIL_TOKEN_LIFE),
         ).delete()
