@@ -52,13 +52,13 @@ describe("<SessionList />", () => {
     cy.get(".list-group-item")
       .eq(0)
       .find(".badge")
-      .should("have.length", 2)
+      .should("have.length", 3)
       .should("contain.text", "tag1")
       .should("contain.text", "tag2");
     cy.get(".list-group-item")
       .eq(0)
       .find("span.text-secondary")
-      .should("have.text", " by owner1");
+      .should("have.text", " owner1");
     cy.get(".list-group-item")
       .eq(0)
       .find("div")
@@ -73,7 +73,7 @@ describe("<SessionList />", () => {
     cy.get(".list-group-item")
       .eq(1)
       .find("span.text-secondary")
-      .should("have.text", " by owner2");
+      .should("have.text", " owner2");
     cy.get(".list-group-item")
       .eq(1)
       .find("div")

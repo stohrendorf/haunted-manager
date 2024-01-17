@@ -54,7 +54,7 @@ describe("<BsBtn />", () => {
 
     cy.get("button")
       .should("have.class", "btn")
-      .should("have.class", "btn-sm")
+      .should("have.class", "smaller-button")
       .should("not.have.class", "disabled");
   });
 
