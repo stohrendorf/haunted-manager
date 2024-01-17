@@ -85,25 +85,20 @@ export default defineComponent({
 
         <div class="row">
           <div class="col col-4">
-            <div v-if="session.tags || session.private" class="row">
-              <div class="col">
-                <span v-if="session.private">
-                  <span class="bi bi-eye-slash" /> Private
-                </span>
-
-                <tag-list :tags="session.tags" />
-              </div>
-            </div>
-
             <div class="row">
               <div class="col col-auto">
+                <div class="row container justify-content-start">
+                  <span v-if="session.private" class="col badge text-bg-info">
+                    <span class="bi bi-eye-slash" /> Private Session
+                  </span>
+                  <span class="col text-secondary"
+                    ><i class="fa-regular fa-user" /> {{ session.owner }}</span
+                  >
+                </div>
                 <div class="row">
-                  <div>
-                    <clipboard-copyable :value="session.id">
-                      <code>{{ session.id }}</code>
-                    </clipboard-copyable>
-                    <span class="text-secondary"> by {{ session.owner }}</span>
-                  </div>
+                  <clipboard-copyable :value="session.id">
+                    <code>{{ session.id }}</code>
+                  </clipboard-copyable>
                 </div>
               </div>
             </div>
@@ -135,21 +130,26 @@ export default defineComponent({
             </div>
           </div>
 
-          <div class="col col-8">
+          <div class="col col-8 justify-content-start">
+            <div class="row">
+              <tag-list
+                v-if="session.tags && session.tags.length > 0"
+                :tags="session.tags"
+              />
+            </div>
+
             <div v-if="session.description" class="row">
               <div>
+                <i class="fa-regular fa-comment" />
                 {{ session.description }}
               </div>
             </div>
-            <hr v-if="session.description" />
-            <div class="row text-secondary">
-              <div v-if="session.players && session.players.length > 0">
-                Currently playing: {{ session.players.join(", ") }}.
-              </div>
-              <div v-else>
-                No active players in this session
-                <span class="bi bi-emoji-frown" />
-              </div>
+
+            <div
+              v-if="session.players && session.players.length > 0"
+              class="row text-secondary"
+            >
+              <i class="fa fa-people-group" />{{ session.players.join(", ") }}.
             </div>
           </div>
         </div>

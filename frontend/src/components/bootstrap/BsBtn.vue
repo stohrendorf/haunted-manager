@@ -33,7 +33,7 @@ export default defineComponent({
       'btn',
       'btn-' + (outline ? 'outline-' : '') + variant,
       disabled ? 'disabled' : '',
-      small ? 'btn-sm' : '',
+      small ? 'smaller-button' : '',
     ]"
     type="button"
     :disabled="disabled"
@@ -42,4 +42,10 @@ export default defineComponent({
   </button>
 </template>
 
-<style scoped></style>
+<style scoped>
+.smaller-button {
+  --bs-btn-padding-y: 0.25rem;
+  --bs-btn-padding-x: 0.5rem;
+  --bs-btn-font-size: 0.75rem;
+}
+</style>
