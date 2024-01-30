@@ -96,11 +96,13 @@ def _get_type_of(field: BaseField | Compound) -> dict:
     elif isinstance(field, ArrayField):
         return {
             "type": "array",
-            "items": {
-                "$ref": f"#/components/schemas/{humps.camelize(field.items.typename())}",
-            }
-            if isinstance(field.items, Compound)
-            else _get_type_of(field.items),
+            "items": (
+                {
+                    "$ref": f"#/components/schemas/{humps.camelize(field.items.typename())}",
+                }
+                if isinstance(field.items, Compound)
+                else _get_type_of(field.items)
+            ),
         }
     elif isinstance(field, Compound):
         return {

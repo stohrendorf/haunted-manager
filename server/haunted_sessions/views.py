@@ -59,12 +59,14 @@ def session_to_response(session: SessionModel) -> Session:
         owner=session.owner.username,
         description=session.description,
         players=[u.username for u in session.players.all()],
-        time=TimeSpan(
-            start=session.start.isoformat(),
-            end=session.end.isoformat(),
-        )
-        if session.is_event
-        else None,
+        time=(
+            TimeSpan(
+                start=session.start.isoformat(),
+                end=session.end.isoformat(),
+            )
+            if session.is_event
+            else None
+        ),
         private=session.private,
     )
 
