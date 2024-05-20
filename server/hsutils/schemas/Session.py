@@ -6,7 +6,7 @@ from dataclasses_json import DataClassJsonMixin, dataclass_json
 from django.core.files.uploadedfile import UploadedFile
 
 from ..error import SchemaValidationError
-from ..json_response import Validatable
+from ..validated_response import Validatable
 from .Tag import Tag
 from .TimeSpan import TimeSpan
 

@@ -118,7 +118,7 @@ def gen_django(
         schema_output += "from django.core.files.uploadedfile import UploadedFile\n"
         for dependency in dependencies:
             schema_output += f"from .{dependency} import {dependency}\n"
-        schema_output += "from ..json_response import Validatable\n"
+        schema_output += "from ..validated_response import Validatable\n"
         schema_output += "from ..error import SchemaValidationError\n"
 
         schema_output += "\n"
@@ -146,13 +146,16 @@ def gen_django(
         schema_outputs[schema.typename()] = schema_output
 
     output = "from typing import Callable, Optional, List\n"
-    output += "from django.http import HttpRequest, HttpResponse, JsonResponse, FileResponse as DjangoFileResponse\n"
+    output += (
+        "from django.http import HttpRequest, HttpResponseBase, JsonResponse, FileResponse as DjangoFileResponse\n"
+    )
     output += "from django.core.files.uploadedfile import UploadedFile\n"
     output += "from django.urls import path\n"
     output += "from enum import Enum\n"
     output += "from http import HTTPStatus\n"
-    output += "from .json_response import json_response\n"
+    output += "from .validated_response import validated_response\n"
     output += "from .error import SchemaValidationError\n"
+    output += "from .validated_response import Validatable\n"
 
     for schema_name in schema_outputs.keys():
         output += f"from .schemas.{schema_name} import {schema_name}\n"
@@ -199,9 +202,7 @@ def gen_django(
             output += f"        {method.name.lower()}_handler: {handler_signature},\n"
         output += "    ):\n"
         output += (
-            "        def dispatch("
-            + ", ".join(["request: HttpRequest"] + url_args_in)
-            + ") -> HttpResponse | JsonResponse:\n"
+            "        def dispatch(" + ", ".join(["request: HttpRequest"] + url_args_in) + ") -> HttpResponseBase:\n"
         )
         for method, endpoint in methods_endpoints.items():
             output += f'            if request.method == "{method.value}":\n'
@@ -214,15 +215,14 @@ def gen_django(
         output += "        return path(cls.path, dispatch, name=cls.name)\n"
 
         for method, endpoint in methods_endpoints.items():
-            if not isinstance(endpoint.response, FileResponse):
-                output += "    @json_response\n"
+            output += "    @validated_response\n"
             output += "    @staticmethod\n"
             handler_signature = make_handler_signature(url_arg_types, endpoint, method)
             if isinstance(endpoint.response, FileResponse):
                 output += (
                     f"    def do_{method.value.lower()}("
                     + ", ".join(["request: HttpRequest", f"handler: {handler_signature}", *url_args_in])
-                    + ") -> DjangoFileResponse:\n"
+                    + f") -> tuple[int, JsonResponse] | JsonResponse | DjangoFileResponse:\n"
                 )
             else:
                 output += (
