@@ -237,7 +237,6 @@ def update_single_ghost(
     return SuccessResponse(success=True, message="")
 
 
-@require_authenticated(response=SuccessResponse(success=False, message="not allowed"))
 @atomic
 def download_ghost(request: HttpRequest, id: int) -> FileResponse:
     try:
