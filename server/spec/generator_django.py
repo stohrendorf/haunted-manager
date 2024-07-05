@@ -222,7 +222,7 @@ def gen_django(
                 output += (
                     f"    def do_{method.value.lower()}("
                     + ", ".join(["request: HttpRequest", f"handler: {handler_signature}", *url_args_in])
-                    + f") -> tuple[int, JsonResponse] | JsonResponse | DjangoFileResponse:\n"
+                    + ") -> tuple[int, JsonResponse] | JsonResponse | DjangoFileResponse:\n"
                 )
             else:
                 output += (

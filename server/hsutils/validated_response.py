@@ -35,7 +35,8 @@ def validated_response(
             if isinstance(response_data, tuple):
                 response_code, response_data = response_data
                 assert not isinstance(
-                    response_data, HttpResponseBase
+                    response_data,
+                    HttpResponseBase,
                 ), "HttpResponseBase must not provide a status code"
 
             assert isinstance(response_data, Validatable)
