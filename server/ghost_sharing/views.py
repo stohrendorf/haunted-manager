@@ -6,9 +6,11 @@ from datetime import timedelta
 from http import HTTPStatus
 from io import BytesIO
 from pathlib import Path
+from tarfile import TarInfo
 
 import yaml
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import UploadedFile
 from django.db.models import Sum
 from django.db.transaction import atomic
@@ -38,6 +40,8 @@ from hsutils.viewmodels import (
 from .models import Gameflow, Ghost, GhostFinishType, Level
 from .models import Tag as TagModel
 
+User = get_user_model()
+
 
 class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
     def ignore_unknown(self, node):
@@ -61,6 +65,45 @@ def get_quota(request: HttpRequest) -> QuotaResponse:
         max=settings.GHOST_QUOTA,
         current=Ghost.objects.filter(owner=request.user).all().aggregate(Sum("data_size"))["data_size__sum"] or 0,
     )
+
+
+def _verify_ghost_data_extension(path: Path) -> tuple[int, SuccessResponse] | None:
+    if path.suffix not in (".yml", ".bin"):
+        return HTTPStatus.BAD_REQUEST, SuccessResponse(
+            success=False,
+            message=f"invalid filename {path.name}",
+        )
+    return None
+
+
+def _verify_ghost_data_archive_member_type(member: TarInfo) -> tuple[int, SuccessResponse] | None:
+    if not member.isfile():
+        return HTTPStatus.BAD_REQUEST, SuccessResponse(
+            success=False,
+            message=f"not a file: {member.name}",
+        )
+    return None
+
+
+def _process_ghost_tarfile(ghost_data_file: BytesIO, data_size: int, data_hash: str, filename: str, owner: User):
+    with tarfile.open(fileobj=ghost_data_file) as archive:
+        for archive_member in archive.getmembers():
+            if result := _verify_ghost_data_extension(archive_member.name):
+                return result
+            if result := _verify_ghost_data_archive_member_type(archive_member):
+                return result
+            if Path(archive_member.name).suffix == ".yml":
+                with archive.extractfile(archive_member) as extracted:
+                    yml_data = yaml.load(extracted, Loader=SafeLoaderIgnoreUnknown)
+                staging_ghost = _parse_ghost_data_yml(
+                    yml_data=yml_data,
+                    data_size=data_size,
+                    data_hash=data_hash,
+                    filename=filename,
+                    owner=owner,
+                )
+    put_staging_ghost(staging_ghost, ghost_data_file)
+    return None
 
 
 @require_authenticated(response=SuccessResponse(success=False, message="not authorized"))
@@ -92,55 +135,50 @@ def upload(request: HttpRequest, files: dict[str, UploadedFile]) -> SuccessRespo
             tmp_file.seek(0)
 
             try:
-                with tarfile.open(fileobj=tmp_file) as archive:
-                    for archive_member in archive.getmembers():
-                        if Path(archive_member.name).suffix not in (".yml", ".bin"):
-                            return HTTPStatus.BAD_REQUEST, SuccessResponse(
-                                success=False,
-                                message=f"invalid filename {archive_member.name}",
-                            )
-                        if not archive_member.isfile():
-                            return HTTPStatus.BAD_REQUEST, SuccessResponse(
-                                success=False,
-                                message=f"not a file: {archive_member.name}",
-                            )
-                        if Path(archive_member.name).suffix == ".yml":
-                            with archive.extractfile(archive_member) as extracted:
-                                yml_data = yaml.load(extracted, Loader=SafeLoaderIgnoreUnknown)
-                            unknown_gameflow, _ = Gameflow.objects.get_or_create(
-                                identifier="unknown",
-                                title="unknown",
-                            )
-                            try:
-                                level = Level.objects.get(
-                                    gameflow=unknown_gameflow,
-                                    identifier=yml_data["ghost"]["level"],
-                                )
-                            except Level.DoesNotExist:
-                                level = Level.objects.create(
-                                    gameflow=unknown_gameflow,
-                                    identifier=yml_data["ghost"]["level"],
-                                    title=yml_data["ghost"]["level"],
-                                )
-
-                            staging_ghost = Ghost.objects.create(
-                                owner=request.user,
-                                file_id=uuid.uuid4(),
-                                level=level,
-                                duration=timedelta(seconds=int(yml_data["ghost"]["duration"]) / 30),
-                                hash=data_hash,
-                                original_filename=filename,
-                                published=False,
-                                finish_type=yml_data["ghost"]["finishState"],
-                                data_size=data.size,
-                            )
-                            staging_ghost.save()
-                put_staging_ghost(staging_ghost, tmp_file)
+                if result := _process_ghost_tarfile(
+                    ghost_data_file=tmp_file,
+                    data_size=data.size,
+                    data_hash=data_hash,
+                    filename=filename,
+                    owner=request.user,
+                ):
+                    return result
             except Exception:
                 logging.fatal("File save failed", exc_info=True)
                 raise
 
     return SuccessResponse(success=True, message="")
+
+
+def _parse_ghost_data_yml(yml_data: dict, data_size: int, data_hash: str, filename: str, owner: User):
+    unknown_gameflow, _ = Gameflow.objects.get_or_create(
+        identifier="unknown",
+        title="unknown",
+    )
+    try:
+        level = Level.objects.get(
+            gameflow=unknown_gameflow,
+            identifier=yml_data["ghost"]["level"],
+        )
+    except Level.DoesNotExist:
+        level = Level.objects.create(
+            gameflow=unknown_gameflow,
+            identifier=yml_data["ghost"]["level"],
+            title=yml_data["ghost"]["level"],
+        )
+    staging_ghost = Ghost.objects.create(
+        owner=owner,
+        file_id=uuid.uuid4(),
+        level=level,
+        duration=timedelta(seconds=int(yml_data["ghost"]["duration"]) / 30),
+        hash=data_hash,
+        original_filename=filename,
+        published=False,
+        finish_type=yml_data["ghost"]["finishState"],
+        data_size=data_size,
+    )
+    staging_ghost.save()
+    return staging_ghost
 
 
 def _ghost_to_response(ghost: Ghost) -> GhostFileResponseEntry:
