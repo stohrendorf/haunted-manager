@@ -23,5 +23,5 @@ urlpatterns = [
     change_email.wrap(post_handler=views.change_email),
     change_password.wrap(post_handler=views.change_password),
     change_username.wrap(post_handler=views.change_username),
-    path("email/<str:token>/", confirm_email_token),
+    path("email/<str:token>", confirm_email_token),
 ]
