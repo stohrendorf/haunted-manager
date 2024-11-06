@@ -34,7 +34,7 @@ types-requests = "*"
 django-stubs = "*"
 teamcity-messages = "*"
 
-flake8 = "<6"
+flake8 = "*"
 flake8-black = "*"
 flake8-coding = "*"
 flake8-commas = "*"
