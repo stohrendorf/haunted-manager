@@ -1,10 +1,11 @@
+import re
 import uuid
-from email.message import EmailMessage
 from http import HTTPStatus
 from typing import Optional
 
 import pytest
 from django.contrib.auth.models import AbstractUser
+from django.core.mail import EmailMultiAlternatives
 from django.test import Client
 
 from hsutils.test_utils import post_test_url
@@ -29,7 +30,7 @@ def try_register(
 def test_register_verify_happy_path(
     client: Client,
     django_user_model: type[AbstractUser],
-    mailoutbox: list[EmailMessage],
+    mailoutbox: list[EmailMultiAlternatives],
 ):
     code, response = try_register(
         client,
@@ -41,6 +42,10 @@ def test_register_verify_happy_path(
     assert response is not None
     assert response.success is True
     assert len(mailoutbox) == 1
+    msg = mailoutbox[0].message().get_payload()[0].as_string()
+    assert re.search(
+        r".*example\.com/email/[-_.a-zA-Z0-9]+\.(\s|$)", msg, re.MULTILINE
+    ), f"Link not found in message:\n{msg}"
 
     mailoutbox.clear()
 
@@ -55,7 +60,7 @@ def test_register_verify_happy_path(
 def test_register_logged_in(
     client: Client,
     django_user_model: type[AbstractUser],
-    mailoutbox: list[EmailMessage],
+    mailoutbox: list[EmailMultiAlternatives],
 ):
     code, response = try_register(
         client,
@@ -89,7 +94,7 @@ def test_register_logged_in(
 @pytest.mark.django_db
 def test_register_duplicate(
     client: Client,
-    mailoutbox: list[EmailMessage],
+    mailoutbox: list[EmailMultiAlternatives],
 ):
     try_register(
         client,
@@ -114,7 +119,7 @@ def test_register_duplicate(
 @pytest.mark.django_db
 def test_register_duplicate_username(
     client: Client,
-    mailoutbox: list[EmailMessage],
+    mailoutbox: list[EmailMultiAlternatives],
 ):
     try_register(
         client,
@@ -139,7 +144,7 @@ def test_register_duplicate_username(
 @pytest.mark.django_db
 def test_register_duplicate_email(
     client: Client,
-    mailoutbox: list[EmailMessage],
+    mailoutbox: list[EmailMultiAlternatives],
 ):
     try_register(
         client,
@@ -162,7 +167,9 @@ def test_register_duplicate_email(
 
 
 @pytest.mark.django_db
-def test_register_missing_data(client: Client, django_user_model: type[AbstractUser], mailoutbox: list[EmailMessage]):
+def test_register_missing_data(
+    client: Client, django_user_model: type[AbstractUser], mailoutbox: list[EmailMultiAlternatives]
+):
     # TODO these error checks are stupid, a proper exception handling is needed
     code, response = try_register(client, email="", password=uuid.uuid4().hex, username="test-user")
     assert code == HTTPStatus.BAD_REQUEST
@@ -187,7 +194,7 @@ def test_register_missing_data(client: Client, django_user_model: type[AbstractU
 def test_register_invalid_password(
     client: Client,
     django_user_model: type[AbstractUser],
-    mailoutbox: list[EmailMessage],
+    mailoutbox: list[EmailMultiAlternatives],
 ):
     code, response = try_register(client, email="test@example.com", password="1234", username="test-user")
     assert code == HTTPStatus.BAD_REQUEST
