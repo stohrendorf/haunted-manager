@@ -45,7 +45,7 @@
     "@vue/eslint-config-typescript": "<14",
     "cypress": "*",
     "cypress-teamcity-reporter": "*",
-    "eslint": "<9",
+    "eslint": "*",
     "eslint-config-prettier": "*",
     "eslint-plugin-prettier": "*",
     "eslint-plugin-vue": "*",
