@@ -3,7 +3,7 @@ FROM python:3.10
 COPY pyproject.toml .
 COPY poetry.lock .
 
-ENV POETRY_VERSION=1.2.2
+ENV POETRY_VERSION=1.8.5
 ENV POETRY_HOME=/etc/poetry
 ENV PATH="$POETRY_HOME/bin:$PATH"
 ARG TEAMCITY_VERSION=""
