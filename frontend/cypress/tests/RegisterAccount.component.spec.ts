@@ -1,11 +1,8 @@
 import RegisterAccount from "@/components/RegisterAccount.vue";
 
 describe("<RegisterAccount />", () => {
-  beforeEach(() => {
-    cy.mount(RegisterAccount);
-  });
-
   it("asks for data on initial display", () => {
+    cy.mount(RegisterAccount);
     cy.get("div h3").should("have.text", "Register");
     cy.get("input[type=email]").should("not.have.value");
     cy.get("input[type=password]").should("not.have.value");
@@ -14,24 +11,28 @@ describe("<RegisterAccount />", () => {
   });
 
   it("is not submittable without email", () => {
+    cy.mount(RegisterAccount);
     cy.get("input[type=password]").type("password");
     cy.get("input[type=text]").type("username");
     cy.get("button").should("be.disabled");
   });
 
   it("is not submittable without password", () => {
+    cy.mount(RegisterAccount);
     cy.get("input[type=email]").type("test@example.com");
     cy.get("input[type=text]").type("username");
     cy.get("button").should("be.disabled");
   });
 
   it("is not submittable without username", () => {
+    cy.mount(RegisterAccount);
     cy.get("input[type=password]").type("password");
     cy.get("input[type=text]").type("username");
     cy.get("button").should("be.disabled");
   });
 
   it("is not submittable with an invalid email", () => {
+    cy.mount(RegisterAccount);
     cy.get("input[type=email]").type("bla");
     cy.get("input[type=password]").type("password");
     cy.get("input[type=text]").type("username");
@@ -39,6 +40,7 @@ describe("<RegisterAccount />", () => {
   });
 
   it("is submittable with valid inputs", () => {
+    cy.mount(RegisterAccount);
     cy.get("input[type=email]").type("test@example.com");
     cy.get("input[type=password]").type("password");
     cy.get("input[type=text]").type("username");
@@ -46,6 +48,7 @@ describe("<RegisterAccount />", () => {
   });
 
   it("calls the endpoint with the correct values", () => {
+    cy.mount(RegisterAccount);
     cy.intercept("POST", "/api/v0/auth/register", (req) => {
       expect(JSON.parse(req.body)).to.deep.eq({
         email: "test@example.com",
@@ -67,6 +70,7 @@ describe("<RegisterAccount />", () => {
   });
 
   it("shows an error", () => {
+    cy.mount(RegisterAccount);
     cy.intercept("POST", "/api/v0/auth/register", {
       success: false,
       message: "error message",

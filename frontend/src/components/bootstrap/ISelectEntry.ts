@@ -1,4 +1,4 @@
 export interface ISelectEntry {
   title: string;
-  value: any;
+  value: never;
 }

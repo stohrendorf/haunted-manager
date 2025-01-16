@@ -1,4 +1,6 @@
-/* eslint-disable no-empty */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
+const env = await import.meta.env;
 
 // noinspection RedundantIfStatementJS
 export interface IAnnouncementEntry {
@@ -30,7 +32,7 @@ export interface ICreateSessionRequest {
   time: ITimeSpan | null;
 }
 
-export interface IEmpty {}
+export type IEmpty = object;
 
 export interface IGhostFileResponse {
   ghost: IGhostFileResponseEntry | null;
@@ -1292,7 +1294,7 @@ function getCsrfHeader(): Headers {
 }
 
 export async function doGet(url: string): Promise<object> {
-  return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
+  return await fetch(`${env.VITE_APP_SERVER_URL}${url}`, {
     credentials: "include",
     headers: getCsrfHeader(),
   }).then((r) => r.json());
@@ -1301,14 +1303,14 @@ export async function doGet(url: string): Promise<object> {
 export async function doGetFile(
   url: string,
 ): Promise<ReadableStream<Uint8Array> | null> {
-  return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
+  return await fetch(`${env.VITE_APP_SERVER_URL}${url}`, {
     credentials: "include",
     headers: getCsrfHeader(),
   }).then((r) => r.body);
 }
 
 export async function doDelete(url: string): Promise<object> {
-  return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
+  return await fetch(`${env.VITE_APP_SERVER_URL}${url}`, {
     method: "DELETE",
     credentials: "include",
     headers: getCsrfHeader(),
@@ -1316,7 +1318,7 @@ export async function doDelete(url: string): Promise<object> {
 }
 
 export async function doPost(url: string, body: object): Promise<object> {
-  return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
+  return await fetch(`${env.VITE_APP_SERVER_URL}${url}`, {
     method: "POST",
     credentials: "include",
     headers: getCsrfHeader(),
@@ -1329,7 +1331,7 @@ export async function doPostFiles(url: string, files: File[]): Promise<object> {
   for (const file of files) {
     formData.append(file.name, file);
   }
-  return await fetch(`${process.env.VUE_APP_SERVER_URL}${url}`, {
+  return await fetch(`${env.VITE_APP_SERVER_URL}${url}`, {
     method: "POST",
     credentials: "include",
     headers: getCsrfHeader(),

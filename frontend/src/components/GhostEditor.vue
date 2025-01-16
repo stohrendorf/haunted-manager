@@ -11,7 +11,7 @@ import BsBtn from "@/components/bootstrap/BsBtn.vue";
 import BsCheckboxSingle from "@/components/bootstrap/BsCheckboxSingle.vue";
 import BsSelect from "@/components/bootstrap/BsSelect.vue";
 import FloatingSingleLineInput from "@/components/bootstrap/FloatingSingleLineInput.vue";
-import { ISelectEntry } from "@/components/bootstrap/ISelectEntry";
+import type { ISelectEntry } from "@/components/bootstrap/ISelectEntry";
 import { seconds } from "@/components/filters";
 import { PropType, defineComponent } from "vue";
 
@@ -80,14 +80,14 @@ export default defineComponent({
           v-model="localGhost.level_id"
           :items="alternativeLevels"
           label="Level"
-          @update:modelValue="updated()"
+          @update:model-value="updated()"
         />
         <span class="bi bi-stopwatch"></span>
         {{ seconds(localGhost.duration) }}
         &bull;
         <bs-checkbox-single
           v-model="localGhost.published"
-          @update:modelValue="updated()"
+          @update:model-value="updated()"
         >
           <span class="bi bi-cloud" /> Published
         </bs-checkbox-single>
@@ -97,7 +97,7 @@ export default defineComponent({
       v-model="localGhost.description"
       class="row"
       label="Description"
-      @update:modelValue="updated()"
+      @update:model-value="updated()"
     />
     <tags-selector
       v-model="localGhost.tags"

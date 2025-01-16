@@ -122,7 +122,7 @@ export default defineComponent({
     }
     this.tags = [...uniqueTags.values()];
     this.tags.sort((a, b) => a.name.localeCompare(b.name));
-    let levels = [...uniqueLevels.values()];
+    const levels = [...uniqueLevels.values()];
     levels.sort((a, b) => a.title.localeCompare(b.title));
     this.levels = [{ value: null, title: "No Level Filter" }, ...levels];
     uniqueFinishTypes.sort();

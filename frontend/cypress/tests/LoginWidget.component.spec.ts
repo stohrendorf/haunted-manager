@@ -2,13 +2,7 @@ import LoginWidget from "@/components/LoginWidget.vue";
 import { createPinia, setActivePinia } from "pinia";
 
 describe("<LoginWidget />", () => {
-  beforeEach(() => {
-    cy.mount(LoginWidget, {
-      global: {
-        plugins: setActivePinia(createPinia()),
-      },
-    });
-
+  const prepareTest = () => {
     cy.intercept("GET", "/api/v0/auth/profile", {
       body: {
         authenticated: true,
@@ -19,9 +13,16 @@ describe("<LoginWidget />", () => {
         is_staff: false,
       },
     }).as("profileRequest");
-  });
+
+    cy.mount(LoginWidget, {
+      global: {
+        plugins: setActivePinia(createPinia()),
+      },
+    });
+  };
 
   it("cannot be submitted on initial load", () => {
+    prepareTest();
     cy.get("input[type='text']").should("be.empty");
     cy.get("input[type='password']").should("be.empty");
     cy.get(".alert").should("not.be.visible");
@@ -30,6 +31,7 @@ describe("<LoginWidget />", () => {
   });
 
   it("cannot be submitted without username", () => {
+    prepareTest();
     cy.get("input[type='password']").type("password");
     cy.get(".alert").should("not.be.visible");
     cy.get("button.btn-success").should("be.disabled");
@@ -37,6 +39,7 @@ describe("<LoginWidget />", () => {
   });
 
   it("cannot be submitted without password", () => {
+    prepareTest();
     cy.get("input[type='text']").type("username");
     cy.get(".alert").should("not.be.visible");
     cy.get("button.btn-success").should("be.disabled");
@@ -44,6 +47,7 @@ describe("<LoginWidget />", () => {
   });
 
   it("can be submitted with valid data", () => {
+    prepareTest();
     cy.get("input[type='text']").type("username");
     cy.get("input[type='password']").type("password");
     cy.get(".alert").should("not.be.visible");
@@ -68,6 +72,7 @@ describe("<LoginWidget />", () => {
   });
 
   it("shows an error", () => {
+    prepareTest();
     cy.get("input[type='text']").type("username");
     cy.get("input[type='password']").type("password");
     cy.get(".alert").should("not.be.visible");

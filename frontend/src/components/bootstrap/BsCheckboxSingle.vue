@@ -8,6 +8,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["update:modelValue"],
   data() {
     return {
       checked: false,

@@ -23,6 +23,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["update:modelValue"],
   data() {
     return {
       tags: [] as ITag[],
@@ -76,7 +77,7 @@ export default defineComponent({
       v-model="localSession.description"
       label="Description"
       required
-      @update:modelValue="sessionUpdated()"
+      @update:model-value="sessionUpdated()"
     />
 
     <div class="card">
@@ -84,7 +85,7 @@ export default defineComponent({
         <div class="card-title form-check form-check-inline">
           <bs-checkbox-single
             v-model="localSession.private"
-            @update:modelValue="sessionUpdated()"
+            @update:model-value="sessionUpdated()"
           >
             <span
               v-bs-tooltip
@@ -95,7 +96,7 @@ export default defineComponent({
           </bs-checkbox-single>
           <bs-checkbox-single
             v-model="isEvent"
-            @update:modelValue="sessionUpdated()"
+            @update:model-value="sessionUpdated()"
           >
             Scheduled Event
           </bs-checkbox-single>
@@ -103,14 +104,14 @@ export default defineComponent({
         <div v-if="localSession.time !== null">
           <date-time-picker
             v-model="localSession.time.start"
-            @update:modelValue="sessionUpdated()"
+            @update:model-value="sessionUpdated()"
           >
             <strong> Start Time </strong>
             {{ datetime(localSession.time.start) }}
           </date-time-picker>
           <date-time-picker
             v-model="localSession.time.end"
-            @update:modelValue="sessionUpdated()"
+            @update:model-value="sessionUpdated()"
           >
             <strong> End Time </strong>
             {{ datetime(localSession.time.end) }}
@@ -123,7 +124,7 @@ export default defineComponent({
     <tags-selector
       v-model="localSession.tags"
       :available-tags="tags"
-      @update:modelValue="sessionUpdated()"
+      @update:model-value="sessionUpdated()"
     />
     <slot />
   </form>

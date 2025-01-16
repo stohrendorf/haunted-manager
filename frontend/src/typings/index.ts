@@ -1,9 +1,10 @@
 declare module "xzwasm" {
   class XzReadableStream implements ReadableStream<Uint8Array> {
     constructor(data: ReadableStream<Uint8Array>);
+
     readonly locked: boolean;
 
-    cancel(reason?: any): Promise<void>;
+    cancel(reason?: never): Promise<void>;
 
     getReader(options: { mode: "byob" }): ReadableStreamBYOBReader;
     getReader(): ReadableStreamDefaultReader<Uint8Array>;

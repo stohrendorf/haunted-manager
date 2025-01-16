@@ -58,7 +58,9 @@ describe("<FloatingSingleLineInput />", () => {
 
     const testInput = "some new text";
 
-    cy.get("input").clear().type(testInput);
+    const input = cy.get("input");
+    input.clear();
+    input.type(testInput);
     component.then(async (wrapper) => {
       await wrapper.component.$nextTick();
       expect(

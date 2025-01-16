@@ -22,9 +22,10 @@ export default defineComponent({
       default: false,
     },
   },
+  emits: ["update:modelValue"],
   data() {
     return {
-      selectedValue: null as any | null,
+      selectedValue: null as never | null,
     };
   },
   created() {

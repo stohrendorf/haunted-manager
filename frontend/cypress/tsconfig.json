@@ -1,10 +1,6 @@
 {
+  "extends": "@vue/tsconfig/tsconfig.dom.json",
   "compilerOptions": {
-    "target": "es5",
-    "lib": [
-      "es5",
-      "dom"
-    ],
     "types": [
       "cypress",
       "vitest/globals",
@@ -14,9 +10,14 @@
       "@/*": [
         "../src/*"
       ]
-    }
+    },
+    "isolatedModules": false
   },
   "include": [
-    "**/*.ts"
+    "./e2e/**/*",
+    "./support/**/*"
+  ],
+  "exclude": [
+    "./support/component.*"
   ]
 }

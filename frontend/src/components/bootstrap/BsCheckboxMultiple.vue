@@ -17,9 +17,10 @@ export default defineComponent({
       },
     },
   },
+  emits: ["update:modelValue"],
   data() {
     return {
-      localModelValue: [] as any[],
+      localModelValue: [] as never[],
     };
   },
   computed: {

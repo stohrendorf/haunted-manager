@@ -2,16 +2,16 @@ import { defineConfig } from "cypress";
 
 export default defineConfig({
   component: {
-    setupNodeEvents(on, config) {},
+    setupNodeEvents() {},
     specPattern: "cypress/tests/**/*.ts",
     devServer: {
-      framework: "vue-cli",
-      bundler: "webpack",
+      framework: "vue",
+      bundler: "vite",
     },
   },
 
   e2e: {
-    setupNodeEvents(on, config) {},
+    setupNodeEvents() {},
     specPattern: "cypress/e2e/**/*.ts",
   },
 });

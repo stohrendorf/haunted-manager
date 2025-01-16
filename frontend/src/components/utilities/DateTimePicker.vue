@@ -9,6 +9,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["update:modelValue"],
   mounted(): void {
     const picker = new TempusDominus(this.$refs.picker as HTMLDivElement, {
       viewDate: new DateTime(this.modelValue),

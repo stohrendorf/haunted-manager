@@ -4,9 +4,9 @@
   "private": true,
   "license": "GPL-3.0-or-later",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
+    "serve": "vite",
+    "build": "vite build",
+    "lint": "eslint",
     "eslint-fix": "eslint --fix",
     "test-ui": "cypress open",
     "test-components": "cypress run --component"
@@ -29,24 +29,21 @@
     "xzwasm": "*"
   },
   "devDependencies": {
-    "@babel/core": "*",
-    "@babel/eslint-parser": "*",
     "@cypress/vue": "*",
     "@testing-library/vue": "*",
     "@trivago/prettier-plugin-sort-imports": "*",
     "@typescript-eslint/eslint-plugin": "*",
     "@typescript-eslint/parser": "*",
-    "@vue/cli": "*",
-    "@vue/cli-plugin-babel": "*",
-    "@vue/cli-plugin-eslint": "*",
-    "@vue/cli-plugin-router": "*",
-    "@vue/cli-plugin-typescript": "*",
-    "@vue/cli-service": "*",
-    "@vue/eslint-config-typescript": "<14",
+    "@vitejs/plugin-vue": "*",
+    "@vitest/eslint-plugin": "*",
+    "@vue/eslint-config-prettier": "*",
+    "@vue/eslint-config-typescript": "*",
+    "@vue/test-utils": "^2.4.6",
+    "@vue/tsconfig": "^0.7.0",
     "cypress": "*",
     "cypress-teamcity-reporter": "*",
     "eslint": "*",
-    "eslint-config-prettier": "*",
+    "eslint-plugin-cypress": "*",
     "eslint-plugin-prettier": "*",
     "eslint-plugin-vue": "*",
     "happy-dom": "*",
@@ -54,31 +51,9 @@
     "sass": "*",
     "sass-loader": "*",
     "typescript": "*",
-    "vitest": "*"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "eslint:recommended",
-      "plugin:vue/recommended",
-      "plugin:prettier/recommended",
-      "@vue/typescript"
-    ],
-    "parserOptions": {
-      "parser": "@typescript-eslint/parser"
-    }
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not dead",
-    "not ie 11"
-  ],
-  "prettier": {
-    "endOfLine": "auto",
-    "importOrderSortSpecifiers": true
+    "vite": "*",
+    "vite-plugin-vue-devtools": "*",
+    "vitest": "*",
+    "vue-tsc": "*"
   }
 }

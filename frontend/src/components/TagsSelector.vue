@@ -43,7 +43,7 @@ export default defineComponent({
       <bs-checkbox-multiple
         v-model="selectedTags"
         :value="tag"
-        @update:modelValue="$emit('update:modelValue', selectedTags)"
+        @update:model-value="$emit('update:modelValue', selectedTags)"
       >
         <span class="badge bg-secondary">{{ tag.name }}</span>
         {{ tag.description }}

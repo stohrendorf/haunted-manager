@@ -15,8 +15,7 @@ import BsNavbarNav from "@/components/bootstrap/BsNavbarNav.vue";
 import BsRouterNavItem from "@/components/bootstrap/BsRouterNavItem.vue";
 import { seconds } from "@/components/filters";
 import ClipboardCopyable from "@/components/utilities/ClipboardCopyable.vue";
-import { ComponentPublicInstance } from "@vue/runtime-core";
-import { defineComponent } from "vue";
+import { ComponentPublicInstance, defineComponent } from "vue";
 
 export default defineComponent({
   components: {
@@ -87,7 +86,7 @@ export default defineComponent({
 
     <bs-navbar variant="dark">
       <template #brand>
-        <img src="logo.png" alt="Logo" style="height: 20px" />
+        <img src="/logo.png" alt="Logo" style="height: 20px" />
         Haunted Server
       </template>
 

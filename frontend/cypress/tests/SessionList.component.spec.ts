@@ -1,17 +1,18 @@
-import { ISessionsResponse, ITagsResponse } from "@/components/ApiService";
+import type { ISessionsResponse, ITagsResponse } from "@/components/ApiService";
 import SessionList from "@/components/SessionList.vue";
 import { createPinia, setActivePinia } from "pinia";
 
 describe("<SessionList />", () => {
-  beforeEach(() => {
+  const doIntercept = () => {
     cy.intercept("GET", "/api/v0/tags", {
       body: {
         tags: [],
       } as ITagsResponse,
     });
-  });
+  };
 
   it("contains items", () => {
+    doIntercept();
     cy.intercept("GET", "/api/v0/sessions", {
       body: {
         sessions: [
@@ -81,6 +82,7 @@ describe("<SessionList />", () => {
   });
 
   it("shows and hides private indicator", () => {
+    doIntercept();
     cy.intercept("GET", "/api/v0/sessions", {
       body: {
         sessions: [
@@ -128,6 +130,7 @@ describe("<SessionList />", () => {
   });
 
   it("shows and hides edit and delete buttons", () => {
+    doIntercept();
     const privilegedUsername = "owner";
     cy.intercept("GET", "/api/v0/sessions", {
       body: {
@@ -167,18 +170,12 @@ describe("<SessionList />", () => {
 
     cy.get(".list-group-item").should("have.length", 2);
 
-    cy.get(".list-group-item")
-      .eq(0)
-      .find(".bi.bi-trash")
-      .should("exist")
-      .parent()
-      .should("contain.text", "Delete");
-    cy.get(".list-group-item")
-      .eq(0)
-      .find(".bi.bi-pencil")
-      .should("exist")
-      .parent()
-      .should("contain.text", "Edit");
+    const trash = cy.get(".list-group-item").eq(0).find(".bi.bi-trash");
+    trash.should("exist");
+    trash.parent().should("contain.text", "Delete");
+    const pencil = cy.get(".list-group-item").eq(0).find(".bi.bi-pencil");
+    pencil.should("exist");
+    pencil.parent().should("contain.text", "Edit");
     cy.get(".list-group-item").eq(1).find(".bi.bi-trash").should("not.exist");
     cy.get(".list-group-item").eq(1).find(".bi.bi-pencil").should("not.exist");
   });

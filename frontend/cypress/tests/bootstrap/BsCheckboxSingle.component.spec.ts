@@ -26,7 +26,8 @@ describe("<BsCheckboxSingle />", () => {
       },
     });
 
-    cy.get("input").click().should("be.checked");
+    cy.get("input").click();
+    cy.get("input").should("be.checked");
 
     component.then(async (wrapper) => {
       await wrapper.component.$nextTick();

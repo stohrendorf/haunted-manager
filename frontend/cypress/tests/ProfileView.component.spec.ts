@@ -76,15 +76,17 @@ describe("<ProfileView />", () => {
       },
     });
 
-    cy.get("input[aria-label='Username']")
-      .should("have.length", 1)
-      .should("have.value", "username123");
-    cy.get("button")
-      .eq(0)
-      .should("contain.text", "Change Username")
-      .should("be.disabled");
-    cy.get("input[aria-label='Username']").clear().type("username456");
-    cy.get("button").eq(0).should("not.be.disabled").click();
+    let username = cy.get("input[aria-label='Username']");
+    username.should("have.length", 1).should("have.value", "username123");
+    let button = cy.get("button").eq(0);
+    button.should("contain.text", "Change Username").should("be.disabled");
+
+    username = cy.get("input[aria-label='Username']");
+    username.clear();
+    username.type("username456");
+    button = cy.get("button").eq(0);
+    button.should("not.be.disabled");
+    button.click();
     cy.wait("@changeUsername");
     cy.wait("@getProfile");
     cy.get(".alert-danger").should("not.be.visible");
@@ -112,15 +114,15 @@ describe("<ProfileView />", () => {
       },
     });
 
-    cy.get("input[aria-label='Username']")
-      .should("have.length", 1)
-      .should("have.value", "username123");
-    cy.get("button")
-      .eq(0)
-      .should("contain.text", "Change Username")
-      .should("be.disabled");
-    cy.get("input[aria-label='Username']").clear().type("username456");
-    cy.get("button").eq(0).should("not.be.disabled").click();
+    const username = cy.get("input[aria-label='Username']");
+    username.should("have.length", 1).should("have.value", "username123");
+    let button = cy.get("button").eq(0);
+    button.should("contain.text", "Change Username").should("be.disabled");
+    username.clear();
+    username.type("username456");
+    button = cy.get("button").eq(0);
+    button.should("not.be.disabled");
+    button.click();
     cy.wait("@changeUsername");
     cy.get(".alert-danger")
       .should("be.visible")
@@ -144,15 +146,13 @@ describe("<ProfileView />", () => {
       },
     });
 
-    cy.get("input[aria-label='Email']")
-      .should("have.length", 1)
-      .should("have.value", "email@example.com");
-    cy.get("button")
-      .eq(2)
-      .should("contain.text", "Change")
-      .should("be.disabled");
-    cy.get("input[aria-label='Email']").clear().type("other-email@example.com");
-    cy.get("button").eq(2).should("not.be.disabled");
+    const email = cy.get("input[aria-label='Email']");
+    email.should("have.length", 1).should("have.value", "email@example.com");
+    const button = cy.get("button").eq(2);
+    button.should("contain.text", "Change").should("be.disabled");
+    email.clear();
+    email.type("other-email@example.com");
+    button.should("not.be.disabled");
   });
 
   it("allows to change the email", () => {
@@ -179,15 +179,15 @@ describe("<ProfileView />", () => {
       },
     });
 
-    cy.get("input[aria-label='Email']")
-      .should("have.length", 1)
-      .should("have.value", "email@example.com");
-    cy.get("button")
-      .eq(2)
-      .should("contain.text", "Change")
-      .should("be.disabled");
-    cy.get("input[aria-label='Email']").clear().type("other-email@example.com");
-    cy.get("button").eq(2).should("not.be.disabled").click();
+    const email = cy.get("input[aria-label='Email']");
+    email.should("have.length", 1).should("have.value", "email@example.com");
+    let button = cy.get("button").eq(2);
+    button.should("contain.text", "Change").should("be.disabled");
+    email.clear();
+    email.type("other-email@example.com");
+    button = cy.get("button").eq(2);
+    button.should("not.be.disabled");
+    button.click();
     cy.wait("@changeEmail");
     cy.wait("@getProfile");
     cy.get(".alert-danger").should("not.be.visible");
@@ -217,15 +217,15 @@ describe("<ProfileView />", () => {
       },
     });
 
-    cy.get("input[aria-label='Email']")
-      .should("have.length", 1)
-      .should("have.value", "email@example.com");
-    cy.get("button")
-      .eq(2)
-      .should("contain.text", "Change")
-      .should("be.disabled");
-    cy.get("input[aria-label='Email']").clear().type("other-email@example.com");
-    cy.get("button").eq(2).should("not.be.disabled").click();
+    const email = cy.get("input[aria-label='Email']");
+    email.should("have.length", 1).should("have.value", "email@example.com");
+    let button = cy.get("button").eq(2);
+    button.should("contain.text", "Change").should("be.disabled");
+    email.clear();
+    email.type("other-email@example.com");
+    button = cy.get("button").eq(2);
+    button.should("not.be.disabled");
+    button.click();
     cy.wait("@changeEmail");
     cy.get(".alert-danger")
       .should("be.visible")
@@ -249,15 +249,13 @@ describe("<ProfileView />", () => {
       },
     });
 
-    cy.get("input[aria-label='Password']")
-      .should("have.length", 1)
-      .should("not.have.value");
-    cy.get("button")
-      .eq(3)
-      .should("contain.text", "Change Password")
-      .should("be.disabled");
-    cy.get("input[aria-label='Password']").clear().type("password123");
-    cy.get("button").eq(3).should("not.be.disabled");
+    const password = cy.get("input[aria-label='Password']");
+    password.should("have.length", 1).should("not.have.value");
+    const button = cy.get("button").eq(3);
+    button.should("contain.text", "Change Password").should("be.disabled");
+    password.clear();
+    password.type("password123");
+    button.should("not.be.disabled");
   });
 
   it("allows to change the password", () => {
@@ -284,13 +282,14 @@ describe("<ProfileView />", () => {
       },
     });
 
-    cy.get("input[aria-label='Password']").should("have.length", 1);
-    cy.get("button")
-      .eq(3)
-      .should("contain.text", "Change Password")
-      .should("be.disabled");
-    cy.get("input[aria-label='Password']").clear().type("password123");
-    cy.get("button").eq(3).should("not.be.disabled").click();
+    const password = cy.get("input[aria-label='Password']");
+    password.should("have.length", 1);
+    let button = cy.get("button").eq(3);
+    button.should("contain.text", "Change Password").should("be.disabled");
+    password.clear().type("password123");
+    button = cy.get("button").eq(3);
+    button.should("not.be.disabled");
+    button.click();
     cy.wait("@changePassword");
     cy.wait("@getProfile");
     cy.get(".alert-danger").should("not.be.visible");
@@ -320,13 +319,15 @@ describe("<ProfileView />", () => {
       },
     });
 
-    cy.get("input[aria-label='Password']").should("have.length", 1);
-    cy.get("button")
-      .eq(3)
-      .should("contain.text", "Change Password")
-      .should("be.disabled");
-    cy.get("input[aria-label='Password']").clear().type("password123");
-    cy.get("button").eq(3).should("not.be.disabled").click();
+    const password = cy.get("input[aria-label='Password']");
+    password.should("have.length", 1);
+    let button = cy.get("button").eq(3);
+    button.should("contain.text", "Change Password").should("be.disabled");
+    password.clear();
+    password.type("password123");
+    button = cy.get("button").eq(3);
+    button.should("not.be.disabled");
+    button.click();
     cy.wait("@changePassword");
     cy.get(".alert-danger")
       .should("be.visible")

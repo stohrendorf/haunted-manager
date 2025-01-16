@@ -32,6 +32,7 @@ export default defineComponent({
       default: "text",
     },
   },
+  emits: ["update:modelValue"],
 });
 </script>
 

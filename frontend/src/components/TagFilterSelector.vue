@@ -21,6 +21,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["update:modelValue"],
   data() {
     return {
       filterTags: [] as ITag[],
@@ -72,7 +73,7 @@ export default defineComponent({
         v-model="filterTags"
         class="ms-2"
         :available-tags="availableTags"
-        @update:modelValue="$emit('update:modelValue', filterTags)"
+        @update:model-value="$emit('update:modelValue', filterTags)"
       />
     </div>
   </div>

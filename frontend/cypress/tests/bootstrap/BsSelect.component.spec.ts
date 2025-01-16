@@ -1,5 +1,5 @@
 import BsSelect from "@/components/bootstrap/BsSelect.vue";
-import { ISelectEntry } from "@/components/bootstrap/ISelectEntry";
+import type { ISelectEntry } from "@/components/bootstrap/ISelectEntry";
 
 describe("<BsSelect />", () => {
   it("contains correct initial data", () => {
@@ -80,10 +80,9 @@ describe("<BsSelect />", () => {
       expect(wrapper.component.selectedValue).to.equal(testValue);
     });
 
-    cy.get("select")
-      .should("not.be.disabled")
-      .should("have.value", testValue)
-      .select(0);
+    const select = cy.get("select");
+    select.should("not.be.disabled").should("have.value", testValue);
+    select.select(0);
     cy.get("option").eq(0).should("be.selected");
     component.then(async (wrapper) => {
       await wrapper.component.$nextTick();
