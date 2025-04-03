@@ -22,7 +22,7 @@ gunicorn = "*"
 django-ckeditor-5 = "*"
 minio = "*"
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
 black = "*"
 isort = "*"
 pytest = "*"
