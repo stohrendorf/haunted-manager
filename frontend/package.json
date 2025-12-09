@@ -40,7 +40,7 @@
     "@vue/eslint-config-typescript": "*",
     "@vue/test-utils": "*",
     "@vue/tsconfig": "*",
-    "cypress": "*",
+    "cypress": ">=7",
     "cypress-teamcity-reporter": "*",
     "eslint": "*",
     "eslint-plugin-cypress": "*",
